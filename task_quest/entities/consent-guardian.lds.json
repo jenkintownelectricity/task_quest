@@ -1,0 +1,88 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:consent/guardian-primary-v1",
+    "type": "consent.guardian",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:consent-guardian-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["consent", "guardian", "hipaa", "active"]
+  },
+  "core": {
+    "consent_type": "guardian_authorization",
+    "minor_id": "armand-lefebvre",
+    "minor_dob": "2016-03-28",
+    "guardian_role": "mother",
+    "guardian_relationship": "biological_parent",
+    "consent_scope": {
+      "data_collection": {
+        "task_completion_data": { "enabled": true, "purpose": "behavioral_tracking" },
+        "reward_transaction_data": { "enabled": true, "purpose": "motivation_system" },
+        "progress_metrics": { "enabled": true, "purpose": "treatment_monitoring" },
+        "behavioral_observations": { "enabled": true, "purpose": "adhd_management" }
+      },
+      "data_sharing": {
+        "with_other_parent": { "enabled": true, "guardian_id": "father" },
+        "with_teacher": {
+          "enabled": true,
+          "scope": "school_related_only",
+          "phi_included": false
+        },
+        "with_therapist": {
+          "enabled": true,
+          "scope": "all_behavioral_data",
+          "phi_included": true
+        },
+        "with_extended_family": {
+          "enabled": true,
+          "scope": "progress_only",
+          "phi_included": false
+        }
+      },
+      "data_export": {
+        "enabled": true,
+        "formats": ["pdf", "json"],
+        "requires_guardian_auth": true
+      }
+    },
+    "explicitly_denied": {
+      "third_party_sharing": true,
+      "marketing_use": true,
+      "research_without_consent": true,
+      "public_display": true,
+      "social_media_integration": true
+    },
+    "consent_obtained": {
+      "method": "electronic_signature",
+      "timestamp": "2025-01-08T00:00:00Z",
+      "ip_address_hash": "sha256:redacted",
+      "device_fingerprint_hash": "sha256:redacted"
+    },
+    "expires_at": "2026-01-08T00:00:00Z",
+    "renewal_reminder_days": 30,
+    "status": "active",
+    "revocation": {
+      "allowed": true,
+      "method": "written_request",
+      "data_handling_on_revoke": "delete_phi_retain_aggregate"
+    }
+  },
+  "inference": {
+    "relates_to": [
+      "lds:profile/armand-lefebvre-v1",
+      "lds:compliance/armand-quest-hipaa-v1"
+    ],
+    "implies": [
+      "data_collection_authorized",
+      "therapeutic_sharing_permitted",
+      "educational_sharing_limited"
+    ],
+    "conflicts_with": [
+      "third_party_data_sale",
+      "uncontrolled_sharing"
+    ],
+    "requires": []
+  }
+}

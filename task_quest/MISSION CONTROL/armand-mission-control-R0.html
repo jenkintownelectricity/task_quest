@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISSION CONTROL // ARMAND</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@500;700&display=swap');
+        
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-green: #0aff0a;
+            --neon-red: #ff003c;
+            --bg-dark: #050510;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .sci-fi-border {
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            position: relative;
+        }
+
+        .sci-fi-border::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--neon-blue);
+            border-left: 2px solid var(--neon-blue);
+        }
+
+        .sci-fi-border::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; right: -2px;
+            width: 10px; height: 10px;
+            border-bottom: 2px solid var(--neon-blue);
+            border-right: 2px solid var(--neon-blue);
+        }
+
+        .mission-card {
+            transition: all 0.3s ease;
+            background: rgba(0, 20, 40, 0.8);
+        }
+
+        .mission-card:hover {
+            transform: translateX(10px);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(10, 255, 10, 0.2);
+        }
+
+        .locked {
+            opacity: 0.5;
+            filter: grayscale(1);
+            pointer-events: none;
+            border-color: var(--neon-red);
+        }
+
+        .btn-complete {
+            background: linear-gradient(45deg, var(--neon-blue), #0066ff);
+            border: none;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        
+        .btn-complete:active { transform: scale(0.95); }
+
+        .xp-bar-container {
+            background: #111;
+            height: 20px;
+            border: 1px solid #333;
+            transform: skewX(-20deg);
+        }
+        
+        .xp-bar-fill {
+            background: var(--neon-green);
+            height: 100%;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <header class="h-20 border-b border-white/10 flex items-center justify-between px-6 bg-black/50 backdrop-blur-md z-10">
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-full border-2 border-cyan-400 p-1">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Armand" class="rounded-full bg-slate-800">
+            </div>
+            <div>
+                <h1 class="font-['Black_Ops_One'] text-2xl tracking-wider text-cyan-400">OPERATIVE ARMAND</h1>
+                <div class="text-xs text-cyan-200/60 tracking-[0.2em]">UNIT READY • ONLINE</div>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-8">
+            <div class="text-right">
+                <div class="text-xs text-gray-400 uppercase">Current Rank</div>
+                <div class="font-bold text-xl text-yellow-400">LEVEL <span id="levelDisplay">3</span></div>
+            </div>
+            <div class="w-64">
+                <div class="flex justify-between text-xs mb-1 text-cyan-400">
+                    <span>XP PROGRESS</span>
+                    <span id="xpText">850 / 1000</span>
+                </div>
+                <div class="xp-bar-container">
+                    <div id="xpBar" class="xp-bar-fill" style="width: 85%"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+        
+        <div class="w-2/3 p-8 overflow-y-auto space-y-6">
+            <h2 class="text-xl font-bold text-white/50 border-b border-white/10 pb-2 mb-6 flex items-center">
+                <i class="fas fa-crosshairs mr-3 text-cyan-400"></i> ACTIVE MISSIONS
+            </h2>
+
+            <div class="mission-card sci-fi-border p-6 flex justify-between items-center group" id="mission-1">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span class="bg-cyan-900/50 text-cyan-400 px-2 py-0.5 text-xs font-bold border border-cyan-500/30">PRIORITY ALPHA</span>
+                        <h3 class="text-2xl font-bold tracking-wide">OPERATION: CLEAR FLOOR</h3>
+                    </div>
+                    <p class="text-slate-400 text-lg">Deploy all LEGO units to containment bins. Floor sector must be clear.</p>
+                    <div class="mt-4 flex space-x-6 text-sm">
+                        <div class="flex items-center text-yellow-400"><i class="fas fa-star mr-2"></i> +150 XP</div>
+                        <div class="flex items-center text-cyan-400"><i class="fas fa-clock mr-2"></i> EST: 15 MIN</div>
+                        <div class="flex items-center text-red-400"><i class="fas fa-lock mr-2"></i> UNLOCKS: TABLET</div>
+                    </div>
+                </div>
+                <button onclick="completeMission(1, 150)" class="btn-complete px-8 py-4 font-bold text-lg text-white hover:brightness-110 tracking-wider shadow-lg transform transition-transform">
+                    COMPLETE
+                </button>
+            </div>
+
+            <div class="mission-card sci-fi-border p-6 flex justify-between items-center locked relative" id="mission-2">
+                <div class="absolute inset-0 bg-black/60 flex items-center justify-center z-10 backdrop-blur-[2px]">
+                    <div class="border border-red-500 bg-red-900/20 px-6 py-2 text-red-500 font-bold tracking-widest animate-pulse">
+                        <i class="fas fa-lock mr-2"></i> LOCKED: REQUIRES SNACK
+                    </div>
+                </div>
+                <div class="flex-1 opacity-50">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span class="bg-purple-900/50 text-purple-400 px-2 py-0.5 text-xs font-bold border border-purple-500/30">INTEL</span>
+                        <h3 class="text-2xl font-bold tracking-wide">PROTOCOL: MATH HOMEWORK</h3>
+                    </div>
+                    <p class="text-slate-400 text-lg">Complete worksheet pg 42. Verify with HQ (Dad).</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="w-1/3 bg-black/20 border-l border-white/10 p-6 backdrop-blur-sm">
+            
+            <div class="mb-8">
+                <h3 class="text-sm font-bold text-cyan-400 mb-4 tracking-widest border-b border-cyan-900 pb-2">SUPPLY DROP / REWARDS</h3>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="bg-slate-900/80 border border-slate-700 p-4 flex justify-between items-center opacity-50">
+                        <div class="flex items-center">
+                            <i class="fas fa-cube text-2xl text-green-500 mr-4"></i>
+                            <div>
+                                <div class="font-bold">Minecraft Time</div>
+                                <div class="text-xs text-gray-500">30 Minutes</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-red-400 font-bold text-sm">LOCKED</div>
+                            <div class="text-[10px] text-gray-500">REQ: CLEAN ROOM</div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/80 border border-green-500/50 p-4 flex justify-between items-center cursor-pointer hover:bg-green-900/20 transition">
+                        <div class="flex items-center">
+                            <i class="fas fa-ice-cream text-2xl text-pink-500 mr-4"></i>
+                            <div>
+                                <div class="font-bold">Ice Cream</div>
+                                <div class="text-xs text-gray-500">Kitchen Sector</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-green-400 font-bold text-sm">200 XP</div>
+                            <button class="bg-green-600 text-[10px] px-2 py-1 mt-1 rounded text-black font-bold">BUY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-64 border border-slate-800 bg-black/40 p-4 font-mono text-xs overflow-y-auto custom-scrollbar">
+                <div class="text-green-500 mb-1">> SYSTEM ONLINE</div>
+                <div class="text-cyan-600 mb-1">> LOADING LDS PROFILE: ARMAND_V1...</div>
+                <div class="text-slate-500 mb-1">> [16:00] MISSION "CLEAN ROOM" ASSIGNED</div>
+                <div class="text-red-500 mb-1">> [16:01] REWARD "MINECRAFT" LOCKED (DEPENDENCY MISSING)</div>
+                <div id="live-log"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- THE "GAME ENGINE" LOGIC ---
+        let xp = 850;
+        let maxXp = 1000;
+
+        function completeMission(id, reward) {
+            // 1. Play Sound (Simulated)
+            console.log("playing fx...");
+            
+            // 2. Update Visuals
+            const card = document.getElementById(`mission-${id}`);
+            card.style.transform = "scale(0.98)";
+            card.style.borderColor = "#0aff0a";
+            setTimeout(() => card.style.transform = "scale(1)", 100);
+
+            // 3. Mark "Verify Pending"
+            card.innerHTML = `
+                <div class="flex-1 flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <i class="fas fa-check-circle text-5xl text-green-500 mb-2 animate-bounce"></i>
+                        <h3 class="text-2xl font-bold text-green-400">MISSION SUBMITTED</h3>
+                        <p class="text-sm text-slate-400">Waiting for HQ Verification...</p>
+                    </div>
+                </div>
+            `;
+
+            // 4. Log Event
+            logEvent(`MISSION ${id} COMPLETE. VERIFICATION REQUESTED.`);
+            
+            // 5. Simulate Dad Verification (After 2s for demo)
+            setTimeout(() => {
+                awardXP(reward);
+                logEvent(`HQ VERIFIED. +${reward} XP TRANSFERRED.`);
+                
+                // Unlock Reward Logic demo
+                unlockReward();
+            }, 2000);
+        }
+
+        function awardXP(amount) {
+            xp += amount;
+            if(xp > maxXp) xp = maxXp; // Cap for demo
+            
+            // Update Bar
+            const percent = (xp / maxXp) * 100;
+            document.getElementById('xpBar').style.width = percent + "%";
+            document.getElementById('xpText').innerText = `${xp} / ${maxXp}`;
+
+            // Pulse Effect
+            document.getElementById('xpBar').classList.add('brightness-150');
+            setTimeout(() => document.getElementById('xpBar').classList.remove('brightness-150'), 500);
+        }
+
+        function unlockReward() {
+            // This simulates the LDS "Dependency" logic resolving
+            // In a real app, this would re-read the JSON file status
+            logEvent("DEPENDENCY MET: MINECRAFT UNLOCKED.");
+        }
+
+        function logEvent(msg) {
+            const log = document.getElementById('live-log');
+            const entry = document.createElement('div');
+            entry.className = "text-cyan-400 mb-1 typewriter";
+            entry.innerText = `> [${new Date().toLocaleTimeString()}] ${msg}`;
+            log.prepend(entry);
+        }
+    </script>
+</body>
+</html>

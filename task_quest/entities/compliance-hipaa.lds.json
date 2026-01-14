@@ -1,0 +1,85 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:compliance/armand-quest-hipaa-v1",
+    "type": "compliance.hipaa",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:compliance-hipaa-armand-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["compliance", "hipaa", "phi-protection", "pediatric"],
+    "regulations": ["hipaa", "ferpa", "coppa"]
+  },
+  "core": {
+    "compliance_status": "active",
+    "hipaa_mode": true,
+    "phi_classification": {
+      "enabled": true,
+      "categories": {
+        "diagnosis": "phi",
+        "treatment_plan": "phi",
+        "therapy_notes": "phi",
+        "medication": "phi",
+        "behavioral_observations": "phi",
+        "504_plan_details": "phi",
+        "task_completion": "operational",
+        "rewards_earned": "operational",
+        "achievement_progress": "operational"
+      }
+    },
+    "phi_handling": {
+      "storage": "encrypted_local",
+      "transmission": "prohibited_without_consent",
+      "display": "role_gated",
+      "export": "requires_guardian_consent",
+      "retention_days": 365,
+      "deletion_on_request": true
+    },
+    "audit_level": "maximum",
+    "audit_retention_days": 2190,
+    "ambient_safety": {
+      "public_display_warning": true,
+      "screen_lock_reminder": true,
+      "session_timeout_minutes": 30
+    },
+    "minimum_necessary": {
+      "enabled": true,
+      "role_data_access": {
+        "armand": ["own_tasks", "own_progress", "own_rewards"],
+        "parent": ["all_data", "audit_logs", "consent_management"],
+        "guardian": ["all_data", "audit_logs", "consent_management"],
+        "teacher": ["school_tasks", "school_progress", "behavioral_notes"],
+        "therapist": ["all_tasks", "all_progress", "treatment_goals", "behavioral_notes"],
+        "family_support": ["task_verification", "encouragement"],
+        "sibling": ["shared_challenges", "encouragement"]
+      }
+    },
+    "breach_notification": {
+      "required": true,
+      "notification_hours": 72,
+      "contacts": ["guardian_primary", "guardian_secondary"]
+    }
+  },
+  "inference": {
+    "relates_to": [
+      "lds:profile/armand-lefebvre-v1",
+      "lds:consent/guardian-primary-v1",
+      "lds:consent/guardian-secondary-v1"
+    ],
+    "implies": [
+      "phi_protection_active",
+      "audit_logging_required",
+      "role_based_access_enforced",
+      "consent_before_sharing"
+    ],
+    "conflicts_with": [
+      "public_data_sharing",
+      "unencrypted_export",
+      "anonymous_access"
+    ],
+    "requires": [
+      "lds:consent/guardian-primary-v1"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "_lds": {
+    "v": "0.1.0",
+    "id": "lds:voice/greeting-v1",
+    "type": "voice.message",
+    "content_hash": "sha256:auto"
+  },
+  "core": {
+    "speak": "Welcome. The LDS Speech Engine is online. I am the mouth. Feed me data, and I will speak.",
+    "voice": {
+      "rate": 1.0,
+      "pitch": 1.0
+    }
+  }
+}

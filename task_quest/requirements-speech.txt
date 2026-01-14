@@ -1,0 +1,16 @@
+# LDS Speech Engine - Minimal Requirements
+# =========================================
+
+# Choose ONE of these TTS backends:
+
+# Option 1: pyttsx3 (offline, cross-platform, works everywhere)
+pyttsx3>=2.90
+
+# Option 2: edge-tts (high quality, requires internet)
+# edge-tts>=6.1.9
+
+# Optional: for audio playback with edge-tts
+# pygame>=2.5.0
+
+# Optional: for file watching
+# watchdog>=3.0.0

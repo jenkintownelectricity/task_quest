@@ -1,0 +1,268 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:achievements/badges-v1",
+    "type": "achievement.collection",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:achievements-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["achievements", "badges", "milestones"],
+    "rarity": ["common", "uncommon", "rare", "epic", "legendary"]
+  },
+  "core": {
+    "achievement_categories": {
+      "streaks": {
+        "icon": "fire",
+        "achievements": [
+          {
+            "id": "first-flame",
+            "name": "First Flame",
+            "description": "Complete all daily tasks for 1 day",
+            "icon": "fire",
+            "rarity": "common",
+            "xp_reward": 50,
+            "coin_reward": 25,
+            "requirement": { "type": "streak", "days": 1 }
+          },
+          {
+            "id": "warming-up",
+            "name": "Warming Up",
+            "description": "3-day task streak",
+            "icon": "fire",
+            "rarity": "common",
+            "xp_reward": 100,
+            "coin_reward": 50,
+            "requirement": { "type": "streak", "days": 3 }
+          },
+          {
+            "id": "on-fire",
+            "name": "On Fire!",
+            "description": "7-day task streak",
+            "icon": "fire-flame-curved",
+            "rarity": "uncommon",
+            "xp_reward": 250,
+            "coin_reward": 125,
+            "requirement": { "type": "streak", "days": 7 }
+          },
+          {
+            "id": "unstoppable",
+            "name": "Unstoppable",
+            "description": "14-day task streak",
+            "icon": "meteor",
+            "rarity": "rare",
+            "xp_reward": 500,
+            "coin_reward": 300,
+            "requirement": { "type": "streak", "days": 14 }
+          },
+          {
+            "id": "legendary-streak",
+            "name": "Legendary Warrior",
+            "description": "30-day task streak",
+            "icon": "dragon",
+            "rarity": "legendary",
+            "xp_reward": 1500,
+            "coin_reward": 1000,
+            "requirement": { "type": "streak", "days": 30 }
+          }
+        ]
+      },
+      "school_hero": {
+        "icon": "graduation-cap",
+        "achievements": [
+          {
+            "id": "seat-master-1",
+            "name": "Seat Apprentice",
+            "description": "Stay in seat for 5 class periods",
+            "icon": "chair",
+            "rarity": "common",
+            "xp_reward": 100,
+            "coin_reward": 50,
+            "requirement": { "type": "task_count", "task_id": "stay-seated", "count": 5 }
+          },
+          {
+            "id": "seat-master-2",
+            "name": "Seat Master",
+            "description": "Stay in seat for 20 class periods",
+            "icon": "chair",
+            "rarity": "rare",
+            "xp_reward": 400,
+            "coin_reward": 200,
+            "requirement": { "type": "task_count", "task_id": "stay-seated", "count": 20 }
+          },
+          {
+            "id": "hand-raiser",
+            "name": "Hand Raiser Hero",
+            "description": "Raise hand 10 times instead of calling out",
+            "icon": "hand",
+            "rarity": "uncommon",
+            "xp_reward": 200,
+            "coin_reward": 100,
+            "requirement": { "type": "task_count", "task_id": "raise-hand", "count": 10 }
+          },
+          {
+            "id": "homework-hero",
+            "name": "Homework Hero",
+            "description": "Complete homework on time 10 days",
+            "icon": "book-open",
+            "rarity": "uncommon",
+            "xp_reward": 250,
+            "coin_reward": 125,
+            "requirement": { "type": "task_count", "task_id": "homework-complete", "count": 10 }
+          }
+        ]
+      },
+      "kindness": {
+        "icon": "heart",
+        "achievements": [
+          {
+            "id": "kind-heart",
+            "name": "Kind Heart",
+            "description": "Help Giuliana 5 times",
+            "icon": "heart",
+            "rarity": "uncommon",
+            "xp_reward": 200,
+            "coin_reward": 150,
+            "requirement": { "type": "task_count", "task_id": "help-giuliana", "count": 5 }
+          },
+          {
+            "id": "super-brother",
+            "name": "Super Brother",
+            "description": "Help Giuliana 20 times",
+            "icon": "heart",
+            "rarity": "epic",
+            "xp_reward": 600,
+            "coin_reward": 400,
+            "requirement": { "type": "task_count", "task_id": "help-giuliana", "count": 20 }
+          }
+        ]
+      },
+      "explorer": {
+        "icon": "map",
+        "achievements": [
+          {
+            "id": "map-scout",
+            "name": "Map Scout",
+            "description": "Complete 5 Map Explorer quests",
+            "icon": "map",
+            "rarity": "common",
+            "xp_reward": 100,
+            "coin_reward": 75,
+            "requirement": { "type": "task_count", "task_id": "map-quest", "count": 5 }
+          },
+          {
+            "id": "cartographer",
+            "name": "Master Cartographer",
+            "description": "Complete 25 Map Explorer quests",
+            "icon": "map-location-dot",
+            "rarity": "epic",
+            "xp_reward": 500,
+            "coin_reward": 350,
+            "requirement": { "type": "task_count", "task_id": "map-quest", "count": 25 }
+          }
+        ]
+      },
+      "math_wizard": {
+        "icon": "calculator",
+        "achievements": [
+          {
+            "id": "math-apprentice",
+            "name": "Math Apprentice",
+            "description": "Complete 10 Math Challenges",
+            "icon": "calculator",
+            "rarity": "uncommon",
+            "xp_reward": 200,
+            "coin_reward": 100,
+            "requirement": { "type": "task_count", "task_id": "math-challenge", "count": 10 }
+          },
+          {
+            "id": "math-wizard",
+            "name": "Math Wizard",
+            "description": "Complete 50 Math Challenges",
+            "icon": "hat-wizard",
+            "rarity": "legendary",
+            "xp_reward": 1000,
+            "coin_reward": 600,
+            "requirement": { "type": "task_count", "task_id": "math-challenge", "count": 50 }
+          }
+        ]
+      },
+      "level_milestones": {
+        "icon": "trophy",
+        "achievements": [
+          {
+            "id": "level-5",
+            "name": "Rising Star",
+            "description": "Reach Level 5",
+            "icon": "star",
+            "rarity": "common",
+            "xp_reward": 100,
+            "coin_reward": 100,
+            "requirement": { "type": "level", "level": 5 }
+          },
+          {
+            "id": "level-10",
+            "name": "Task Champion",
+            "description": "Reach Level 10",
+            "icon": "medal",
+            "rarity": "uncommon",
+            "xp_reward": 300,
+            "coin_reward": 250,
+            "requirement": { "type": "level", "level": 10 }
+          },
+          {
+            "id": "level-25",
+            "name": "Elite Achiever",
+            "description": "Reach Level 25",
+            "icon": "trophy",
+            "rarity": "rare",
+            "xp_reward": 750,
+            "coin_reward": 500,
+            "requirement": { "type": "level", "level": 25 }
+          },
+          {
+            "id": "level-50",
+            "name": "Legendary Master",
+            "description": "Reach Level 50",
+            "icon": "crown",
+            "rarity": "legendary",
+            "xp_reward": 2000,
+            "coin_reward": 1500,
+            "requirement": { "type": "level", "level": 50 }
+          }
+        ]
+      },
+      "perfect_days": {
+        "icon": "circle-check",
+        "achievements": [
+          {
+            "id": "perfect-day-1",
+            "name": "Perfect Day",
+            "description": "Complete 100% of tasks in one day",
+            "icon": "circle-check",
+            "rarity": "common",
+            "xp_reward": 75,
+            "coin_reward": 50,
+            "requirement": { "type": "perfect_day", "count": 1 }
+          },
+          {
+            "id": "perfect-week",
+            "name": "Perfect Week",
+            "description": "7 perfect days in a row",
+            "icon": "calendar-check",
+            "rarity": "epic",
+            "xp_reward": 750,
+            "coin_reward": 500,
+            "requirement": { "type": "perfect_day", "count": 7 }
+          }
+        ]
+      }
+    }
+  },
+  "inference": {
+    "relates_to": ["lds:profile/armand-lefebvre-v1", "lds:tasks/daily-v1"],
+    "implies": ["gamification-active", "motivation-system"],
+    "requires": ["task-tracking", "xp-system"]
+  }
+}

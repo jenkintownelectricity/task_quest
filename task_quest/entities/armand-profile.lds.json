@@ -1,0 +1,72 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:profile/armand-lefebvre-v1",
+    "type": "user.profile",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:profile-armand-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["user", "child", "adhd-support"],
+    "traits": ["smart", "empathetic", "visual-learner", "map-lover", "math-whiz", "athletic"]
+  },
+  "core": {
+    "name": "Armand Lefebvre",
+    "nickname": "Armand",
+    "dob": "2016-03-28",
+    "age": 9,
+    "diagnosis": {
+      "type": "ADHD",
+      "diagnosed_date": "2025-04-01",
+      "support_plan": "504 Plan"
+    },
+    "strengths": [
+      "Brilliant mathematician - doing square roots at age 3",
+      "Self-taught reader - learned to read Mario Kart player names",
+      "Exceptional spatial intelligence - mapped routes at age 3",
+      "Empathetic - puts others' needs first",
+      "Athletic - excels at sports",
+      "Loves maps and geography"
+    ],
+    "growth_areas": [
+      "Staying in seat during class",
+      "Waiting turn to speak",
+      "Managing screen time (Roblox)",
+      "Keeping track of belongings",
+      "Sustained focus on tasks"
+    ],
+    "learning_style": "visual",
+    "motivators": ["Roblox", "maps", "math challenges", "sports", "family time"],
+    "current_level": 1,
+    "total_xp": 0,
+    "current_streak": 0,
+    "longest_streak": 0,
+    "coins": 0,
+    "achievements_unlocked": []
+  },
+  "inference": {
+    "relates_to": ["lds:family/lefebvre-v1"],
+    "implies": ["visual-task-display-required", "short-task-chunks-optimal", "immediate-feedback-needed"],
+    "requires": ["lds:tasks/daily-v1", "lds:rewards/shop-v1"]
+  },
+  "family": {
+    "sister": {
+      "name": "Giuliana Lefebvre",
+      "dob": "2013-10-10",
+      "age": 12,
+      "role": "sibling-supporter"
+    },
+    "support_team": [
+      {"role": "mother", "permissions": ["admin", "verify", "reward"]},
+      {"role": "father", "permissions": ["admin", "verify", "reward"]},
+      {"role": "grandmother_1", "permissions": ["verify", "encourage"]},
+      {"role": "grandmother_2", "permissions": ["verify", "encourage"]},
+      {"role": "uncle", "permissions": ["verify", "encourage"]},
+      {"role": "chriss", "title": "Dad's Partner", "permissions": ["verify", "encourage", "reward"]},
+      {"role": "giuliana", "title": "Sister", "permissions": ["encourage", "team-challenge"]},
+      {"role": "teacher", "permissions": ["add-task", "verify", "report"]},
+      {"role": "therapist", "permissions": ["add-task", "verify", "adjust-goals"]}
+    ]
+  }
+}

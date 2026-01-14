@@ -1,0 +1,174 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:rewards/shop-v1",
+    "type": "reward.shop",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:rewards-shop-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["rewards", "privileges", "shop"],
+    "reward_types": ["screen-time", "activities", "special", "physical"]
+  },
+  "core": {
+    "shop_categories": {
+      "screen_time": {
+        "icon": "gamepad",
+        "color": "#9B59B6",
+        "items": [
+          {
+            "id": "roblox-15",
+            "name": "15 Min Roblox",
+            "description": "15 minutes of Roblox time",
+            "cost_coins": 50,
+            "icon": "gamepad",
+            "available": true
+          },
+          {
+            "id": "roblox-30",
+            "name": "30 Min Roblox",
+            "description": "30 minutes of Roblox time",
+            "cost_coins": 90,
+            "icon": "gamepad",
+            "available": true
+          },
+          {
+            "id": "roblox-60",
+            "name": "1 Hour Roblox",
+            "description": "Full hour of Roblox time",
+            "cost_coins": 150,
+            "icon": "gamepad",
+            "available": true
+          },
+          {
+            "id": "youtube-15",
+            "name": "15 Min YouTube",
+            "description": "15 minutes of YouTube",
+            "cost_coins": 40,
+            "icon": "play",
+            "available": true
+          },
+          {
+            "id": "movie-night",
+            "name": "Movie Night Pick",
+            "description": "You pick the family movie",
+            "cost_coins": 200,
+            "icon": "film",
+            "available": true
+          }
+        ]
+      },
+      "activities": {
+        "icon": "basketball",
+        "color": "#E67E22",
+        "items": [
+          {
+            "id": "stay-up-15",
+            "name": "Stay Up 15 Min Late",
+            "description": "Stay up 15 minutes past bedtime",
+            "cost_coins": 75,
+            "icon": "moon",
+            "available": true
+          },
+          {
+            "id": "friend-playdate",
+            "name": "Friend Playdate",
+            "description": "Have a friend over or go to their house",
+            "cost_coins": 250,
+            "icon": "users",
+            "available": true
+          },
+          {
+            "id": "special-outing",
+            "name": "Special Outing",
+            "description": "Trip to arcade, park, or fun place",
+            "cost_coins": 400,
+            "icon": "ticket",
+            "available": true
+          },
+          {
+            "id": "skip-chore",
+            "name": "Skip One Chore",
+            "description": "Skip one daily chore (once per week max)",
+            "cost_coins": 100,
+            "icon": "forward",
+            "available": true,
+            "limit_per_week": 1
+          }
+        ]
+      },
+      "treats": {
+        "icon": "ice-cream",
+        "color": "#F1C40F",
+        "items": [
+          {
+            "id": "dessert-extra",
+            "name": "Extra Dessert",
+            "description": "Get an extra dessert treat",
+            "cost_coins": 60,
+            "icon": "cookie",
+            "available": true
+          },
+          {
+            "id": "ice-cream",
+            "name": "Ice Cream Trip",
+            "description": "Trip to get ice cream",
+            "cost_coins": 200,
+            "icon": "ice-cream",
+            "available": true
+          },
+          {
+            "id": "choice-dinner",
+            "name": "Dinner Choice",
+            "description": "Pick what's for dinner",
+            "cost_coins": 150,
+            "icon": "utensils",
+            "available": true
+          }
+        ]
+      },
+      "special": {
+        "icon": "gem",
+        "color": "#1ABC9C",
+        "items": [
+          {
+            "id": "robux-100",
+            "name": "100 Robux",
+            "description": "Get 100 Robux added to account",
+            "cost_coins": 500,
+            "icon": "coins",
+            "available": true
+          },
+          {
+            "id": "new-game",
+            "name": "New Game",
+            "description": "Pick a new game (under $20)",
+            "cost_coins": 1000,
+            "icon": "gift",
+            "available": true
+          },
+          {
+            "id": "sleepover",
+            "name": "Sleepover Permission",
+            "description": "Have or attend a sleepover",
+            "cost_coins": 600,
+            "icon": "house",
+            "available": true
+          }
+        ]
+      }
+    },
+    "daily_bonus": {
+      "streak_3": { "bonus_coins": 25, "bonus_xp": 50 },
+      "streak_7": { "bonus_coins": 100, "bonus_xp": 200 },
+      "streak_14": { "bonus_coins": 250, "bonus_xp": 500 },
+      "streak_30": { "bonus_coins": 750, "bonus_xp": 1500 }
+    }
+  },
+  "inference": {
+    "relates_to": ["lds:profile/armand-lefebvre-v1", "lds:tasks/daily-v1"],
+    "implies": ["coin-economy-active", "reward-motivation-system"],
+    "requires": ["task-completion-for-coins"]
+  }
+}

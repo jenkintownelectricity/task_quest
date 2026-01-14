@@ -1,0 +1,69 @@
+{
+  "_lds": {
+    "v": "1.0",
+    "id": "lds:504/ot-update-2025",
+    "type": "504.therapy.update",
+    "created": "2025-04-14",
+    "updated": "2025-11-01"
+  },
+  "core": {
+    "student": "Armand Lefebvre",
+    "service": "Occupational Therapy",
+    "status": "discontinued",
+    "speak": "504 Occupational Therapy update for Armand Lefebvre. As of November 2025, OT services have been discontinued. Armand made good progress in executive function, hand fatigue, self-regulation, and visual motor skills.",
+    "updates": [
+      {
+        "date": "2025-04-14",
+        "summary": "Working on executive function, hand fatigue, self-regulation, and visual motor skills. Making good progress.",
+        "areas": {
+          "executive_function": {
+            "attention": "Improves with hands-on tasks with concrete start and end without many steps",
+            "multi_step": "Requires verbal and visual cues to begin. Once started, can typically finish."
+          },
+          "hand_fatigue": {
+            "progress": "Completed 7-sentence paragraph copying with only one hand shake/stretch",
+            "interventions": ["thera-putty activities", "pencil grip"]
+          },
+          "visual_motor": {
+            "handwriting": "Very legible when copying from near point",
+            "letter_legibility": "90-96% accurate",
+            "letter_alignment": "80-83% accurate",
+            "word_spacing": "100% accurate"
+          }
+        },
+        "recommendation": "Continue on consultative basis until end of first marking period of 4th grade"
+      },
+      {
+        "date": "2025-11-01",
+        "summary": "Has not required direct or indirect school-based consultative services this marking period",
+        "recommendation": "OT services to be discontinued"
+      }
+    ],
+    "accommodations": [
+      {
+        "id": "pencil-grip",
+        "text": "Pencil grip on writing implement to decrease pressure on pencil, reducing hand fatigue",
+        "category": "Classroom",
+        "active": true
+      },
+      {
+        "id": "type-lengthy",
+        "text": "Type lengthy assignments",
+        "category": "Classroom",
+        "active": true
+      },
+      {
+        "id": "break-down-tasks",
+        "text": "Multi-step activities/projects: Break down assignments into smaller more manageable parts",
+        "category": "Organization",
+        "active": true
+      },
+      {
+        "id": "stand-sit",
+        "text": "Allow Armand to stand and/or sit to complete assignments",
+        "category": "Classroom",
+        "active": true
+      }
+    ]
+  }
+}
