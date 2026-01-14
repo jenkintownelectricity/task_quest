@@ -1,0 +1,283 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:tasks/daily-v1",
+    "type": "task.collection",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:tasks-daily-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["tasks", "daily", "routine"],
+    "time_of_day": ["morning", "afternoon", "evening"]
+  },
+  "core": {
+    "task_categories": {
+      "morning_routine": {
+        "icon": "sunrise",
+        "color": "#FFB347",
+        "tasks": [
+          {
+            "id": "wake-up",
+            "name": "Wake Up On Time",
+            "description": "Get out of bed when alarm goes off",
+            "xp": 10,
+            "coins": 5,
+            "time_limit_minutes": 5,
+            "difficulty": "easy",
+            "icon": "bed"
+          },
+          {
+            "id": "make-bed",
+            "name": "Make Your Bed",
+            "description": "Pull up covers and arrange pillows",
+            "xp": 15,
+            "coins": 5,
+            "time_limit_minutes": 5,
+            "difficulty": "easy",
+            "icon": "bed"
+          },
+          {
+            "id": "brush-teeth-am",
+            "name": "Brush Teeth (Morning)",
+            "description": "Brush for 2 full minutes",
+            "xp": 15,
+            "coins": 5,
+            "time_limit_minutes": 3,
+            "difficulty": "easy",
+            "icon": "tooth"
+          },
+          {
+            "id": "get-dressed",
+            "name": "Get Dressed",
+            "description": "Put on clothes for the day",
+            "xp": 15,
+            "coins": 5,
+            "time_limit_minutes": 10,
+            "difficulty": "easy",
+            "icon": "shirt"
+          },
+          {
+            "id": "eat-breakfast",
+            "name": "Eat Breakfast",
+            "description": "Finish your breakfast at the table",
+            "xp": 20,
+            "coins": 10,
+            "time_limit_minutes": 20,
+            "difficulty": "easy",
+            "icon": "utensils"
+          },
+          {
+            "id": "pack-backpack",
+            "name": "Pack Backpack",
+            "description": "Check list and pack everything needed",
+            "xp": 25,
+            "coins": 10,
+            "time_limit_minutes": 10,
+            "difficulty": "medium",
+            "icon": "backpack"
+          }
+        ]
+      },
+      "school_day": {
+        "icon": "school",
+        "color": "#87CEEB",
+        "tasks": [
+          {
+            "id": "stay-seated",
+            "name": "Stay in Seat Challenge",
+            "description": "Stay in seat for full class period",
+            "xp": 50,
+            "coins": 25,
+            "difficulty": "hero",
+            "icon": "chair",
+            "bonus_multiplier": 2
+          },
+          {
+            "id": "raise-hand",
+            "name": "Raise Hand First",
+            "description": "Raise hand instead of calling out",
+            "xp": 40,
+            "coins": 20,
+            "difficulty": "hard",
+            "icon": "hand"
+          },
+          {
+            "id": "homework-written",
+            "name": "Write Down Homework",
+            "description": "Write all assignments in planner",
+            "xp": 30,
+            "coins": 15,
+            "difficulty": "medium",
+            "icon": "pencil"
+          },
+          {
+            "id": "bring-materials",
+            "name": "Bring All Materials Home",
+            "description": "Check backpack before leaving school",
+            "xp": 35,
+            "coins": 15,
+            "difficulty": "medium",
+            "icon": "clipboard-check"
+          }
+        ]
+      },
+      "afternoon": {
+        "icon": "sun",
+        "color": "#98FB98",
+        "tasks": [
+          {
+            "id": "snack-healthy",
+            "name": "Healthy Snack",
+            "description": "Eat a healthy snack after school",
+            "xp": 15,
+            "coins": 5,
+            "time_limit_minutes": 15,
+            "difficulty": "easy",
+            "icon": "apple-whole"
+          },
+          {
+            "id": "homework-start",
+            "name": "Start Homework",
+            "description": "Begin homework within 30 min of getting home",
+            "xp": 40,
+            "coins": 20,
+            "time_limit_minutes": 30,
+            "difficulty": "hard",
+            "icon": "book-open"
+          },
+          {
+            "id": "homework-complete",
+            "name": "Complete Homework",
+            "description": "Finish all homework assignments",
+            "xp": 50,
+            "coins": 25,
+            "difficulty": "hero",
+            "icon": "check-double"
+          },
+          {
+            "id": "reading-20",
+            "name": "Read for 20 Minutes",
+            "description": "Read a book for 20 minutes",
+            "xp": 30,
+            "coins": 15,
+            "time_limit_minutes": 20,
+            "difficulty": "medium",
+            "icon": "book"
+          }
+        ]
+      },
+      "evening": {
+        "icon": "moon",
+        "color": "#DDA0DD",
+        "tasks": [
+          {
+            "id": "dinner-table",
+            "name": "Dinner at Table",
+            "description": "Eat dinner at the table with family",
+            "xp": 20,
+            "coins": 10,
+            "time_limit_minutes": 30,
+            "difficulty": "easy",
+            "icon": "utensils"
+          },
+          {
+            "id": "chore-complete",
+            "name": "Complete Daily Chore",
+            "description": "Do your assigned chore for the day",
+            "xp": 35,
+            "coins": 20,
+            "time_limit_minutes": 20,
+            "difficulty": "medium",
+            "icon": "broom"
+          },
+          {
+            "id": "screen-off",
+            "name": "Screens Off On Time",
+            "description": "Turn off all screens at designated time",
+            "xp": 45,
+            "coins": 25,
+            "difficulty": "hard",
+            "icon": "power-off"
+          },
+          {
+            "id": "brush-teeth-pm",
+            "name": "Brush Teeth (Night)",
+            "description": "Brush for 2 full minutes before bed",
+            "xp": 15,
+            "coins": 5,
+            "time_limit_minutes": 3,
+            "difficulty": "easy",
+            "icon": "tooth"
+          },
+          {
+            "id": "clothes-ready",
+            "name": "Tomorrow's Clothes Ready",
+            "description": "Pick out and lay out clothes for tomorrow",
+            "xp": 20,
+            "coins": 10,
+            "time_limit_minutes": 10,
+            "difficulty": "easy",
+            "icon": "shirt"
+          },
+          {
+            "id": "bed-on-time",
+            "name": "In Bed On Time",
+            "description": "Be in bed by bedtime",
+            "xp": 25,
+            "coins": 15,
+            "difficulty": "medium",
+            "icon": "bed"
+          }
+        ]
+      },
+      "bonus_quests": {
+        "icon": "star",
+        "color": "#FFD700",
+        "tasks": [
+          {
+            "id": "help-giuliana",
+            "name": "Help Giuliana",
+            "description": "Do something kind for your sister",
+            "xp": 40,
+            "coins": 30,
+            "difficulty": "special",
+            "icon": "heart"
+          },
+          {
+            "id": "no-reminders",
+            "name": "Zero Reminders Day",
+            "description": "Complete all tasks without any reminders",
+            "xp": 100,
+            "coins": 50,
+            "difficulty": "legendary",
+            "icon": "crown"
+          },
+          {
+            "id": "math-challenge",
+            "name": "Math Challenge",
+            "description": "Complete a bonus math problem",
+            "xp": 35,
+            "coins": 20,
+            "difficulty": "medium",
+            "icon": "calculator"
+          },
+          {
+            "id": "map-quest",
+            "name": "Map Explorer Quest",
+            "description": "Learn about a new place on the map",
+            "xp": 30,
+            "coins": 20,
+            "difficulty": "medium",
+            "icon": "map"
+          }
+        ]
+      }
+    }
+  },
+  "inference": {
+    "relates_to": ["lds:profile/armand-lefebvre-v1"],
+    "implies": ["visual-checklist-required", "timer-support-needed"],
+    "requires": ["lds:rewards/shop-v1"]
+  }
+}

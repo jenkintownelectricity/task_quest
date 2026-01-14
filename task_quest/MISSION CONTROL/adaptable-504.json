@@ -1,0 +1,21 @@
+{
+  "_lds": {
+    "id": "lds:plan/504-armand-grade4-v1",
+    "type": "plan.educational",
+    "supersedes": "lds:plan/504-armand-grade3-final"
+  },
+  "core": {
+    "diagnosis": "ADHD",
+    "accommodations": [
+      { "rule": "extended_time", "factor": 1.5, "context": "testing" },
+      { "rule": "chunking", "desc": "Break assignments into small parts" },
+      { "rule": "visual_cues", "desc": "Provide picture schedules" }
+    ]
+  },
+  "inference": {
+    "implies": [
+      "teacher:must_provide_notes",
+      "testing:separate_location"
+    ]
+  }
+}

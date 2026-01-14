@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Life</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#09090b;--s1:#111113;--s2:#18181b;--b:#27272a;--t:#fafafa;--d:#71717a;--a:#22c55e;--a2:#3b82f6;--w:#f59e0b;--r:#ef4444;--p:#a855f7}
+body{background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+.shell{max-width:900px;margin:0 auto;padding:20px}
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--b);margin-bottom:30px}
+.logo{font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.actions{display:flex;gap:8px}
+.btn{padding:10px 18px;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-p{background:var(--a);color:#000}
+.btn-s{background:var(--s2);color:var(--t);border:1px solid var(--b)}
+.btn-v{background:var(--p);color:#fff}
+.btn:hover{transform:translateY(-1px);opacity:.9}
+.tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+.tab{padding:10px 18px;background:var(--s1);border:1px solid var(--b);border-radius:8px;color:var(--d);font-size:13px;cursor:pointer}
+.tab.on{background:var(--a);color:#000;border-color:var(--a);font-weight:600}
+.view{display:none}.view.on{display:block}
+.card{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:20px;margin-bottom:16px}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{font-weight:600;display:flex;align-items:center;gap:8px}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-a{background:var(--a);color:#000}
+.badge-w{background:var(--w);color:#000}
+.badge-r{background:var(--r);color:#fff}
+.stat{font-size:36px;font-weight:700;color:var(--a);margin:10px 0}
+.dim{color:var(--d);font-size:13px}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{padding:14px;background:var(--s2);border-radius:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+.item:hover{background:var(--b)}
+.item-text{flex:1}
+.item-meta{font-size:11px;color:var(--d);margin-top:4px}
+.tag{display:inline-block;padding:3px 8px;background:var(--s2);border-radius:12px;font-size:10px;margin-right:4px}
+.tag-504{background:#14532d;color:var(--a)}
+.tag-therapy{background:#1e3a5f;color:var(--a2)}
+.tag-school{background:#422006;color:var(--w)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.tl{position:relative;padding-left:24px}
+.tl::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--b)}
+.tl-item{position:relative;padding:16px;background:var(--s1);border:1px solid var(--b);border-radius:12px;margin-bottom:12px}
+.tl-item::before{content:'';position:absolute;left:-22px;top:18px;width:10px;height:10px;background:var(--a);border-radius:50%}
+.tl-date{font-size:11px;color:var(--d)}
+.tl-title{font-weight:600;margin:4px 0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal.on{display:flex}
+.modal-box{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:24px;max-width:440px;width:100%;max-height:85vh;overflow-y:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-title{font-size:18px;font-weight:600}
+.close{background:none;border:none;color:var(--d);font-size:24px;cursor:pointer}
+.form-g{margin-bottom:16px}
+.form-l{display:block;font-size:11px;font-weight:600;color:var(--d);margin-bottom:6px;text-transform:uppercase}
+.form-i{width:100%;padding:12px;background:var(--bg);border:1px solid var(--b);border-radius:8px;color:var(--t);font-family:inherit;font-size:14px}
+.form-i:focus{outline:none;border-color:var(--a)}
+.form-t{min-height:80px;resize:vertical}
+.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.empty{text-align:center;padding:40px;color:var(--d)}
+.speak-btn{position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:var(--p);border:none;border-radius:50%;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(168,85,247,.4)}
+.speak-btn.on{animation:pulse .4s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.lds-data{font-family:monospace;font-size:11px;background:var(--bg);padding:12px;border-radius:8px;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow:auto}
+.status{position:fixed;bottom:20px;left:20px;padding:8px 14px;background:var(--s1);border:1px solid var(--b);border-radius:8px;font-size:11px;color:var(--d);display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;background:var(--a);border-radius:50%;animation:pulse 2s infinite}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+<div class="logo">Life</div>
+<div class="actions">
+<button class="btn btn-s" onclick="imp()">📥 Import</button>
+<button class="btn btn-s" onclick="exp()">📤 Export</button>
+<button class="btn btn-v" onclick="speakAll()">🔊 Speak</button>
+<button class="btn btn-p" onclick="modal('add')">+ Add</button>
+</div>
+</header>
+<div class="tabs">
+<div class="tab on" data-v="dash">Dashboard</div>
+<div class="tab" data-v="504">504 Plan</div>
+<div class="tab" data-v="therapy">Therapy</div>
+<div class="tab" data-v="school">School</div>
+<div class="tab" data-v="people">People</div>
+<div class="tab" data-v="goals">Goals</div>
+<div class="tab" data-v="timeline">Timeline</div>
+<div class="tab" data-v="notes">Notes</div>
+<div class="tab" data-v="lds">LDS</div>
+</div>
+<div id="views"></div>
+</div>
+<div class="modal" id="modal">
+<div class="modal-box">
+<div class="modal-head"><div class="modal-title" id="mtitle">Add</div><button class="close" onclick="closeModal()">×</button></div>
+<div id="mbody"></div>
+</div>
+</div>
+<button class="speak-btn" id="spkBtn" onclick="speakPage()">🔊</button>
+<div class="status"><div class="dot"></div>LDS Active</div>
+<script>
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const synth=speechSynthesis;
+let D={profile:{name:""},p504:{items:[],goals:[],meetings:[]},therapy:{who:"",sessions:[],insights:[]},school:{teachers:[],classes:[]},people:[],goals:[],timeline:[],notes:[]};
+const L=()=>{try{const s=localStorage.getItem('life');if(s)D=JSON.parse(s);}catch{}};
+const S=()=>localStorage.setItem('life',JSON.stringify(D));
+const icons={dash:'🏠','504':'📋',therapy:'💭',school:'🎓',people:'👥',goals:'🎯',timeline:'📅',notes:'📝',lds:'⚡'};
+const speak=(t)=>{synth.cancel();const u=new SpeechSynthesisUtterance(t);u.onstart=()=>$('#spkBtn').classList.add('on');u.onend=()=>$('#spkBtn').classList.remove('on');synth.speak(u);};
+const speakPage=()=>{const v=$('.view.on');if(!v)return;const t=v.innerText.substring(0,500);speak(t);};
+const speakAll=()=>{const a=D.p504.items.length,g=D.goals.length,gc=D.goals.filter(x=>x.done).length,s=D.therapy.sessions.length;speak(`Life summary. ${a} accommodations. ${gc} of ${g} goals done. ${s} therapy sessions. ${D.people.length} contacts.`);};
+const render=()=>{
+const v=$('.tab.on').dataset.v;
+const c=$('#views');
+c.innerHTML={
+dash:`<div class="grid">
+<div class="card"><div class="card-head"><div class="card-title">📋 504</div><span class="badge badge-a">Active</span></div><div class="stat">${D.p504.items.length}</div><div class="dim">Accommodations</div></div>
+<div class="card"><div class="card-head"><div class="card-title">🎯 Goals</div></div><div class="stat">${D.goals.filter(x=>x.done).length}/${D.goals.length}</div><div class="dim">Completed</div></div>
+<div class="card"><div class="card-head"><div class="card-title">💭 Therapy</div></div><div class="stat">${D.therapy.sessions.length}</div><div class="dim">Sessions</div></div>
+<div class="card"><div class="card-head"><div class="card-title">👥 People</div></div><div class="stat">${D.people.length}</div><div class="dim">Contacts</div></div>
+</div>
+<div class="card"><div class="card-title">📅 Recent</div><div class="list" style="margin-top:12px">${D.timeline.slice(-5).reverse().map(t=>`<div class="item"><span>${icons[t.type]||'📌'}</span><div class="item-text">${t.title}<div class="item-meta">${t.date}</div></div></div>`).join('')||'<div class="empty">No events yet</div>'}</div></div>`,
+'504':`<button class="btn btn-p" onclick="modal('acc')" style="margin-bottom:16px">+ Add Accommodation</button>
+<div class="list">${D.p504.items.map((a,i)=>`<div class="item"><span>✓</span><div class="item-text">${a.text}<div class="item-meta">${a.cat}</div></div><button class="btn btn-s" onclick="rm504(${i})" style="padding:6px 10px;font-size:11px">×</button></div>`).join('')||'<div class="empty">No accommodations yet</div>'}</div>`,
+therapy:`<div class="grid" style="margin-bottom:20px">
+<div class="card"><div class="card-title">👤 Therapist</div><div style="margin-top:8px">${D.therapy.who||'<span class="dim">Not set</span>'}</div><button class="btn btn-s" onclick="modal('therapist')" style="margin-top:10px">Set</button></div>
+<div class="card"><div class="card-title">📊 Sessions</div><div class="stat">${D.therapy.sessions.length}</div></div>
+</div>
+<button class="btn btn-p" onclick="modal('session')" style="margin-bottom:16px">+ Add Session</button>
+<div class="list">${D.therapy.sessions.slice().reverse().map((s,i)=>`<div class="item" onclick="speakSession(${D.therapy.sessions.length-1-i})"><span>📝</span><div class="item-text">${s.title}<div class="item-meta">${s.date} • ${s.mood}</div></div><span class="tag tag-therapy">${s.mood}</span></div>`).join('')||'<div class="empty">No sessions yet</div>'}</div>`,
+school:`<button class="btn btn-p" onclick="modal('teacher')" style="margin-bottom:16px">+ Add Teacher</button>
+<div class="grid">${D.school.teachers.map(t=>`<div class="card"><div class="card-title">👨‍🏫 ${t.name}</div><div class="dim">${t.subj}</div><div class="dim" style="margin-top:4px">${t.email||''}</div></div>`).join('')||'<div class="empty" style="grid-column:1/-1">No teachers yet</div>'}</div>`,
+people:`<button class="btn btn-p" onclick="modal('person')" style="margin-bottom:16px">+ Add Person</button>
+<div class="grid">${D.people.map(p=>`<div class="card"><div class="card-head"><div class="card-title">👤 ${p.name}</div><span class="tag">${p.role}</span></div><div class="dim">${p.phone||''}</div><div class="dim">${p.email||''}</div></div>`).join('')||'<div class="empty" style="grid-column:1/-1">No people yet</div>'}</div>`,
+goals:`<button class="btn btn-p" onclick="modal('goal')" style="margin-bottom:16px">+ Add Goal</button>
+<div class="list">${D.goals.map((g,i)=>`<div class="item" onclick="toggleGoal(${i})"><span style="cursor:pointer">${g.done?'✅':'⭕'}</span><div class="item-text">${g.text}<div class="item-meta">${g.cat} • ${g.date}</div></div><span class="tag tag-${g.cat}">${g.cat}</span></div>`).join('')||'<div class="empty">No goals yet</div>'}</div>`,
+timeline:`<button class="btn btn-p" onclick="modal('event')" style="margin-bottom:16px">+ Add Event</button>
+<div class="tl">${D.timeline.slice().reverse().map(t=>`<div class="tl-item"><div class="tl-date">${t.date}</div><div class="tl-title">${icons[t.type]||'📌'} ${t.title}</div><div class="dim">${t.body||''}</div></div>`).join('')||'<div class="empty">No events yet</div>'}</div>`,
+notes:`<button class="btn btn-p" onclick="modal('note')" style="margin-bottom:16px">+ Add Note</button>
+<div class="grid">${D.notes.map(n=>`<div class="card" onclick="speakNote('${n.title}','${n.body.replace(/'/g,"\\'")}')"><div class="card-head"><div class="card-title">📝 ${n.title}</div><span class="dim">${n.date}</span></div><div class="dim">${n.body.substring(0,100)}${n.body.length>100?'...':''}</div></div>`).join('')||'<div class="empty" style="grid-column:1/-1">No notes yet</div>'}</div>`,
+lds:`<div class="card"><div class="card-title">⚡ LDS Data</div><div class="dim" style="margin:8px 0">All your data in portable LDS format</div><div class="lds-data">${JSON.stringify(toLDS(),null,2)}</div><div style="display:flex;gap:8px;margin-top:16px"><button class="btn btn-p" onclick="exp()">📥 Download</button><button class="btn btn-s" onclick="copyLDS()">📋 Copy</button><button class="btn btn-v" onclick="speak('LDS data ready for export')">🔊 Speak</button></div></div>`
+}[v]||'';
+c.querySelector('.view')?.classList.add('on');
+};
+const toLDS=()=>({_lds:{v:"1.0",id:"lds:life/data",type:"life.backup",ts:new Date().toISOString()},core:D});
+const exp=()=>{const b=new Blob([JSON.stringify(toLDS(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='life-'+new Date().toISOString().split('T')[0]+'.lds.json';a.click();};
+const imp=()=>{const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=e=>{const r=new FileReader();r.onload=ev=>{try{const j=JSON.parse(ev.target.result);D=j.core||j;S();render();speak('Data imported');}catch{alert('Invalid file');}};r.readAsText(e.target.files[0]);};i.click();};
+const copyLDS=()=>{navigator.clipboard.writeText(JSON.stringify(toLDS(),null,2));speak('Copied to clipboard');};
+const addTL=(type,title)=>{D.timeline.push({date:new Date().toISOString().split('T')[0],type,title,body:''});};
+const modal=(t)=>{
+$('#modal').classList.add('on');
+const T=$('#mtitle'),B=$('#mbody');
+const forms={
+add:`<div class="quick"><button class="btn btn-s" onclick="closeModal();modal('acc')">📋 Accommodation</button><button class="btn btn-s" onclick="closeModal();modal('session')">💭 Session</button><button class="btn btn-s" onclick="closeModal();modal('goal')">🎯 Goal</button><button class="btn btn-s" onclick="closeModal();modal('note')">📝 Note</button><button class="btn btn-s" onclick="closeModal();modal('person')">👤 Person</button><button class="btn btn-s" onclick="closeModal();modal('event')">📅 Event</button></div>`,
+acc:`<div class="form-g"><label class="form-l">Accommodation</label><input class="form-i" id="f1" placeholder="Extended time..."></div><div class="form-g"><label class="form-l">Category</label><select class="form-i" id="f2"><option>Testing</option><option>Classroom</option><option>Organization</option><option>Behavioral</option></select></div><button class="btn btn-p" onclick="addAcc()">Add</button>`,
+session:`<div class="form-g"><label class="form-l">Date</label><input class="form-i" type="date" id="f1" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-g"><label class="form-l">Title</label><input class="form-i" id="f2" placeholder="Weekly session..."></div><div class="form-g"><label class="form-l">Mood</label><select class="form-i" id="f3"><option>Great</option><option>Good</option><option>Okay</option><option>Difficult</option></select></div><div class="form-g"><label class="form-l">Notes</label><textarea class="form-i form-t" id="f4" placeholder="What was discussed..."></textarea></div><button class="btn btn-p" onclick="addSess()">Add</button>`,
+goal:`<div class="form-g"><label class="form-l">Goal</label><input class="form-i" id="f1" placeholder="Complete homework..."></div><div class="form-g"><label class="form-l">Category</label><select class="form-i" id="f2"><option>school</option><option>therapy</option><option>health</option><option>social</option></select></div><button class="btn btn-p" onclick="addGoal()">Add</button>`,
+note:`<div class="form-g"><label class="form-l">Title</label><input class="form-i" id="f1"></div><div class="form-g"><label class="form-l">Note</label><textarea class="form-i form-t" id="f2"></textarea></div><button class="btn btn-p" onclick="addNote()">Add</button>`,
+person:`<div class="form-g"><label class="form-l">Name</label><input class="form-i" id="f1"></div><div class="form-g"><label class="form-l">Role</label><input class="form-i" id="f2" placeholder="Teacher, Doctor..."></div><div class="form-g"><label class="form-l">Phone</label><input class="form-i" id="f3"></div><div class="form-g"><label class="form-l">Email</label><input class="form-i" id="f4"></div><button class="btn btn-p" onclick="addPerson()">Add</button>`,
+teacher:`<div class="form-g"><label class="form-l">Name</label><input class="form-i" id="f1"></div><div class="form-g"><label class="form-l">Subject</label><input class="form-i" id="f2"></div><div class="form-g"><label class="form-l">Email</label><input class="form-i" id="f3"></div><button class="btn btn-p" onclick="addTeacher()">Add</button>`,
+event:`<div class="form-g"><label class="form-l">Date</label><input class="form-i" type="date" id="f1" value="${new Date().toISOString().split('T')[0]}"></div><div class="form-g"><label class="form-l">Title</label><input class="form-i" id="f2"></div><div class="form-g"><label class="form-l">Type</label><select class="form-i" id="f3"><option>school</option><option>therapy</option><option>milestone</option><option>medical</option></select></div><div class="form-g"><label class="form-l">Details</label><textarea class="form-i form-t" id="f4"></textarea></div><button class="btn btn-p" onclick="addEvent()">Add</button>`,
+therapist:`<div class="form-g"><label class="form-l">Therapist Name</label><input class="form-i" id="f1" value="${D.therapy.who}"></div><button class="btn btn-p" onclick="setTherapist()">Save</button>`
+};
+T.textContent={add:'Quick Add',acc:'Add Accommodation',session:'Add Session',goal:'Add Goal',note:'Add Note',person:'Add Person',teacher:'Add Teacher',event:'Add Event',therapist:'Set Therapist'}[t]||'Add';
+B.innerHTML=forms[t]||'';
+};
+const closeModal=()=>$('#modal').classList.remove('on');
+const addAcc=()=>{D.p504.items.push({text:$('#f1').value,cat:$('#f2').value});addTL('504','Added: '+$('#f1').value);S();closeModal();render();speak('Accommodation added');};
+const addSess=()=>{D.therapy.sessions.push({date:$('#f1').value,title:$('#f2').value,mood:$('#f3').value,notes:$('#f4').value});addTL('therapy',$('#f2').value);S();closeModal();render();speak('Session logged');};
+const addGoal=()=>{D.goals.push({text:$('#f1').value,cat:$('#f2').value,date:new Date().toISOString().split('T')[0],done:false});addTL('goals','Goal: '+$('#f1').value);S();closeModal();render();speak('Goal added');};
+const addNote=()=>{D.notes.push({title:$('#f1').value,body:$('#f2').value,date:new Date().toISOString().split('T')[0]});S();closeModal();render();speak('Note saved');};
+const addPerson=()=>{D.people.push({name:$('#f1').value,role:$('#f2').value,phone:$('#f3').value,email:$('#f4').value});addTL('people','Added '+$('#f1').value);S();closeModal();render();speak('Contact added');};
+const addTeacher=()=>{D.school.teachers.push({name:$('#f1').value,subj:$('#f2').value,email:$('#f3').value});S();closeModal();render();speak('Teacher added');};
+const addEvent=()=>{D.timeline.push({date:$('#f1').value,title:$('#f2').value,type:$('#f3').value,body:$('#f4').value});S();closeModal();render();speak('Event added');};
+const setTherapist=()=>{D.therapy.who=$('#f1').value;S();closeModal();render();speak('Therapist set to '+D.therapy.who);};
+const rm504=(i)=>{D.p504.items.splice(i,1);S();render();};
+const toggleGoal=(i)=>{D.goals[i].done=!D.goals[i].done;S();render();speak(D.goals[i].done?'Goal completed':'Goal reopened');};
+const speakSession=(i)=>{const s=D.therapy.sessions[i];speak(`Session on ${s.date}. ${s.title}. Mood was ${s.mood}. ${s.notes||''}`);};
+const speakNote=(t,b)=>{speak(`${t}. ${b}`);};
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');render();});
+L();render();
+</script>
+</body>
+</html>

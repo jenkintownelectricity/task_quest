@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armand's Quest - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #22d3ee;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.9);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header h1 i {
+            color: var(--accent);
+        }
+
+        .back-link {
+            color: var(--secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-box {
+            background: var(--glass);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .task-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--glass);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            border-color: var(--primary);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--glass-border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .task-checkbox:hover {
+            border-color: var(--success);
+        }
+
+        .task-item.completed .task-checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .task-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .task-rewards {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .reward-pill {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            background: var(--glass);
+        }
+
+        .reward-pill.xp { color: var(--primary); }
+        .reward-pill.coins { color: var(--accent); }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2394a3b8' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success);
+        }
+
+        .alert-info {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--glass);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-icon.task { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .history-icon.purchase { background: rgba(245, 158, 11, 0.2); color: var(--accent); }
+        .history-icon.achievement { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 26px;
+            background: var(--glass);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+        }
+
+        .toggle.active {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s ease;
+        }
+
+        .toggle.active::after {
+            left: 26px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid var(--glass-border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cog"></i> Admin Panel</h1>
+            <a href="armand-quest.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Quest
+            </a>
+        </div>
+
+        <div class="grid">
+            <!-- Stats Overview -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-chart-line"></i> Today's Progress</h2>
+                    <span id="todayDate"></span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="completedCount">0</div>
+                        <div class="stat-label">Tasks Done</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalCount">0</div>
+                        <div class="stat-label">Total Tasks</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="xpEarned">0</div>
+                        <div class="stat-label">XP Earned</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="coinsEarned">0</div>
+                        <div class="stat-label">Coins Earned</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <p style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary);">
+                    <span id="progressPercent">0</span>% complete today
+                </p>
+            </div>
+
+            <!-- Armand's Profile -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-user"></i> Armand's Profile</h2>
+                    <button class="btn btn-ghost" onclick="resetProgress()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="currentLevel">1</div>
+                        <div class="stat-label">Level</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalXP">0</div>
+                        <div class="stat-label">Total XP</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalCoins">0</div>
+                        <div class="stat-label">Coins</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-tasks"></i> Task Verification</h2>
+                    <button class="btn btn-primary" onclick="openAddTaskModal()">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </div>
+                <div class="task-list" id="taskList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Reward History -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-history"></i> Activity Log</h2>
+                </div>
+                <div id="activityLog">
+                    <div class="history-item">
+                        <div class="history-icon task"><i class="fas fa-check"></i></div>
+                        <div class="history-info">
+                            <div>No activity yet today</div>
+                            <div class="history-time">Start completing tasks!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="btn btn-success" onclick="grantBonus('xp', 50)">
+                        <i class="fas fa-star"></i> Grant 50 Bonus XP
+                    </button>
+                    <button class="btn btn-success" onclick="grantBonus('coins', 25)">
+                        <i class="fas fa-coins"></i> Grant 25 Bonus Coins
+                    </button>
+                    <button class="btn btn-primary" onclick="incrementStreak()">
+                        <i class="fas fa-fire"></i> Award Streak Day
+                    </button>
+                    <button class="btn btn-danger" onclick="markAllComplete()">
+                        <i class="fas fa-check-double"></i> Mark All Tasks Complete
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-sliders-h"></i> Settings</h2>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <strong>Voice Announcements</strong>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">Read tasks aloud</div>
+                    </div>
+                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <strong>Celebration Effects</strong>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">Confetti on completion</div>
+                    </div>
+                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <strong>Timer Sounds</strong>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">Audio for task timers</div>
+                    </div>
+                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <strong>Require Verification</strong>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">Parent must verify tasks</div>
+                    </div>
+                    <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal-overlay" id="addTaskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Add Custom Task</h3>
+                <button class="modal-close" onclick="closeAddTaskModal()">&times;</button>
+            </div>
+            <form onsubmit="addCustomTask(event)">
+                <div class="form-group">
+                    <label>Task Name</label>
+                    <input type="text" class="form-control" id="taskName" required placeholder="e.g., Practice Piano">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" class="form-control" id="taskDesc" placeholder="e.g., Practice for 15 minutes">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select class="form-control" id="taskCategory">
+                        <option value="morning_routine">Morning Routine</option>
+                        <option value="school_day">School Day</option>
+                        <option value="afternoon">Afternoon</option>
+                        <option value="evening">Evening</option>
+                        <option value="bonus_quests">Bonus Quest</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>XP Reward</label>
+                        <input type="number" class="form-control" id="taskXP" value="25" min="5" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Coin Reward</label>
+                        <input type="number" class="form-control" id="taskCoins" value="15" min="5" max="50">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Time Limit (minutes, 0 = no limit)</label>
+                    <input type="number" class="form-control" id="taskTime" value="0" min="0" max="60">
+                </div>
+                <div class="form-group">
+                    <label>Difficulty</label>
+                    <select class="form-control" id="taskDifficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                        <option value="hero">Hero</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-ghost" onclick="closeAddTaskModal()" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Load state from localStorage (shared with main app)
+        let gameState = {
+            profile: {
+                currentLevel: 1,
+                totalXP: 0,
+                coins: 0,
+                currentStreak: 0,
+                taskCompletions: {},
+                achievementsUnlocked: []
+            },
+            completedTasks: [],
+            todayXP: 0,
+            todayCoins: 0,
+            date: new Date().toDateString(),
+            customTasks: []
+        };
+
+        const LDS_TASKS = {
+            morning_routine: {
+                name: "Morning Routine",
+                tasks: [
+                    { id: "wake-up", name: "Wake Up On Time", xp: 10, coins: 5 },
+                    { id: "make-bed", name: "Make Your Bed", xp: 15, coins: 5 },
+                    { id: "brush-teeth-am", name: "Brush Teeth (Morning)", xp: 15, coins: 5 },
+                    { id: "get-dressed", name: "Get Dressed", xp: 15, coins: 5 },
+                    { id: "eat-breakfast", name: "Eat Breakfast", xp: 20, coins: 10 },
+                    { id: "pack-backpack", name: "Pack Backpack", xp: 25, coins: 10 }
+                ]
+            },
+            school_day: {
+                name: "School Hero",
+                tasks: [
+                    { id: "stay-seated", name: "Stay in Seat Challenge", xp: 50, coins: 25 },
+                    { id: "raise-hand", name: "Raise Hand First", xp: 40, coins: 20 },
+                    { id: "homework-written", name: "Write Down Homework", xp: 30, coins: 15 },
+                    { id: "bring-materials", name: "Bring All Materials Home", xp: 35, coins: 15 }
+                ]
+            },
+            afternoon: {
+                name: "Afternoon",
+                tasks: [
+                    { id: "snack-healthy", name: "Healthy Snack", xp: 15, coins: 5 },
+                    { id: "homework-start", name: "Start Homework", xp: 40, coins: 20 },
+                    { id: "homework-complete", name: "Complete Homework", xp: 50, coins: 25 },
+                    { id: "reading-20", name: "Read for 20 Minutes", xp: 30, coins: 15 }
+                ]
+            },
+            evening: {
+                name: "Evening",
+                tasks: [
+                    { id: "dinner-table", name: "Dinner at Table", xp: 20, coins: 10 },
+                    { id: "chore-complete", name: "Complete Daily Chore", xp: 35, coins: 20 },
+                    { id: "screen-off", name: "Screens Off On Time", xp: 45, coins: 25 },
+                    { id: "brush-teeth-pm", name: "Brush Teeth (Night)", xp: 15, coins: 5 },
+                    { id: "clothes-ready", name: "Tomorrow's Clothes Ready", xp: 20, coins: 10 },
+                    { id: "bed-on-time", name: "In Bed On Time", xp: 25, coins: 15 }
+                ]
+            },
+            bonus_quests: {
+                name: "Bonus Quests",
+                tasks: [
+                    { id: "help-giuliana", name: "Help Giuliana", xp: 40, coins: 30 },
+                    { id: "no-reminders", name: "Zero Reminders Day", xp: 100, coins: 50 },
+                    { id: "math-challenge", name: "Math Challenge", xp: 35, coins: 20 },
+                    { id: "map-quest", name: "Map Explorer Quest", xp: 30, coins: 20 }
+                ]
+            }
+        };
+
+        function loadState() {
+            const saved = localStorage.getItem('armandQuest');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                gameState.profile = { ...gameState.profile, ...parsed.profile };
+                gameState.completedTasks = parsed.completedTasks || [];
+                gameState.todayXP = parsed.todayXP || 0;
+                gameState.todayCoins = parsed.todayCoins || 0;
+                gameState.customTasks = parsed.customTasks || [];
+
+                if (parsed.date !== new Date().toDateString()) {
+                    gameState.completedTasks = [];
+                    gameState.todayXP = 0;
+                    gameState.todayCoins = 0;
+                    gameState.date = new Date().toDateString();
+                } else {
+                    gameState.date = parsed.date;
+                }
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('armandQuest', JSON.stringify({
+                profile: gameState.profile,
+                completedTasks: gameState.completedTasks,
+                todayXP: gameState.todayXP,
+                todayCoins: gameState.todayCoins,
+                date: gameState.date,
+                customTasks: gameState.customTasks
+            }));
+        }
+
+        function getAllTasks() {
+            let tasks = [];
+            Object.entries(LDS_TASKS).forEach(([cat, data]) => {
+                data.tasks.forEach(task => {
+                    tasks.push({ ...task, category: cat, categoryName: data.name });
+                });
+            });
+            // Add custom tasks
+            gameState.customTasks.forEach(task => {
+                tasks.push(task);
+            });
+            return tasks;
+        }
+
+        function updateUI() {
+            const tasks = getAllTasks();
+            const completedCount = gameState.completedTasks.length;
+            const totalCount = tasks.length;
+            const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+            document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            document.getElementById('completedCount').textContent = completedCount;
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('xpEarned').textContent = gameState.todayXP;
+            document.getElementById('coinsEarned').textContent = gameState.todayCoins;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = progress;
+
+            document.getElementById('currentLevel').textContent = gameState.profile.currentLevel;
+            document.getElementById('totalXP').textContent = gameState.profile.totalXP.toLocaleString();
+            document.getElementById('totalCoins').textContent = gameState.profile.coins.toLocaleString();
+            document.getElementById('currentStreak').textContent = gameState.profile.currentStreak;
+
+            renderTaskList();
+        }
+
+        function renderTaskList() {
+            const container = document.getElementById('taskList');
+            const tasks = getAllTasks();
+
+            container.innerHTML = tasks.map(task => {
+                const completed = gameState.completedTasks.includes(task.id);
+                return `
+                    <div class="task-item ${completed ? 'completed' : ''}" data-id="${task.id}">
+                        <div class="task-checkbox" onclick="toggleTask('${task.id}')">
+                            ${completed ? '<i class="fas fa-check" style="color: white;"></i>' : ''}
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">${task.name}</div>
+                            <div class="task-meta">${task.categoryName || task.category}</div>
+                        </div>
+                        <div class="task-rewards">
+                            <span class="reward-pill xp"><i class="fas fa-star"></i> ${task.xp}</span>
+                            <span class="reward-pill coins"><i class="fas fa-coins"></i> ${task.coins}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleTask(taskId) {
+            const tasks = getAllTasks();
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const index = gameState.completedTasks.indexOf(taskId);
+            if (index === -1) {
+                // Complete task
+                gameState.completedTasks.push(taskId);
+                gameState.profile.totalXP += task.xp;
+                gameState.profile.coins += task.coins;
+                gameState.todayXP += task.xp;
+                gameState.todayCoins += task.coins;
+
+                if (!gameState.profile.taskCompletions[taskId]) {
+                    gameState.profile.taskCompletions[taskId] = 0;
+                }
+                gameState.profile.taskCompletions[taskId]++;
+
+                checkLevelUp();
+            } else {
+                // Uncomplete task
+                gameState.completedTasks.splice(index, 1);
+                gameState.profile.totalXP -= task.xp;
+                gameState.profile.coins -= task.coins;
+                gameState.todayXP -= task.xp;
+                gameState.todayCoins -= task.coins;
+            }
+
+            saveState();
+            updateUI();
+        }
+
+        function checkLevelUp() {
+            const nextLevelXP = getXPForLevel(gameState.profile.currentLevel + 1);
+            while (gameState.profile.totalXP >= nextLevelXP) {
+                gameState.profile.currentLevel++;
+            }
+        }
+
+        function getXPForLevel(level) {
+            let total = 0;
+            for (let i = 1; i < level; i++) {
+                total += Math.floor(100 * i * 1.2);
+            }
+            return total;
+        }
+
+        function grantBonus(type, amount) {
+            if (type === 'xp') {
+                gameState.profile.totalXP += amount;
+                gameState.todayXP += amount;
+                checkLevelUp();
+            } else {
+                gameState.profile.coins += amount;
+                gameState.todayCoins += amount;
+            }
+            saveState();
+            updateUI();
+            alert(`Granted ${amount} ${type.toUpperCase()} to Armand!`);
+        }
+
+        function incrementStreak() {
+            gameState.profile.currentStreak++;
+            if (gameState.profile.currentStreak > (gameState.profile.longestStreak || 0)) {
+                gameState.profile.longestStreak = gameState.profile.currentStreak;
+            }
+            saveState();
+            updateUI();
+            alert(`Streak is now ${gameState.profile.currentStreak} days!`);
+        }
+
+        function markAllComplete() {
+            if (!confirm('Mark ALL tasks complete for today? This will award all XP and coins.')) return;
+
+            const tasks = getAllTasks();
+            tasks.forEach(task => {
+                if (!gameState.completedTasks.includes(task.id)) {
+                    gameState.completedTasks.push(task.id);
+                    gameState.profile.totalXP += task.xp;
+                    gameState.profile.coins += task.coins;
+                    gameState.todayXP += task.xp;
+                    gameState.todayCoins += task.coins;
+                }
+            });
+
+            checkLevelUp();
+            saveState();
+            updateUI();
+        }
+
+        function resetProgress() {
+            if (!confirm('Reset ALL progress? This cannot be undone!')) return;
+            if (!confirm('Are you REALLY sure? All XP, coins, and achievements will be lost!')) return;
+
+            localStorage.removeItem('armandQuest');
+            location.reload();
+        }
+
+        function openAddTaskModal() {
+            document.getElementById('addTaskModal').classList.add('active');
+        }
+
+        function closeAddTaskModal() {
+            document.getElementById('addTaskModal').classList.remove('active');
+        }
+
+        function addCustomTask(e) {
+            e.preventDefault();
+
+            const task = {
+                id: 'custom-' + Date.now(),
+                name: document.getElementById('taskName').value,
+                description: document.getElementById('taskDesc').value,
+                category: document.getElementById('taskCategory').value,
+                categoryName: 'Custom',
+                xp: parseInt(document.getElementById('taskXP').value),
+                coins: parseInt(document.getElementById('taskCoins').value),
+                time_limit: parseInt(document.getElementById('taskTime').value) || null,
+                difficulty: document.getElementById('taskDifficulty').value,
+                custom: true
+            };
+
+            gameState.customTasks.push(task);
+            saveState();
+            updateUI();
+            closeAddTaskModal();
+
+            // Reset form
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskDesc').value = '';
+            document.getElementById('taskXP').value = '25';
+            document.getElementById('taskCoins').value = '15';
+            document.getElementById('taskTime').value = '0';
+        }
+
+        // Initialize
+        loadState();
+        updateUI();
+    </script>
+</body>
+</html>

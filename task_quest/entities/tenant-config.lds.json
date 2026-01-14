@@ -1,0 +1,88 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:tenant/armand-quest-config-v1",
+    "type": "tenant.configuration",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:tenant-config-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["multi-tenant", "configuration", "saas", "isolation"]
+  },
+  "core": {
+    "multi_tenant_mode": true,
+    "tenant_isolation": {
+      "data_isolation": "complete",
+      "storage_prefix": "tenant_{id}_",
+      "encryption_per_tenant": true,
+      "cross_tenant_access": "prohibited"
+    },
+    "tenant_schema": {
+      "id": "uuid",
+      "name": "string",
+      "subdomain": "string",
+      "created_at": "iso8601",
+      "subscription_tier": "enum:free|basic|professional|enterprise",
+      "max_subjects": "integer",
+      "max_users": "integer",
+      "features_enabled": "array",
+      "custom_domain": "string|null",
+      "theme_id": "reference:lds:theme/*",
+      "compliance_level": "enum:standard|hipaa|ferpa"
+    },
+    "subscription_tiers": {
+      "free": {
+        "max_subjects": 1,
+        "max_users": 3,
+        "features": ["basic_tasks", "basic_rewards", "journey_map"],
+        "data_retention_days": 90,
+        "support_level": "community"
+      },
+      "basic": {
+        "max_subjects": 3,
+        "max_users": 10,
+        "features": ["basic_tasks", "basic_rewards", "journey_map", "custom_tasks", "achievements"],
+        "data_retention_days": 365,
+        "support_level": "email"
+      },
+      "professional": {
+        "max_subjects": 10,
+        "max_users": 25,
+        "features": ["all_features", "multi_child", "therapist_integration", "data_export", "custom_theme"],
+        "data_retention_days": 730,
+        "support_level": "priority",
+        "hipaa_eligible": true
+      },
+      "enterprise": {
+        "max_subjects": "unlimited",
+        "max_users": "unlimited",
+        "features": ["all_features", "api_access", "sso", "custom_integrations", "dedicated_support"],
+        "data_retention_days": 2190,
+        "support_level": "dedicated",
+        "hipaa_eligible": true,
+        "custom_baa": true
+      }
+    },
+    "data_segregation": {
+      "storage_strategy": "prefixed_keys",
+      "backup_isolation": true,
+      "audit_log_separation": true,
+      "encryption_key_per_tenant": true
+    }
+  },
+  "inference": {
+    "relates_to": [
+      "lds:compliance/armand-quest-hipaa-v1",
+      "lds:theme/default-v1"
+    ],
+    "implies": [
+      "multi_tenant_ready",
+      "data_isolation_enforced",
+      "scalable_architecture"
+    ],
+    "requires": [
+      "lds:compliance/armand-quest-hipaa-v1"
+    ]
+  }
+}

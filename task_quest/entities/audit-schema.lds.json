@@ -1,0 +1,85 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:audit/armand-quest-schema-v1",
+    "type": "audit.schema",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:audit-schema-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["audit", "logging", "compliance", "hipaa"]
+  },
+  "core": {
+    "audit_events": {
+      "authentication": {
+        "login": { "severity": "info", "phi_risk": "low", "retention_days": 365 },
+        "logout": { "severity": "info", "phi_risk": "low", "retention_days": 365 },
+        "role_switch": { "severity": "warning", "phi_risk": "medium", "retention_days": 730 },
+        "failed_login": { "severity": "warning", "phi_risk": "low", "retention_days": 730 }
+      },
+      "data_access": {
+        "profile_view": { "severity": "info", "phi_risk": "high", "retention_days": 2190 },
+        "task_view": { "severity": "info", "phi_risk": "low", "retention_days": 365 },
+        "progress_view": { "severity": "info", "phi_risk": "medium", "retention_days": 730 },
+        "diagnosis_view": { "severity": "warning", "phi_risk": "high", "retention_days": 2190 }
+      },
+      "data_modification": {
+        "task_complete": { "severity": "info", "phi_risk": "low", "retention_days": 365 },
+        "task_uncomplete": { "severity": "info", "phi_risk": "low", "retention_days": 365 },
+        "reward_purchase": { "severity": "info", "phi_risk": "low", "retention_days": 365 },
+        "task_created": { "severity": "info", "phi_risk": "medium", "retention_days": 730 },
+        "goal_modified": { "severity": "warning", "phi_risk": "high", "retention_days": 2190 },
+        "profile_updated": { "severity": "warning", "phi_risk": "high", "retention_days": 2190 }
+      },
+      "data_export": {
+        "report_generated": { "severity": "warning", "phi_risk": "high", "retention_days": 2190 },
+        "data_downloaded": { "severity": "critical", "phi_risk": "high", "retention_days": 2190 }
+      },
+      "consent_management": {
+        "consent_granted": { "severity": "critical", "phi_risk": "high", "retention_days": 2190 },
+        "consent_revoked": { "severity": "critical", "phi_risk": "high", "retention_days": 2190 },
+        "consent_expired": { "severity": "warning", "phi_risk": "high", "retention_days": 2190 }
+      },
+      "security": {
+        "session_timeout": { "severity": "info", "phi_risk": "low", "retention_days": 365 },
+        "unauthorized_access_attempt": { "severity": "critical", "phi_risk": "high", "retention_days": 2190 },
+        "permission_denied": { "severity": "warning", "phi_risk": "medium", "retention_days": 730 }
+      }
+    },
+    "audit_record_schema": {
+      "id": "uuid",
+      "timestamp": "iso8601",
+      "event_type": "string",
+      "event_category": "string",
+      "actor_role": "string",
+      "actor_id_hash": "sha256",
+      "target_entity": "string",
+      "action": "string",
+      "outcome": "success|failure|denied",
+      "reason": "string",
+      "phi_accessed": "boolean",
+      "ip_hash": "sha256",
+      "session_id_hash": "sha256",
+      "entity_version": "string"
+    },
+    "audit_integrity": {
+      "hash_chain": true,
+      "tamper_detection": true,
+      "immutable_storage": true
+    }
+  },
+  "inference": {
+    "relates_to": [
+      "lds:compliance/armand-quest-hipaa-v1"
+    ],
+    "implies": [
+      "comprehensive_logging",
+      "phi_access_tracking",
+      "compliance_verification_possible"
+    ],
+    "requires": [
+      "lds:compliance/armand-quest-hipaa-v1"
+    ]
+  }
+}

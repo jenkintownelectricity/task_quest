@@ -1,0 +1,16 @@
+{
+  "_lds": {
+    "v": "0.1.0",
+    "id": "lds:voice/alert-v1",
+    "type": "voice.alert",
+    "content_hash": "sha256:auto"
+  },
+  "core": {
+    "speak": "Alert! Attention required. A new event has been detected in the system. Please review immediately.",
+    "priority": "high",
+    "voice": {
+      "rate": 1.2,
+      "pitch": 1.1
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "_lds": {
+    "id": "lds:memory/visual/2026-01-07-math",
+    "type": "memory.visual"
+  },
+  "core": {
+    "image_uri": "img://armand/progress/math_worksheet_success.jpg",
+    "context": "Independent work without redirection",
+    "mood_detected": "proud"
+  },
+  "inference": {
+    "supports": ["lds:goal/math-confidence"]
+  }
+}

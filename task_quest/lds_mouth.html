@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LDS Mouth | Zero Latency Speech</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --border: #222;
+            --text: #e0e0e0;
+            --accent: #00ff88;
+            --accent-dim: #00aa5a;
+            --pulse: #00ff88;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--bg);
+        }
+
+        .logo-text {
+            font-size: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            opacity: 0.5;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+        }
+
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--surface);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        /* LDS Input */
+        .lds-input {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .lds-input:focus {
+            border-color: var(--accent-dim);
+        }
+
+        /* The Mouth */
+        .mouth-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .mouth {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .mouth-ring {
+            position: absolute;
+            inset: 0;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            opacity: 0.2;
+        }
+
+        .mouth-ring.active {
+            animation: ring-expand 1s ease-out infinite;
+        }
+
+        @keyframes ring-expand {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .mouth-core {
+            position: absolute;
+            inset: 20px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.1;
+            transition: all 0.3s;
+        }
+
+        .mouth-core.active {
+            opacity: 0.3;
+            animation: breathe 0.5s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .mouth-center {
+            position: absolute;
+            inset: 50px;
+            background: var(--bg);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            transition: all 0.3s;
+        }
+
+        .mouth-center.active {
+            background: var(--accent);
+            color: var(--bg);
+            box-shadow: 0 0 40px var(--accent);
+        }
+
+        .speech-text {
+            text-align: center;
+            max-width: 400px;
+            font-size: 14px;
+            line-height: 1.8;
+            min-height: 80px;
+            color: var(--text);
+            opacity: 0.7;
+        }
+
+        .speech-text.speaking {
+            opacity: 1;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: var(--border);
+        }
+
+        button.primary {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        button.primary:hover {
+            background: var(--accent-dim);
+        }
+
+        button.danger {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        button.danger:hover {
+            background: #ff444420;
+        }
+
+        /* Voice Settings */
+        .voice-settings {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .setting {
+            flex: 1;
+        }
+
+        .setting label {
+            display: block;
+            font-size: 11px;
+            opacity: 0.5;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .setting input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            background: var(--border);
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .setting input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .setting select {
+            width: 100%;
+            padding: 8px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12px;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        /* Examples */
+        .examples {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .example-btn {
+            padding: 6px 12px;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .example-btn:hover {
+            opacity: 1;
+        }
+
+        /* Stream Indicator */
+        .stream-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stream-indicator.visible {
+            opacity: 1;
+        }
+
+        .stream-dots span {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: stream-dot 1s infinite;
+        }
+
+        .stream-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .stream-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes stream-dot {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-mark">M</div>
+            <div class="logo-text">LDS <span>Mouth</span></div>
+        </div>
+        <div class="status">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Ready</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- LDS Input Panel -->
+        <div class="panel">
+            <div class="panel-title">LDS Entity / Message</div>
+            <textarea class="lds-input" id="ldsInput" placeholder="Enter LDS JSON or plain text to speak...">{
+  "_lds": {
+    "id": "lds:greeting/hello-v1",
+    "type": "voice.message"
+  },
+  "core": {
+    "speak": "Hello! I am the LDS Speech Engine. The mouth comes alive. Data flows through me and becomes voice instantly. Zero latency. Always true."
+  }
+}</textarea>
+            <div class="examples">
+                <button class="example-btn" onclick="loadExample('greeting')">Greeting</button>
+                <button class="example-btn" onclick="loadExample('notification')">Notification</button>
+                <button class="example-btn" onclick="loadExample('personality')">Personality</button>
+                <button class="example-btn" onclick="loadExample('streaming')">Streaming</button>
+            </div>
+            <div class="controls">
+                <button class="primary" onclick="speakLDS()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    Speak
+                </button>
+                <button onclick="streamLDS()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 12h16M12 4l8 8-8 8"/>
+                    </svg>
+                    Stream
+                </button>
+                <button class="danger" onclick="stopSpeaking()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="6" width="12" height="12"/>
+                    </svg>
+                    Stop
+                </button>
+            </div>
+            <div class="voice-settings">
+                <div class="setting">
+                    <label>Rate</label>
+                    <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                <div class="setting">
+                    <label>Pitch</label>
+                    <input type="range" id="pitchSlider" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                <div class="setting">
+                    <label>Voice</label>
+                    <select id="voiceSelect"></select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mouth Output Panel -->
+        <div class="panel">
+            <div class="panel-title">The Mouth</div>
+            <div class="mouth-container">
+                <div class="mouth">
+                    <div class="mouth-ring" id="ring1"></div>
+                    <div class="mouth-ring" id="ring2" style="animation-delay: 0.5s"></div>
+                    <div class="mouth-core" id="mouthCore"></div>
+                    <div class="mouth-center" id="mouthCenter">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="speech-text" id="speechText">
+                    Feed me an LDS entity. I will speak.
+                </div>
+                <div class="stream-indicator" id="streamIndicator">
+                    <div class="stream-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span>Streaming...</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // =================================================================
+        // LDS SPEECH ENGINE - Browser Edition
+        // Zero latency via Web Speech API
+        // =================================================================
+
+        const LDSMouth = {
+            synth: window.speechSynthesis,
+            voices: [],
+            speaking: false,
+            currentUtterance: null,
+
+            // Initialize
+            init() {
+                // Load voices
+                this.loadVoices();
+                speechSynthesis.onvoiceschanged = () => this.loadVoices();
+            },
+
+            loadVoices() {
+                this.voices = this.synth.getVoices();
+                const select = document.getElementById('voiceSelect');
+                select.innerHTML = '';
+
+                this.voices.forEach((voice, i) => {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    if (voice.default) option.selected = true;
+                    select.appendChild(option);
+                });
+            },
+
+            // Parse LDS to extract speech content
+            parseLDS(input) {
+                let lds;
+
+                // Try to parse as JSON
+                try {
+                    lds = typeof input === 'string' ? JSON.parse(input) : input;
+                } catch {
+                    // Not JSON - treat as plain text
+                    return { text: input, voice: {} };
+                }
+
+                const core = lds.core || lds;
+                let text = '';
+                let voice = {};
+
+                // Extract text - priority order
+                const textFields = ['speak', 'say', 'message', 'text', 'utterance', 'speech'];
+                for (const field of textFields) {
+                    if (core[field]) {
+                        text = Array.isArray(core[field]) ? core[field].join(' ') : core[field];
+                        break;
+                    }
+                }
+
+                // Fallback to name + description
+                if (!text) {
+                    const name = core.name || '';
+                    const desc = core.description || '';
+                    text = name && desc ? `${name}. ${desc}` : name || desc;
+                }
+
+                // Still nothing? Stringify core
+                if (!text) {
+                    text = JSON.stringify(core);
+                }
+
+                // Extract voice settings
+                const voiceConfig = core.voice || {};
+                voice = {
+                    rate: voiceConfig.rate || voiceConfig.speed || 1,
+                    pitch: voiceConfig.pitch || 1,
+                    volume: voiceConfig.volume || 1,
+                    voiceIndex: voiceConfig.voiceIndex
+                };
+
+                return { text, voice, lds };
+            },
+
+            // Speak - the mouth comes alive
+            speak(input) {
+                const { text, voice } = this.parseLDS(input);
+
+                if (!text) {
+                    this.updateUI('silent', 'Nothing to speak');
+                    return;
+                }
+
+                // Cancel any existing speech
+                this.synth.cancel();
+
+                // Create utterance
+                const utterance = new SpeechSynthesisUtterance(text);
+
+                // Apply settings from sliders
+                utterance.rate = voice.rate || parseFloat(document.getElementById('rateSlider').value);
+                utterance.pitch = voice.pitch || parseFloat(document.getElementById('pitchSlider').value);
+                utterance.volume = voice.volume || 1;
+
+                // Apply voice
+                const voiceIndex = parseInt(document.getElementById('voiceSelect').value);
+                if (this.voices[voiceIndex]) {
+                    utterance.voice = this.voices[voiceIndex];
+                }
+
+                // Events
+                utterance.onstart = () => {
+                    this.speaking = true;
+                    this.updateUI('speaking', text);
+                };
+
+                utterance.onend = () => {
+                    this.speaking = false;
+                    this.updateUI('silent', 'Done.');
+                };
+
+                utterance.onerror = (e) => {
+                    this.speaking = false;
+                    this.updateUI('silent', `Error: ${e.error}`);
+                };
+
+                this.currentUtterance = utterance;
+
+                // SPEAK! Zero latency - starts immediately
+                this.synth.speak(utterance);
+            },
+
+            // Stream speak - for chunked/streaming input
+            async streamSpeak(input, chunkDelay = 100) {
+                const { text } = this.parseLDS(input);
+
+                if (!text) return;
+
+                this.synth.cancel();
+                document.getElementById('streamIndicator').classList.add('visible');
+
+                // Split into sentences
+                const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+
+                this.updateUI('streaming', '');
+
+                for (const sentence of sentences) {
+                    if (!this.speaking && sentences.indexOf(sentence) > 0) break;
+
+                    await this.speakChunk(sentence.trim());
+                    await this.delay(chunkDelay);
+                }
+
+                document.getElementById('streamIndicator').classList.remove('visible');
+                this.updateUI('silent', 'Stream complete.');
+            },
+
+            speakChunk(text) {
+                return new Promise((resolve) => {
+                    const utterance = new SpeechSynthesisUtterance(text);
+
+                    utterance.rate = parseFloat(document.getElementById('rateSlider').value);
+                    utterance.pitch = parseFloat(document.getElementById('pitchSlider').value);
+
+                    const voiceIndex = parseInt(document.getElementById('voiceSelect').value);
+                    if (this.voices[voiceIndex]) {
+                        utterance.voice = this.voices[voiceIndex];
+                    }
+
+                    utterance.onstart = () => {
+                        this.speaking = true;
+                        this.updateUI('speaking', text);
+                    };
+
+                    utterance.onend = () => resolve();
+                    utterance.onerror = () => resolve();
+
+                    this.synth.speak(utterance);
+                });
+            },
+
+            stop() {
+                this.synth.cancel();
+                this.speaking = false;
+                document.getElementById('streamIndicator').classList.remove('visible');
+                this.updateUI('silent', 'Stopped.');
+            },
+
+            updateUI(state, text) {
+                const mouthCenter = document.getElementById('mouthCenter');
+                const mouthCore = document.getElementById('mouthCore');
+                const ring1 = document.getElementById('ring1');
+                const ring2 = document.getElementById('ring2');
+                const speechText = document.getElementById('speechText');
+                const statusDot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+
+                if (state === 'speaking' || state === 'streaming') {
+                    mouthCenter.classList.add('active');
+                    mouthCore.classList.add('active');
+                    ring1.classList.add('active');
+                    ring2.classList.add('active');
+                    speechText.classList.add('speaking');
+                    statusText.textContent = 'Speaking';
+                    statusDot.style.background = '#00ff88';
+                } else {
+                    mouthCenter.classList.remove('active');
+                    mouthCore.classList.remove('active');
+                    ring1.classList.remove('active');
+                    ring2.classList.remove('active');
+                    speechText.classList.remove('speaking');
+                    statusText.textContent = 'Ready';
+                    statusDot.style.background = '#00ff88';
+                }
+
+                if (text) {
+                    speechText.textContent = text;
+                }
+            },
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        };
+
+        // =================================================================
+        // UI Functions
+        // =================================================================
+
+        function speakLDS() {
+            const input = document.getElementById('ldsInput').value;
+            LDSMouth.speak(input);
+        }
+
+        function streamLDS() {
+            const input = document.getElementById('ldsInput').value;
+            LDSMouth.streamSpeak(input);
+        }
+
+        function stopSpeaking() {
+            LDSMouth.stop();
+        }
+
+        // Example LDS entities
+        const examples = {
+            greeting: {
+                "_lds": { "id": "lds:greeting/hello-v1", "type": "voice.message" },
+                "core": {
+                    "speak": "Hello! I am the LDS Speech Engine. The mouth comes alive. Data flows through me and becomes voice instantly. Zero latency. Always true."
+                }
+            },
+            notification: {
+                "_lds": { "id": "lds:alert/notification-v1", "type": "voice.alert" },
+                "core": {
+                    "speak": "Attention! You have a new message from the system. The data has been processed successfully. All systems are operational.",
+                    "voice": { "rate": 1.1 }
+                }
+            },
+            personality: {
+                "_lds": { "id": "lds:persona/assistant-v1", "type": "voice.personality" },
+                "core": {
+                    "name": "Aria",
+                    "description": "I'm your AI assistant. I speak from logic data structures. Each word I say is governed, deterministic, and true. How may I help you today?",
+                    "voice": { "rate": 0.95, "pitch": 1.1 }
+                }
+            },
+            streaming: {
+                "_lds": { "id": "lds:demo/streaming-v1", "type": "voice.stream" },
+                "core": {
+                    "speak": "This is a streaming demo. Each sentence arrives separately. The mouth speaks as data flows. No waiting. No buffering. Just pure, instant voice. This is the future of LDS-driven speech."
+                }
+            }
+        };
+
+        function loadExample(name) {
+            const example = examples[name];
+            document.getElementById('ldsInput').value = JSON.stringify(example, null, 2);
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            LDSMouth.init();
+        };
+    </script>
+</body>
+</html>

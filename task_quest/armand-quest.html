@@ -1,0 +1,3645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armand's Quest - Task Hero</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #22d3ee;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --xp-bar: linear-gradient(90deg, #6366f1, #22d3ee);
+            --coin-gold: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 50%;
+            animation: float 15s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Header */
+        .header {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--xp-bar);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            background: var(--xp-bar);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--glass);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .stat-icon {
+            font-size: 1.2rem;
+        }
+
+        .stat-icon.xp { color: var(--primary); }
+        .stat-icon.coins { color: var(--coin-gold); }
+        .stat-icon.streak { color: var(--danger); }
+        .stat-icon.level { color: var(--secondary); }
+
+        .stat-value {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Level Progress */
+        .level-progress {
+            width: 200px;
+        }
+
+        .level-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        .level-fill {
+            height: 100%;
+            background: var(--xp-bar);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* User Menu */
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--xp-bar);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            border: 2px solid var(--glass-border);
+        }
+
+        .role-badge {
+            background: var(--accent);
+            color: var(--bg-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Task Categories */
+        .task-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .task-category {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .category-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .category-title {
+            flex: 1;
+        }
+
+        .category-title h3 {
+            font-size: 1.1rem;
+        }
+
+        .category-title span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .category-progress {
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        /* Task Items */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task-item {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            border-color: var(--primary);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+        }
+
+        .task-checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--glass-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .task-item.completed .task-checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .task-checkbox i {
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-item.completed .task-checkbox i {
+            opacity: 1;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .task-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .task-rewards {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .reward-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .reward-badge.xp { color: var(--primary); }
+        .reward-badge.coins { color: var(--coin-gold); }
+
+        .task-timer {
+            background: var(--accent);
+            color: var(--bg-dark);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .difficulty-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .difficulty-easy { background: var(--success); color: white; }
+        .difficulty-medium { background: var(--accent); color: var(--bg-dark); }
+        .difficulty-hard { background: var(--danger); color: white; }
+        .difficulty-hero { background: linear-gradient(135deg, #6366f1, #ec4899); color: white; }
+        .difficulty-legendary { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; }
+        .difficulty-special { background: linear-gradient(135deg, #22d3ee, #10b981); color: var(--bg-dark); }
+
+        /* Reward Shop */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .shop-category {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .shop-item {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shop-item:hover {
+            border-color: var(--coin-gold);
+            transform: scale(1.02);
+        }
+
+        .shop-item-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--glass);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .shop-item-info {
+            flex: 1;
+        }
+
+        .shop-item-name {
+            font-weight: 600;
+        }
+
+        .shop-item-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .shop-item-price {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(251, 191, 36, 0.2);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            color: var(--coin-gold);
+            font-weight: bold;
+        }
+
+        .shop-item.cannot-afford {
+            opacity: 0.5;
+        }
+
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .achievement-category {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .achievement-item {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-item.locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .achievement-item.unlocked {
+            border-color: var(--coin-gold);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+        }
+
+        .achievement-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 3px solid;
+        }
+
+        .rarity-common .achievement-icon { border-color: #9ca3af; background: rgba(156,163,175,0.2); }
+        .rarity-uncommon .achievement-icon { border-color: #10b981; background: rgba(16,185,129,0.2); }
+        .rarity-rare .achievement-icon { border-color: #3b82f6; background: rgba(59,130,246,0.2); }
+        .rarity-epic .achievement-icon { border-color: #8b5cf6; background: rgba(139,92,246,0.2); }
+        .rarity-legendary .achievement-icon { border-color: #f59e0b; background: rgba(245,158,11,0.2); animation: glow 2s infinite; }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(245,158,11,0.5); }
+            50% { box-shadow: 0 0 20px rgba(245,158,11,0.8); }
+        }
+
+        .achievement-info {
+            flex: 1;
+        }
+
+        .achievement-name {
+            font-weight: 600;
+        }
+
+        .achievement-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .achievement-progress {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .achievement-progress-fill {
+            height: 100%;
+            background: var(--xp-bar);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Journey Map */
+        .journey-map {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 2rem;
+        }
+
+        .journey-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .journey-title h2 {
+            background: var(--xp-bar);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Region Filter */
+        .region-filter {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .region-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .region-btn:hover, .region-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Current Destination Card */
+        .current-destination {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(34, 211, 238, 0.2));
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .destination-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .destination-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--xp-bar);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .destination-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .destination-info span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .destination-facts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .fact-card {
+            background: var(--glass);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .fact-card.gem {
+            border-color: var(--coin-gold);
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .fact-label {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .fact-card.gem .fact-label {
+            color: var(--coin-gold);
+        }
+
+        .fact-card p {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* Journey Stats */
+        .journey-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .journey-stat {
+            text-align: center;
+        }
+
+        .stat-num {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .stat-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .journey-path {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .journey-milestone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .journey-milestone:hover {
+            transform: translateY(-5px);
+        }
+
+        .milestone-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 3px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .milestone-icon.reached {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--secondary);
+        }
+
+        .milestone-icon.current {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .milestone-icon.locked {
+            opacity: 0.4;
+            filter: grayscale(0.5);
+        }
+
+        .milestone-icon.legendary {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border-color: #f59e0b;
+        }
+
+        .milestone-label {
+            text-align: center;
+        }
+
+        .milestone-level {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .milestone-location {
+            font-size: 0.75rem;
+            font-weight: 600;
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .milestone-region {
+            font-size: 0.65rem;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        /* Team Panel */
+        .team-panel {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .team-member {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .team-member:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .team-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .team-info {
+            flex: 1;
+        }
+
+        .team-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .team-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Compliance Panel */
+        .compliance-card, .audit-card, .access-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 1.5rem;
+        }
+
+        .compliance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .compliance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .compliance-badge.hipaa {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 211, 238, 0.2));
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .compliance-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+
+        .status-dot.active {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .compliance-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--glass);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .compliance-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .compliance-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .compliance-value {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .compliance-entities h4 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .entity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .entity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--glass);
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .entity-item code {
+            font-size: 0.85rem;
+            color: var(--secondary);
+        }
+
+        .entity-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .entity-status.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .audit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .audit-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .audit-controls select {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .audit-log {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .audit-entry {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            font-size: 0.85rem;
+        }
+
+        .audit-entry:last-child {
+            border-bottom: none;
+        }
+
+        .audit-time {
+            color: var(--text-secondary);
+            font-family: monospace;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        .audit-event {
+            flex: 1;
+        }
+
+        .audit-type {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .audit-action {
+            color: var(--text-primary);
+        }
+
+        .audit-actor {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .access-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .access-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--glass);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .access-count {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .access-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Settings Panel */
+        .settings-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .settings-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .theme-option {
+            cursor: pointer;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: var(--glass);
+            transition: all 0.3s ease;
+        }
+
+        .theme-option:hover {
+            border-color: var(--glass-border);
+            transform: translateY(-2px);
+        }
+
+        .theme-option.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        .theme-preview {
+            width: 80px;
+            height: 50px;
+            border-radius: 8px;
+            margin: 0 auto 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .theme-check {
+            color: white;
+            font-size: 1.2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .theme-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .branding-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 400px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .tenant-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .tenant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--glass);
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .tenant-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .tenant-value {
+            font-weight: 500;
+        }
+
+        .tier-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .tier-badge.professional {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        .tier-badge.hipaa {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid var(--glass-border);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Timer Modal */
+        .timer-display {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .timer-value {
+            font-size: 4rem;
+            font-weight: bold;
+            background: var(--xp-bar);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .timer-task {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .timer-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Celebration Animation */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            display: none;
+        }
+
+        .celebration.active {
+            display: block;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Daily Summary Card */
+        .daily-summary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-stat {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Voice Button */
+        .voice-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--xp-bar);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .voice-btn.listening {
+            animation: voicePulse 1s infinite;
+        }
+
+        @keyframes voicePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); }
+        }
+
+        /* Role Selector */
+        .role-selector {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .role-selector.hidden {
+            display: none;
+        }
+
+        .role-selector-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .role-selector h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: var(--xp-bar);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .role-selector p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .role-option {
+            background: var(--glass);
+            border: 2px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .role-option.selected {
+            border-color: var(--secondary);
+            background: rgba(34, 211, 238, 0.1);
+        }
+
+        .role-option-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-option-name {
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats-bar {
+                justify-content: center;
+            }
+
+            .level-progress {
+                width: 150px;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .task-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .daily-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .journey-path {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .journey-path::before {
+                width: 4px;
+                height: 100%;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Role Selector Screen -->
+    <div class="role-selector" id="roleSelector">
+        <div class="role-selector-content">
+            <h2><i class="fas fa-user-astronaut"></i> Armand's Quest</h2>
+            <p>Who's logging in today?</p>
+            <div class="role-grid" id="roleGrid">
+                <!-- Roles populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <!-- Celebration Container -->
+    <div class="celebration" id="celebration"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-rocket"></i></div>
+                <div class="logo-text">
+                    <h1>Armand's Quest</h1>
+                    <span>Level up your day!</span>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <i class="fas fa-bolt stat-icon level"></i>
+                    <span>Lvl</span>
+                    <span class="stat-value" id="currentLevel">1</span>
+                </div>
+                <div class="level-progress">
+                    <small id="xpProgress">0 / 100 XP</small>
+                    <div class="level-bar">
+                        <div class="level-fill" id="levelFill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-star stat-icon xp"></i>
+                    <span class="stat-value" id="totalXP">0</span>
+                    <span>XP</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-coins stat-icon coins"></i>
+                    <span class="stat-value" id="totalCoins">0</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-fire stat-icon streak"></i>
+                    <span class="stat-value" id="currentStreak">0</span>
+                    <span>day streak</span>
+                </div>
+            </div>
+
+            <div class="user-menu">
+                <span class="role-badge" id="currentRoleBadge">Player</span>
+                <div class="user-avatar" id="userAvatar" onclick="showRoleSelector()">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <div class="nav-tab active" data-tab="tasks">
+                <i class="fas fa-tasks"></i> Tasks
+            </div>
+            <div class="nav-tab" data-tab="shop">
+                <i class="fas fa-store"></i> Reward Shop
+            </div>
+            <div class="nav-tab" data-tab="achievements">
+                <i class="fas fa-trophy"></i> Achievements
+            </div>
+            <div class="nav-tab" data-tab="journey">
+                <i class="fas fa-map"></i> Journey Map
+            </div>
+            <div class="nav-tab" data-tab="team">
+                <i class="fas fa-users"></i> Team
+            </div>
+            <div class="nav-tab" data-tab="compliance" id="complianceTab" style="display: none;">
+                <i class="fas fa-shield-halved"></i> Compliance
+            </div>
+            <div class="nav-tab" data-tab="settings" id="settingsTab" style="display: none;">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+        </nav>
+
+        <!-- Tasks Tab -->
+        <div class="tab-content active" id="tasks-tab">
+            <!-- Daily Summary -->
+            <div class="daily-summary">
+                <div class="summary-stat">
+                    <div class="summary-value" id="tasksComplete">0</div>
+                    <div class="summary-label">Tasks Done</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value" id="tasksTotal">0</div>
+                    <div class="summary-label">Total Tasks</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value" id="xpToday">0</div>
+                    <div class="summary-label">XP Today</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value" id="coinsToday">0</div>
+                    <div class="summary-label">Coins Today</div>
+                </div>
+            </div>
+
+            <!-- Task Categories -->
+            <div class="task-categories" id="taskCategories">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Shop Tab -->
+        <div class="tab-content" id="shop-tab">
+            <div class="shop-grid" id="shopGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Achievements Tab -->
+        <div class="tab-content" id="achievements-tab">
+            <div class="achievements-grid" id="achievementsGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Journey Map Tab -->
+        <div class="tab-content" id="journey-tab">
+            <div class="journey-map">
+                <div class="journey-title">
+                    <h2><i class="fas fa-map-marked-alt"></i> Armand's USA Adventure</h2>
+                    <p>Explore amazing towns across America! Click any destination to learn fun facts!</p>
+                </div>
+
+                <!-- Region Filter -->
+                <div class="region-filter" id="regionFilter">
+                    <button class="region-btn active" data-region="all">All</button>
+                    <button class="region-btn" data-region="east">East Coast</button>
+                    <button class="region-btn" data-region="south">South</button>
+                    <button class="region-btn" data-region="midwest">Midwest</button>
+                    <button class="region-btn" data-region="west">Mountain West</button>
+                    <button class="region-btn" data-region="pacific">Pacific</button>
+                    <button class="region-btn" data-region="legendary">Legendary</button>
+                </div>
+
+                <!-- Current Destination Card -->
+                <div class="current-destination" id="currentDestination">
+                    <div class="destination-header">
+                        <div class="destination-icon" id="destIcon"><i class="fas fa-home"></i></div>
+                        <div class="destination-info">
+                            <h3 id="destLocation">Jenkintown, PA</h3>
+                            <span id="destLevel">Level 1 - Home Base</span>
+                        </div>
+                    </div>
+                    <div class="destination-facts">
+                        <div class="fact-card">
+                            <div class="fact-label"><i class="fas fa-lightbulb"></i> Fun Fact</div>
+                            <p id="destFunFact">Click a destination to learn about it!</p>
+                        </div>
+                        <div class="fact-card gem">
+                            <div class="fact-label"><i class="fas fa-gem"></i> Hidden Gem</div>
+                            <p id="destHiddenGem">Discover the secrets of each town!</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="googleBtn" onclick="searchGoogle()">
+                        <i class="fas fa-search"></i> Google This Town!
+                    </button>
+                </div>
+
+                <div class="journey-path" id="journeyPath">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <!-- Journey Stats -->
+                <div class="journey-stats">
+                    <div class="journey-stat">
+                        <span class="stat-num" id="townsUnlocked">1</span>
+                        <span class="stat-desc">Towns Unlocked</span>
+                    </div>
+                    <div class="journey-stat">
+                        <span class="stat-num" id="townsRemaining">30</span>
+                        <span class="stat-desc">To Discover</span>
+                    </div>
+                    <div class="journey-stat">
+                        <span class="stat-num" id="nextTownLevel">2</span>
+                        <span class="stat-desc">Next Town At</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Tab -->
+        <div class="tab-content" id="team-tab">
+            <div class="team-panel">
+                <h3><i class="fas fa-users"></i> Support Team</h3>
+                <p style="color: var(--text-secondary); margin-top: 0.5rem;">Your team is here to help you succeed!</p>
+                <div class="team-grid" id="teamGrid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Compliance Tab (Admin Only) -->
+        <div class="tab-content" id="compliance-tab">
+            <!-- Compliance Status Card -->
+            <div class="compliance-card">
+                <div class="compliance-header">
+                    <div class="compliance-badge hipaa">
+                        <i class="fas fa-shield-halved"></i> HIPAA COMPLIANT
+                    </div>
+                    <div class="compliance-status">
+                        <span class="status-dot active"></span>
+                        <span>Protection Active</span>
+                    </div>
+                </div>
+
+                <div class="compliance-grid">
+                    <div class="compliance-item">
+                        <div class="compliance-icon"><i class="fas fa-lock"></i></div>
+                        <div class="compliance-info">
+                            <div class="compliance-label">PHI Protection</div>
+                            <div class="compliance-value" id="phiStatus">Active</div>
+                        </div>
+                    </div>
+                    <div class="compliance-item">
+                        <div class="compliance-icon"><i class="fas fa-file-signature"></i></div>
+                        <div class="compliance-info">
+                            <div class="compliance-label">Consent Status</div>
+                            <div class="compliance-value" id="consentStatus">Valid</div>
+                        </div>
+                    </div>
+                    <div class="compliance-item">
+                        <div class="compliance-icon"><i class="fas fa-calendar"></i></div>
+                        <div class="compliance-info">
+                            <div class="compliance-label">Consent Expiry</div>
+                            <div class="compliance-value" id="consentExpiry">2026-01-08</div>
+                        </div>
+                    </div>
+                    <div class="compliance-item">
+                        <div class="compliance-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                        <div class="compliance-info">
+                            <div class="compliance-label">Session Timeout</div>
+                            <div class="compliance-value">30 minutes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compliance-entities">
+                    <h4><i class="fas fa-file-code"></i> LDS Compliance Entities</h4>
+                    <div class="entity-list">
+                        <div class="entity-item">
+                            <code>lds:compliance/armand-quest-hipaa-v1</code>
+                            <span class="entity-status active">ACTIVE</span>
+                        </div>
+                        <div class="entity-item">
+                            <code>lds:consent/guardian-primary-v1</code>
+                            <span class="entity-status active">ACTIVE</span>
+                        </div>
+                        <div class="entity-item">
+                            <code>lds:audit/armand-quest-schema-v1</code>
+                            <span class="entity-status active">ACTIVE</span>
+                        </div>
+                        <div class="entity-item">
+                            <code>lds:roles/armand-quest-rbac-v1</code>
+                            <span class="entity-status active">ACTIVE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Log Card -->
+            <div class="audit-card">
+                <div class="audit-header">
+                    <h3><i class="fas fa-scroll"></i> Audit Log</h3>
+                    <div class="audit-controls">
+                        <select id="auditFilter" onchange="filterAuditLog()">
+                            <option value="all">All Events</option>
+                            <option value="authentication">Authentication</option>
+                            <option value="data_modification">Data Changes</option>
+                            <option value="security">Security</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="exportAuditLog()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="audit-log" id="auditLogDisplay">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Data Access Summary -->
+            <div class="access-card">
+                <h3><i class="fas fa-eye"></i> Data Access Summary</h3>
+                <div class="access-grid" id="accessSummary">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <!-- Theme Selection Card -->
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3><i class="fas fa-palette"></i> Theme & Appearance</h3>
+                    <span class="settings-subtitle">Choose a theme that matches your style</span>
+                </div>
+                <div class="theme-grid" id="themeSelector">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Branding Card -->
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3><i class="fas fa-tag"></i> White Label Branding</h3>
+                    <span class="settings-subtitle">Customize app name and identity</span>
+                </div>
+                <div class="branding-form">
+                    <div class="form-group">
+                        <label for="appNameInput">App Name</label>
+                        <input type="text" id="appNameInput" placeholder="Adventure Quest" maxlength="30">
+                    </div>
+                    <div class="form-group">
+                        <label for="taglineInput">Tagline</label>
+                        <input type="text" id="taglineInput" placeholder="Your Journey Awaits!" maxlength="50">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveBranding()">
+                        <i class="fas fa-save"></i> Save Branding
+                    </button>
+                </div>
+            </div>
+
+            <!-- Multi-Tenant Info Card -->
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3><i class="fas fa-building"></i> Tenant Configuration</h3>
+                    <span class="settings-subtitle">Multi-tenant architecture settings</span>
+                </div>
+                <div class="tenant-info">
+                    <div class="tenant-item">
+                        <span class="tenant-label">Tenant ID:</span>
+                        <span class="tenant-value" id="tenantIdDisplay">default</span>
+                    </div>
+                    <div class="tenant-item">
+                        <span class="tenant-label">Data Isolation:</span>
+                        <span class="tenant-value"><i class="fas fa-check-circle" style="color: var(--success);"></i> Complete</span>
+                    </div>
+                    <div class="tenant-item">
+                        <span class="tenant-label">Storage Prefix:</span>
+                        <span class="tenant-value" id="storagePrefixDisplay">(none - default tenant)</span>
+                    </div>
+                    <div class="tenant-item">
+                        <span class="tenant-label">Subscription Tier:</span>
+                        <span class="tenant-value"><span class="tier-badge professional">Professional</span></span>
+                    </div>
+                    <div class="tenant-item">
+                        <span class="tenant-label">Compliance Level:</span>
+                        <span class="tenant-value"><span class="tier-badge hipaa">HIPAA</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management Card -->
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3><i class="fas fa-database"></i> Data Management</h3>
+                    <span class="settings-subtitle">Export and manage your data</span>
+                </div>
+                <div class="data-actions">
+                    <button class="btn btn-secondary" onclick="exportAllData()">
+                        <i class="fas fa-download"></i> Export All Data
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetLocalData()">
+                        <i class="fas fa-refresh"></i> Reset Progress (Demo)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Timer Modal -->
+    <div class="modal-overlay" id="timerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-clock"></i> Task Timer</h3>
+                <button class="modal-close" onclick="closeTimerModal()">&times;</button>
+            </div>
+            <div class="timer-display">
+                <div class="timer-value" id="timerValue">5:00</div>
+                <div class="timer-task" id="timerTask">Make Your Bed</div>
+            </div>
+            <div class="timer-buttons">
+                <button class="btn btn-secondary" onclick="closeTimerModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn btn-success" id="completeTaskBtn" onclick="completeTimerTask()">
+                    <i class="fas fa-check"></i> Done!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div class="modal-overlay" id="purchaseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-shopping-cart"></i> Confirm Purchase</h3>
+                <button class="modal-close" onclick="closePurchaseModal()">&times;</button>
+            </div>
+            <div style="text-align: center; padding: 1rem 0;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;" id="purchaseIcon"></div>
+                <h4 id="purchaseName">Item Name</h4>
+                <p style="color: var(--text-secondary); margin: 0.5rem 0;" id="purchaseDesc">Description</p>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 1.5rem; margin-top: 1rem;">
+                    <i class="fas fa-coins" style="color: var(--coin-gold);"></i>
+                    <span id="purchaseCost">100</span>
+                </div>
+            </div>
+            <div class="timer-buttons">
+                <button class="btn btn-secondary" onclick="closePurchaseModal()">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" id="confirmPurchaseBtn" onclick="confirmPurchase()">
+                    <i class="fas fa-coins"></i> Buy Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Button -->
+    <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice Assistant">
+        <i class="fas fa-microphone"></i>
+    </button>
+
+    <script>
+        // ===== LDS ENTITY DATA =====
+        const LDS_PROFILE = {
+            name: "Armand Lefebvre",
+            nickname: "Armand",
+            age: 9,
+            currentLevel: 1,
+            totalXP: 0,
+            currentXP: 0,
+            coins: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            achievementsUnlocked: [],
+            taskCompletions: {},
+            perfectDays: 0
+        };
+
+        const LDS_TASKS = {
+            morning_routine: {
+                icon: "fa-sun",
+                color: "#FFB347",
+                name: "Morning Routine",
+                tasks: [
+                    { id: "wake-up", name: "Wake Up On Time", description: "Get out of bed when alarm goes off", xp: 10, coins: 5, time_limit: 5, difficulty: "easy", icon: "fa-bed" },
+                    { id: "make-bed", name: "Make Your Bed", description: "Pull up covers and arrange pillows", xp: 15, coins: 5, time_limit: 5, difficulty: "easy", icon: "fa-bed" },
+                    { id: "brush-teeth-am", name: "Brush Teeth (Morning)", description: "Brush for 2 full minutes", xp: 15, coins: 5, time_limit: 3, difficulty: "easy", icon: "fa-tooth" },
+                    { id: "get-dressed", name: "Get Dressed", description: "Put on clothes for the day", xp: 15, coins: 5, time_limit: 10, difficulty: "easy", icon: "fa-shirt" },
+                    { id: "eat-breakfast", name: "Eat Breakfast", description: "Finish your breakfast at the table", xp: 20, coins: 10, time_limit: 20, difficulty: "easy", icon: "fa-utensils" },
+                    { id: "pack-backpack", name: "Pack Backpack", description: "Check list and pack everything needed", xp: 25, coins: 10, time_limit: 10, difficulty: "medium", icon: "fa-backpack" }
+                ]
+            },
+            school_day: {
+                icon: "fa-school",
+                color: "#87CEEB",
+                name: "School Hero",
+                tasks: [
+                    { id: "stay-seated", name: "Stay in Seat Challenge", description: "Stay in seat for full class period", xp: 50, coins: 25, difficulty: "hero", icon: "fa-chair", bonus: 2 },
+                    { id: "raise-hand", name: "Raise Hand First", description: "Raise hand instead of calling out", xp: 40, coins: 20, difficulty: "hard", icon: "fa-hand" },
+                    { id: "homework-written", name: "Write Down Homework", description: "Write all assignments in planner", xp: 30, coins: 15, difficulty: "medium", icon: "fa-pencil" },
+                    { id: "bring-materials", name: "Bring All Materials Home", description: "Check backpack before leaving school", xp: 35, coins: 15, difficulty: "medium", icon: "fa-clipboard-check" }
+                ]
+            },
+            afternoon: {
+                icon: "fa-cloud-sun",
+                color: "#98FB98",
+                name: "Afternoon",
+                tasks: [
+                    { id: "snack-healthy", name: "Healthy Snack", description: "Eat a healthy snack after school", xp: 15, coins: 5, time_limit: 15, difficulty: "easy", icon: "fa-apple-whole" },
+                    { id: "homework-start", name: "Start Homework", description: "Begin homework within 30 min of getting home", xp: 40, coins: 20, time_limit: 30, difficulty: "hard", icon: "fa-book-open" },
+                    { id: "homework-complete", name: "Complete Homework", description: "Finish all homework assignments", xp: 50, coins: 25, difficulty: "hero", icon: "fa-check-double" },
+                    { id: "reading-20", name: "Read for 20 Minutes", description: "Read a book for 20 minutes", xp: 30, coins: 15, time_limit: 20, difficulty: "medium", icon: "fa-book" }
+                ]
+            },
+            evening: {
+                icon: "fa-moon",
+                color: "#DDA0DD",
+                name: "Evening",
+                tasks: [
+                    { id: "dinner-table", name: "Dinner at Table", description: "Eat dinner at the table with family", xp: 20, coins: 10, time_limit: 30, difficulty: "easy", icon: "fa-utensils" },
+                    { id: "chore-complete", name: "Complete Daily Chore", description: "Do your assigned chore for the day", xp: 35, coins: 20, time_limit: 20, difficulty: "medium", icon: "fa-broom" },
+                    { id: "screen-off", name: "Screens Off On Time", description: "Turn off all screens at designated time", xp: 45, coins: 25, difficulty: "hard", icon: "fa-power-off" },
+                    { id: "brush-teeth-pm", name: "Brush Teeth (Night)", description: "Brush for 2 full minutes before bed", xp: 15, coins: 5, time_limit: 3, difficulty: "easy", icon: "fa-tooth" },
+                    { id: "clothes-ready", name: "Tomorrow's Clothes Ready", description: "Pick out and lay out clothes for tomorrow", xp: 20, coins: 10, time_limit: 10, difficulty: "easy", icon: "fa-shirt" },
+                    { id: "bed-on-time", name: "In Bed On Time", description: "Be in bed by bedtime", xp: 25, coins: 15, difficulty: "medium", icon: "fa-bed" }
+                ]
+            },
+            bonus_quests: {
+                icon: "fa-star",
+                color: "#FFD700",
+                name: "Bonus Quests",
+                tasks: [
+                    { id: "help-giuliana", name: "Help Giuliana", description: "Do something kind for your sister", xp: 40, coins: 30, difficulty: "special", icon: "fa-heart" },
+                    { id: "no-reminders", name: "Zero Reminders Day", description: "Complete all tasks without any reminders", xp: 100, coins: 50, difficulty: "legendary", icon: "fa-crown" },
+                    { id: "math-challenge", name: "Math Challenge", description: "Complete a bonus math problem", xp: 35, coins: 20, difficulty: "medium", icon: "fa-calculator" },
+                    { id: "map-quest", name: "Map Explorer Quest", description: "Learn about a new place on the map", xp: 30, coins: 20, difficulty: "medium", icon: "fa-map" }
+                ]
+            }
+        };
+
+        const LDS_REWARDS = {
+            screen_time: {
+                icon: "fa-gamepad",
+                color: "#9B59B6",
+                name: "Screen Time",
+                items: [
+                    { id: "roblox-15", name: "15 Min Roblox", description: "15 minutes of Roblox time", cost: 50, icon: "fa-gamepad" },
+                    { id: "roblox-30", name: "30 Min Roblox", description: "30 minutes of Roblox time", cost: 90, icon: "fa-gamepad" },
+                    { id: "roblox-60", name: "1 Hour Roblox", description: "Full hour of Roblox time", cost: 150, icon: "fa-gamepad" },
+                    { id: "youtube-15", name: "15 Min YouTube", description: "15 minutes of YouTube", cost: 40, icon: "fa-play" },
+                    { id: "movie-night", name: "Movie Night Pick", description: "You pick the family movie", cost: 200, icon: "fa-film" }
+                ]
+            },
+            activities: {
+                icon: "fa-basketball",
+                color: "#E67E22",
+                name: "Activities",
+                items: [
+                    { id: "stay-up-15", name: "Stay Up 15 Min Late", description: "Stay up 15 minutes past bedtime", cost: 75, icon: "fa-moon" },
+                    { id: "friend-playdate", name: "Friend Playdate", description: "Have a friend over or go to their house", cost: 250, icon: "fa-users" },
+                    { id: "special-outing", name: "Special Outing", description: "Trip to arcade, park, or fun place", cost: 400, icon: "fa-ticket" },
+                    { id: "skip-chore", name: "Skip One Chore", description: "Skip one daily chore (once per week max)", cost: 100, icon: "fa-forward" }
+                ]
+            },
+            treats: {
+                icon: "fa-ice-cream",
+                color: "#F1C40F",
+                name: "Treats",
+                items: [
+                    { id: "dessert-extra", name: "Extra Dessert", description: "Get an extra dessert treat", cost: 60, icon: "fa-cookie" },
+                    { id: "ice-cream", name: "Ice Cream Trip", description: "Trip to get ice cream", cost: 200, icon: "fa-ice-cream" },
+                    { id: "choice-dinner", name: "Dinner Choice", description: "Pick what's for dinner", cost: 150, icon: "fa-utensils" }
+                ]
+            },
+            special: {
+                icon: "fa-gem",
+                color: "#1ABC9C",
+                name: "Special Rewards",
+                items: [
+                    { id: "robux-100", name: "100 Robux", description: "Get 100 Robux added to account", cost: 500, icon: "fa-coins" },
+                    { id: "new-game", name: "New Game", description: "Pick a new game (under $20)", cost: 1000, icon: "fa-gift" },
+                    { id: "sleepover", name: "Sleepover Permission", description: "Have or attend a sleepover", cost: 600, icon: "fa-house" }
+                ]
+            }
+        };
+
+        const LDS_ACHIEVEMENTS = {
+            streaks: {
+                icon: "fa-fire",
+                name: "Streak Master",
+                achievements: [
+                    { id: "first-flame", name: "First Flame", description: "Complete all daily tasks for 1 day", icon: "fa-fire", rarity: "common", xp: 50, coins: 25, req: { type: "streak", value: 1 } },
+                    { id: "warming-up", name: "Warming Up", description: "3-day task streak", icon: "fa-fire", rarity: "common", xp: 100, coins: 50, req: { type: "streak", value: 3 } },
+                    { id: "on-fire", name: "On Fire!", description: "7-day task streak", icon: "fa-fire-flame-curved", rarity: "uncommon", xp: 250, coins: 125, req: { type: "streak", value: 7 } },
+                    { id: "unstoppable", name: "Unstoppable", description: "14-day task streak", icon: "fa-meteor", rarity: "rare", xp: 500, coins: 300, req: { type: "streak", value: 14 } },
+                    { id: "legendary-streak", name: "Legendary Warrior", description: "30-day task streak", icon: "fa-dragon", rarity: "legendary", xp: 1500, coins: 1000, req: { type: "streak", value: 30 } }
+                ]
+            },
+            school_hero: {
+                icon: "fa-graduation-cap",
+                name: "School Hero",
+                achievements: [
+                    { id: "seat-master-1", name: "Seat Apprentice", description: "Stay in seat for 5 class periods", icon: "fa-chair", rarity: "common", xp: 100, coins: 50, req: { type: "task", id: "stay-seated", value: 5 } },
+                    { id: "seat-master-2", name: "Seat Master", description: "Stay in seat for 20 class periods", icon: "fa-chair", rarity: "rare", xp: 400, coins: 200, req: { type: "task", id: "stay-seated", value: 20 } },
+                    { id: "hand-raiser", name: "Hand Raiser Hero", description: "Raise hand 10 times instead of calling out", icon: "fa-hand", rarity: "uncommon", xp: 200, coins: 100, req: { type: "task", id: "raise-hand", value: 10 } },
+                    { id: "homework-hero", name: "Homework Hero", description: "Complete homework on time 10 days", icon: "fa-book-open", rarity: "uncommon", xp: 250, coins: 125, req: { type: "task", id: "homework-complete", value: 10 } }
+                ]
+            },
+            kindness: {
+                icon: "fa-heart",
+                name: "Kindness",
+                achievements: [
+                    { id: "kind-heart", name: "Kind Heart", description: "Help Giuliana 5 times", icon: "fa-heart", rarity: "uncommon", xp: 200, coins: 150, req: { type: "task", id: "help-giuliana", value: 5 } },
+                    { id: "super-brother", name: "Super Brother", description: "Help Giuliana 20 times", icon: "fa-heart", rarity: "epic", xp: 600, coins: 400, req: { type: "task", id: "help-giuliana", value: 20 } }
+                ]
+            },
+            explorer: {
+                icon: "fa-map",
+                name: "Explorer",
+                achievements: [
+                    { id: "map-scout", name: "Map Scout", description: "Complete 5 Map Explorer quests", icon: "fa-map", rarity: "common", xp: 100, coins: 75, req: { type: "task", id: "map-quest", value: 5 } },
+                    { id: "cartographer", name: "Master Cartographer", description: "Complete 25 Map Explorer quests", icon: "fa-map-location-dot", rarity: "epic", xp: 500, coins: 350, req: { type: "task", id: "map-quest", value: 25 } }
+                ]
+            },
+            levels: {
+                icon: "fa-trophy",
+                name: "Level Milestones",
+                achievements: [
+                    { id: "level-5", name: "Rising Star", description: "Reach Level 5", icon: "fa-star", rarity: "common", xp: 100, coins: 100, req: { type: "level", value: 5 } },
+                    { id: "level-10", name: "Task Champion", description: "Reach Level 10", icon: "fa-medal", rarity: "uncommon", xp: 300, coins: 250, req: { type: "level", value: 10 } },
+                    { id: "level-25", name: "Elite Achiever", description: "Reach Level 25", icon: "fa-trophy", rarity: "rare", xp: 750, coins: 500, req: { type: "level", value: 25 } },
+                    { id: "level-50", name: "Legendary Master", description: "Reach Level 50", icon: "fa-crown", rarity: "legendary", xp: 2000, coins: 1500, req: { type: "level", value: 50 } }
+                ]
+            }
+        };
+
+        const LDS_LEVELS = [
+            { level: 1, title: "Beginner", icon: "fa-seedling", color: "#A8E6CF" },
+            { level: 2, title: "Apprentice", icon: "fa-leaf", color: "#88D8B0" },
+            { level: 3, title: "Student", icon: "fa-book", color: "#7EC8A9" },
+            { level: 4, title: "Learner", icon: "fa-graduation-cap", color: "#6DB89A" },
+            { level: 5, title: "Rising Star", icon: "fa-star", color: "#FFD93D" },
+            { level: 6, title: "Achiever", icon: "fa-trophy", color: "#FFC857" },
+            { level: 7, title: "Explorer", icon: "fa-compass", color: "#4ECDC4" },
+            { level: 8, title: "Adventurer", icon: "fa-map", color: "#45B7AA" },
+            { level: 9, title: "Pathfinder", icon: "fa-route", color: "#3CA59D" },
+            { level: 10, title: "Champion", icon: "fa-medal", color: "#C9B037" }
+        ];
+
+        const LDS_JOURNEY = [
+            // Starting point - Home!
+            { level: 1, location: "Jenkintown, PA", icon: "fa-home", region: "home",
+              funFact: "Jenkintown was named after William Jenkins, a Welsh settler!",
+              hiddenGem: "The Hiway Theater is one of the oldest single-screen theaters still operating!" },
+
+            // East Coast Adventure (Levels 2-15)
+            { level: 2, location: "Doylestown, PA", icon: "fa-castle", region: "east",
+              funFact: "Home to Fonthill Castle, built entirely of concrete with tiles from around the world!",
+              hiddenGem: "The Mercer Museum looks like a castle and has over 40,000 tools!" },
+            { level: 3, location: "Jim Thorpe, PA", icon: "fa-mountain", region: "east",
+              funFact: "Called 'The Switzerland of America' - named after the famous Olympic athlete!",
+              hiddenGem: "You can ride a scenic train through the Lehigh Gorge!" },
+            { level: 4, location: "Cape May, NJ", icon: "fa-umbrella-beach", region: "east",
+              funFact: "The entire town is a National Historic Landmark with Victorian houses!",
+              hiddenGem: "You can find 'Cape May Diamonds' (quartz crystals) on the beach!" },
+            { level: 5, location: "Philadelphia, PA", icon: "fa-bell", region: "east",
+              funFact: "The Liberty Bell cracked the first time it was rung!",
+              hiddenGem: "There's a giant clothespin sculpture downtown that's 45 feet tall!" },
+            { level: 6, location: "Mystic, CT", icon: "fa-anchor", region: "east",
+              funFact: "Home to the last wooden whaling ship in the world!",
+              hiddenGem: "Mystic Pizza from the movie is a real restaurant you can visit!" },
+            { level: 7, location: "Salem, MA", icon: "fa-hat-wizard", region: "east",
+              funFact: "Famous for the 1692 witch trials - but no witches were burned (a myth)!",
+              hiddenGem: "The Peabody Essex Museum has a 200-year-old Chinese house inside!" },
+            { level: 8, location: "Bar Harbor, ME", icon: "fa-tree", region: "east",
+              funFact: "Gateway to Acadia National Park - the first national park east of the Mississippi!",
+              hiddenGem: "Thunder Hole makes a booming sound when waves crash into it!" },
+            { level: 10, location: "New York City, NY", icon: "fa-city", region: "east",
+              funFact: "The NYC subway runs 24/7 - one of the only systems in the world that does!",
+              hiddenGem: "There's a secret train platform under the Waldorf Astoria hotel!" },
+            { level: 12, location: "Sleepy Hollow, NY", icon: "fa-ghost", region: "east",
+              funFact: "The town from the Headless Horseman legend is real!",
+              hiddenGem: "Washington Irving, who wrote the story, is buried in the local cemetery!" },
+            { level: 15, location: "Washington, DC", icon: "fa-landmark", region: "east",
+              funFact: "The Library of Congress has 838 miles of bookshelves!",
+              hiddenGem: "There's a tiny museum inside the Capitol Building's crypt!" },
+
+            // Southern Charm (Levels 16-25)
+            { level: 16, location: "Williamsburg, VA", icon: "fa-scroll", region: "south",
+              funFact: "The entire town is a living museum of colonial America!",
+              hiddenGem: "You can watch blacksmiths make real horseshoes!" },
+            { level: 17, location: "Asheville, NC", icon: "fa-palette", region: "south",
+              funFact: "Home to the largest private home in America - Biltmore Estate with 250 rooms!",
+              hiddenGem: "There are secret passages and a bowling alley in the basement!" },
+            { level: 18, location: "Charleston, SC", icon: "fa-horse", region: "south",
+              funFact: "Rainbow Row has 13 colorful houses - the longest cluster in the US!",
+              hiddenGem: "There's a haunted jail you can tour at night!" },
+            { level: 20, location: "Savannah, GA", icon: "fa-tree", region: "south",
+              funFact: "The squares were designed so soldiers could practice marching!",
+              hiddenGem: "The Waving Girl statue honors a woman who waved at ships for 44 years!" },
+            { level: 22, location: "St. Augustine, FL", icon: "fa-fort-awesome", region: "south",
+              funFact: "The oldest city in the US - founded in 1565, before the Pilgrims!",
+              hiddenGem: "The Castillo fort is made of coquina (compressed seashells) that absorbs cannonballs!" },
+            { level: 25, location: "Key West, FL", icon: "fa-sun", region: "south",
+              funFact: "Only 90 miles from Cuba - closer to Havana than Miami!",
+              hiddenGem: "Ernest Hemingway's house has 60 cats, many with 6 toes!" },
+
+            // Midwest Adventure (Levels 26-35)
+            { level: 26, location: "Put-in-Bay, OH", icon: "fa-ship", region: "midwest",
+              funFact: "This island has the tallest monument in the US National Park System!",
+              hiddenGem: "Crystal Cave has the world's largest geode - big enough to walk inside!" },
+            { level: 27, location: "Galena, IL", icon: "fa-building-columns", region: "midwest",
+              funFact: "Ulysses S. Grant lived here - 85% of buildings are from the 1800s!",
+              hiddenGem: "There's a toy store with over 3,000 kinds of toys!" },
+            { level: 28, location: "Mackinac Island, MI", icon: "fa-horse-head", region: "midwest",
+              funFact: "No cars allowed - only horses and bikes!",
+              hiddenGem: "The Grand Hotel has the world's longest porch (660 feet)!" },
+            { level: 30, location: "Duluth, MN", icon: "fa-water", region: "midwest",
+              funFact: "You can watch giant cargo ships pass through the Aerial Lift Bridge!",
+              hiddenGem: "Lake Superior is so big it creates its own weather!" },
+            { level: 32, location: "Hannibal, MO", icon: "fa-book", region: "midwest",
+              funFact: "Mark Twain's hometown - Tom Sawyer and Huck Finn are based on real caves here!",
+              hiddenGem: "You can explore the actual cave from Tom Sawyer!" },
+            { level: 35, location: "Wall, SD", icon: "fa-store", region: "midwest",
+              funFact: "Wall Drug started by offering free ice water to travelers!",
+              hiddenGem: "There's a giant 80-foot dinosaur and free donuts for veterans!" },
+
+            // Mountain & Desert West (Levels 36-45)
+            { level: 36, location: "Roswell, NM", icon: "fa-rocket", region: "west",
+              funFact: "Famous for the 1947 UFO incident - even the McDonald's is shaped like a spaceship!",
+              hiddenGem: "The International UFO Museum has a research library!" },
+            { level: 37, location: "Sedona, AZ", icon: "fa-mountain-sun", region: "west",
+              funFact: "The red rocks get their color from iron oxide (rust)!",
+              hiddenGem: "There's a chapel built INTO the red rocks!" },
+            { level: 38, location: "Moab, UT", icon: "fa-archway", region: "west",
+              funFact: "Gateway to Arches National Park with over 2,000 natural stone arches!",
+              hiddenGem: "Delicate Arch is on Utah's license plate!" },
+            { level: 40, location: "Jackson Hole, WY", icon: "fa-mountain", region: "west",
+              funFact: "The town square has arches made of thousands of elk antlers!",
+              hiddenGem: "You can take a ski lift UP a mountain just to eat at a restaurant!" },
+            { level: 42, location: "Bozeman, MT", icon: "fa-cow", region: "west",
+              funFact: "More dinosaur fossils have been found here than almost anywhere!",
+              hiddenGem: "Museum of the Rockies has a real T-Rex skeleton!" },
+            { level: 45, location: "Leavenworth, WA", icon: "fa-snowflake", region: "west",
+              funFact: "A regular town that transformed itself into a Bavarian village!",
+              hiddenGem: "The Nutcracker Museum has over 7,000 nutcrackers!" },
+
+            // Pacific Coast (Levels 46-50)
+            { level: 46, location: "Carmel-by-the-Sea, CA", icon: "fa-dog", region: "pacific",
+              funFact: "No street addresses, no mail delivery, and dogs have their own beach!",
+              hiddenGem: "Clint Eastwood was once the mayor!" },
+            { level: 47, location: "Astoria, OR", icon: "fa-film", region: "pacific",
+              funFact: "The Goonies movie was filmed here - you can visit the house!",
+              hiddenGem: "The column on the hill has a spiral staircase with murals inside!" },
+            { level: 48, location: "Friday Harbor, WA", icon: "fa-whale", region: "pacific",
+              funFact: "One of the best places in the world to see orca whales!",
+              hiddenGem: "The Pig War of 1859 started over... a pig eating potatoes!" },
+            { level: 50, location: "Ketchikan, AK", icon: "fa-fish", region: "pacific",
+              funFact: "The 'Salmon Capital of the World' - gets 150 inches of rain per year!",
+              hiddenGem: "The world's largest collection of totem poles is here!" },
+
+            // LEGENDARY BONUS DESTINATIONS (Level 51+)
+            { level: 55, location: "Tombstone, AZ", icon: "fa-hat-cowboy", region: "legendary",
+              funFact: "Site of the famous O.K. Corral gunfight - they reenact it daily!",
+              hiddenGem: "Bird Cage Theatre is one of the most haunted places in America!" },
+            { level: 60, location: "Whittier, AK", icon: "fa-building", region: "legendary",
+              funFact: "Almost everyone in town lives in ONE building!",
+              hiddenGem: "You can only get there by tunnel or boat!" },
+            { level: 75, location: "Centralia, PA", icon: "fa-fire", region: "legendary",
+              funFact: "An underground mine fire has been burning since 1962!",
+              hiddenGem: "Steam rises from cracks in the abandoned roads!" },
+            { level: 100, location: "ANYWHERE IN THE WORLD!", icon: "fa-globe", region: "legendary",
+              funFact: "You've mastered the entire USA - the world awaits!",
+              hiddenGem: "Your curiosity and hard work can take you anywhere!" }
+        ];
+
+        const LDS_TEAM = [
+            { role: "armand", name: "Armand", icon: "fa-rocket", permissions: ["view", "complete"] },
+            { role: "mother", name: "Mom", icon: "fa-heart", permissions: ["admin", "verify", "reward"] },
+            { role: "father", name: "Dad", icon: "fa-shield", permissions: ["admin", "verify", "reward"] },
+            { role: "giuliana", name: "Giuliana", icon: "fa-star", title: "Sister", permissions: ["encourage", "team-challenge"] },
+            { role: "grandmother1", name: "Grandma 1", icon: "fa-cookie", permissions: ["verify", "encourage"] },
+            { role: "grandmother2", name: "Grandma 2", icon: "fa-cookie", permissions: ["verify", "encourage"] },
+            { role: "uncle", name: "Uncle", icon: "fa-user", permissions: ["verify", "encourage"] },
+            { role: "chriss", name: "Chriss", icon: "fa-heart", title: "Dad's Partner", permissions: ["verify", "encourage", "reward"] },
+            { role: "teacher", name: "Teacher", icon: "fa-chalkboard-user", permissions: ["add-task", "verify", "report"] },
+            { role: "therapist", name: "Therapist", icon: "fa-brain", permissions: ["add-task", "verify", "adjust-goals"] }
+        ];
+
+        // ===== STATE =====
+        let currentRole = null;
+        let gameState = {
+            profile: { ...LDS_PROFILE },
+            completedTasks: new Set(),
+            todayXP: 0,
+            todayCoins: 0,
+            date: new Date().toDateString()
+        };
+
+        let currentTimerTask = null;
+        let timerInterval = null;
+        let timerSeconds = 0;
+
+        let currentPurchaseItem = null;
+
+        // ===== HIPAA COMPLIANCE & AUDIT SYSTEM =====
+        const LDS_COMPLIANCE = {
+            version: "1.0.0",
+            hipaa_mode: true,
+            consent_status: "active",
+            consent_expiry: "2026-01-08",
+            audit_level: "maximum",
+            phi_protection: true,
+            session_timeout_minutes: 30
+        };
+
+        // ===== MULTI-TENANT & WHITE-LABEL SYSTEM =====
+        const LDS_TENANT = {
+            version: "1.0.0",
+            multi_tenant_mode: true,
+            current_tenant: null,
+            storage_prefix: '',
+
+            // Default tenant for single-family mode
+            default_tenant: {
+                id: 'default',
+                name: 'Family',
+                subdomain: null,
+                subscription_tier: 'professional',
+                theme_id: 'adventure_quest',
+                compliance_level: 'hipaa'
+            }
+        };
+
+        const LDS_THEMES = {
+            adventure_quest: {
+                name: "Adventure Quest",
+                colors: {
+                    primary: "#6366f1",
+                    primaryDark: "#4f46e5",
+                    secondary: "#22d3ee",
+                    accent: "#f59e0b",
+                    success: "#10b981",
+                    danger: "#ef4444",
+                    bgDark: "#0f172a",
+                    bgCard: "rgba(30, 41, 59, 0.8)",
+                    textPrimary: "#f8fafc",
+                    textSecondary: "#94a3b8",
+                    glass: "rgba(255, 255, 255, 0.1)",
+                    glassBorder: "rgba(255, 255, 255, 0.2)",
+                    coinGold: "#fbbf24"
+                },
+                branding: { appName: "Adventure Quest", tagline: "Your Journey Awaits!" }
+            },
+            ocean_explorer: {
+                name: "Ocean Explorer",
+                colors: {
+                    primary: "#0077b6",
+                    primaryDark: "#023e8a",
+                    secondary: "#00b4d8",
+                    accent: "#90e0ef",
+                    success: "#06d6a0",
+                    danger: "#ef476f",
+                    bgDark: "#023e8a",
+                    bgCard: "rgba(0, 119, 182, 0.3)",
+                    textPrimary: "#ffffff",
+                    textSecondary: "rgba(255, 255, 255, 0.7)",
+                    glass: "rgba(255, 255, 255, 0.12)",
+                    glassBorder: "rgba(255, 255, 255, 0.2)",
+                    coinGold: "#ffd166"
+                },
+                branding: { appName: "Ocean Explorer", tagline: "Dive Into Success!" }
+            },
+            forest_adventure: {
+                name: "Forest Adventure",
+                colors: {
+                    primary: "#2d6a4f",
+                    primaryDark: "#1b4332",
+                    secondary: "#40916c",
+                    accent: "#95d5b2",
+                    success: "#52b788",
+                    danger: "#e76f51",
+                    bgDark: "#1b4332",
+                    bgCard: "rgba(45, 106, 79, 0.3)",
+                    textPrimary: "#ffffff",
+                    textSecondary: "rgba(255, 255, 255, 0.7)",
+                    glass: "rgba(255, 255, 255, 0.1)",
+                    glassBorder: "rgba(255, 255, 255, 0.15)",
+                    coinGold: "#e9c46a"
+                },
+                branding: { appName: "Forest Adventure", tagline: "Explore the Wild!" }
+            },
+            space_mission: {
+                name: "Space Mission",
+                colors: {
+                    primary: "#7209b7",
+                    primaryDark: "#3a0ca3",
+                    secondary: "#4cc9f0",
+                    accent: "#f72585",
+                    success: "#4cc9f0",
+                    danger: "#ff006e",
+                    bgDark: "#10002b",
+                    bgCard: "rgba(114, 9, 183, 0.2)",
+                    textPrimary: "#ffffff",
+                    textSecondary: "rgba(255, 255, 255, 0.6)",
+                    glass: "rgba(255, 255, 255, 0.08)",
+                    glassBorder: "rgba(255, 255, 255, 0.15)",
+                    coinGold: "#ffd60a"
+                },
+                branding: { appName: "Space Mission", tagline: "Reach for the Stars!" }
+            },
+            sunshine_day: {
+                name: "Sunshine Day",
+                colors: {
+                    primary: "#f77f00",
+                    primaryDark: "#d62828",
+                    secondary: "#fcbf49",
+                    accent: "#eae2b7",
+                    success: "#06d6a0",
+                    danger: "#d62828",
+                    bgDark: "#d62828",
+                    bgCard: "rgba(247, 127, 0, 0.25)",
+                    textPrimary: "#ffffff",
+                    textSecondary: "rgba(255, 255, 255, 0.8)",
+                    glass: "rgba(255, 255, 255, 0.2)",
+                    glassBorder: "rgba(255, 255, 255, 0.3)",
+                    coinGold: "#fcbf49"
+                },
+                branding: { appName: "Sunshine Day", tagline: "Shine Bright Every Day!" }
+            },
+            clinical_professional: {
+                name: "Clinical Professional",
+                colors: {
+                    primary: "#1a365d",
+                    primaryDark: "#1a365d",
+                    secondary: "#4299e1",
+                    accent: "#4299e1",
+                    success: "#38a169",
+                    danger: "#c53030",
+                    bgDark: "#1a365d",
+                    bgCard: "rgba(255, 255, 255, 0.95)",
+                    textPrimary: "#1a202c",
+                    textSecondary: "#4a5568",
+                    glass: "rgba(255, 255, 255, 0.9)",
+                    glassBorder: "rgba(26, 54, 93, 0.2)",
+                    coinGold: "#d69e2e"
+                },
+                branding: { appName: "Task Tracker Pro", tagline: "Behavioral Support System" }
+            }
+        };
+
+        let currentTheme = 'adventure_quest';
+
+        function getTenantStorageKey(key) {
+            const prefix = LDS_TENANT.storage_prefix || '';
+            return prefix + key;
+        }
+
+        function initTenant() {
+            // Check URL for tenant subdomain or load from storage
+            const urlParams = new URLSearchParams(window.location.search);
+            const tenantId = urlParams.get('tenant') || localStorage.getItem('currentTenant') || 'default';
+
+            LDS_TENANT.current_tenant = tenantId;
+            LDS_TENANT.storage_prefix = tenantId === 'default' ? '' : `tenant_${tenantId}_`;
+
+            // Load saved theme for this tenant
+            const savedTheme = localStorage.getItem(getTenantStorageKey('selectedTheme'));
+            if (savedTheme && LDS_THEMES[savedTheme]) {
+                currentTheme = savedTheme;
+            }
+
+            applyTheme(currentTheme);
+        }
+
+        function applyTheme(themeId) {
+            const theme = LDS_THEMES[themeId];
+            if (!theme) return;
+
+            currentTheme = themeId;
+            const c = theme.colors;
+            const root = document.documentElement;
+
+            root.style.setProperty('--primary', c.primary);
+            root.style.setProperty('--primary-dark', c.primaryDark);
+            root.style.setProperty('--secondary', c.secondary);
+            root.style.setProperty('--accent', c.accent);
+            root.style.setProperty('--success', c.success);
+            root.style.setProperty('--danger', c.danger);
+            root.style.setProperty('--bg-dark', c.bgDark);
+            root.style.setProperty('--bg-card', c.bgCard);
+            root.style.setProperty('--text-primary', c.textPrimary);
+            root.style.setProperty('--text-secondary', c.textSecondary);
+            root.style.setProperty('--glass', c.glass);
+            root.style.setProperty('--glass-border', c.glassBorder);
+            root.style.setProperty('--coin-gold', c.coinGold);
+            root.style.setProperty('--xp-bar', `linear-gradient(90deg, ${c.primary}, ${c.secondary})`);
+
+            // Update body background
+            document.body.style.background = `linear-gradient(135deg, ${c.bgDark} 0%, ${c.primary}33 50%, ${c.bgDark} 100%)`;
+
+            // Update branding
+            const logoTitle = document.querySelector('.logo-title');
+            if (logoTitle) {
+                logoTitle.textContent = theme.branding.appName;
+            }
+
+            // Save theme preference
+            localStorage.setItem(getTenantStorageKey('selectedTheme'), themeId);
+
+            // Log theme change
+            logAudit('theme_changed', 'settings', `Theme changed to: ${theme.name}`, {
+                extra: { theme_id: themeId }
+            });
+        }
+
+        function renderThemeSelector() {
+            const container = document.getElementById('themeSelector');
+            if (!container) return;
+
+            container.innerHTML = Object.entries(LDS_THEMES).map(([id, theme]) => `
+                <div class="theme-option ${currentTheme === id ? 'active' : ''}" onclick="applyTheme('${id}')">
+                    <div class="theme-preview" style="background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})">
+                        <div class="theme-check">${currentTheme === id ? '<i class="fas fa-check"></i>' : ''}</div>
+                    </div>
+                    <div class="theme-name">${theme.name}</div>
+                </div>
+            `).join('');
+        }
+
+        let auditLog = [];
+        let sessionId = generateSessionId();
+        let sessionStart = new Date().toISOString();
+        let lastActivity = Date.now();
+
+        function generateSessionId() {
+            return 'sess_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        }
+
+        function hashString(str) {
+            // Simple hash for demo - production would use crypto.subtle
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return 'hash_' + Math.abs(hash).toString(16);
+        }
+
+        function logAudit(eventType, eventCategory, action, details = {}) {
+            const entry = {
+                id: 'audit_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                timestamp: new Date().toISOString(),
+                event_type: eventType,
+                event_category: eventCategory,
+                actor_role: currentRole ? currentRole.role : 'anonymous',
+                actor_id_hash: currentRole ? hashString(currentRole.name) : 'none',
+                action: action,
+                outcome: details.outcome || 'success',
+                reason: details.reason || '',
+                phi_accessed: details.phi_accessed || false,
+                session_id_hash: hashString(sessionId),
+                entity_version: "lds:audit/armand-quest-v1",
+                details: details.extra || {}
+            };
+
+            auditLog.push(entry);
+
+            // Keep only last 1000 entries in memory
+            if (auditLog.length > 1000) {
+                auditLog = auditLog.slice(-1000);
+            }
+
+            // Save to localStorage
+            saveAuditLog();
+
+            // Update last activity for session timeout
+            lastActivity = Date.now();
+
+            return entry;
+        }
+
+        function saveAuditLog() {
+            try {
+                const existing = JSON.parse(localStorage.getItem('armandQuestAudit') || '[]');
+                const combined = [...existing, ...auditLog.slice(-100)];
+                // Keep last 500 audit entries
+                const trimmed = combined.slice(-500);
+                localStorage.setItem('armandQuestAudit', JSON.stringify(trimmed));
+            } catch (e) {
+                console.warn('Audit log save failed:', e);
+            }
+        }
+
+        function loadAuditLog() {
+            try {
+                const saved = localStorage.getItem('armandQuestAudit');
+                if (saved) {
+                    auditLog = JSON.parse(saved);
+                }
+            } catch (e) {
+                auditLog = [];
+            }
+        }
+
+        function checkSessionTimeout() {
+            const elapsed = (Date.now() - lastActivity) / 1000 / 60;
+            if (elapsed >= LDS_COMPLIANCE.session_timeout_minutes) {
+                logAudit('session_timeout', 'security', 'Session timed out due to inactivity');
+                showRoleSelector();
+                alert('Session timed out for security. Please log in again.');
+            }
+        }
+
+        function getConsentStatus() {
+            const expiry = new Date(LDS_COMPLIANCE.consent_expiry);
+            const now = new Date();
+            const daysRemaining = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            return {
+                active: now < expiry,
+                expiry: LDS_COMPLIANCE.consent_expiry,
+                daysRemaining: daysRemaining,
+                needsRenewal: daysRemaining <= 30
+            };
+        }
+
+        function checkPermission(permission) {
+            if (!currentRole) return false;
+            if (currentRole.role === 'armand') {
+                // Armand has limited permissions
+                const armandPermissions = ['view', 'complete', 'purchase'];
+                return armandPermissions.includes(permission);
+            }
+            return currentRole.permissions.includes(permission) ||
+                   currentRole.permissions.includes('admin');
+        }
+
+        function canAccessPHI() {
+            if (!currentRole) return false;
+            const phiRoles = ['mother', 'father', 'therapist'];
+            return phiRoles.includes(currentRole.role);
+        }
+
+        // Session timeout checker - runs every minute
+        setInterval(checkSessionTimeout, 60000);
+
+        // ===== INITIALIZATION =====
+        function init() {
+            initTenant(); // Initialize multi-tenant and theme system first
+            loadState();
+            createParticles();
+            setupRoleSelector();
+            setupTabs();
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('armandQuest');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                gameState.profile = { ...LDS_PROFILE, ...parsed.profile };
+                gameState.completedTasks = new Set(parsed.completedTasks || []);
+                gameState.todayXP = parsed.todayXP || 0;
+                gameState.todayCoins = parsed.todayCoins || 0;
+
+                // Reset daily tasks if new day
+                if (parsed.date !== new Date().toDateString()) {
+                    gameState.completedTasks = new Set();
+                    gameState.todayXP = 0;
+                    gameState.todayCoins = 0;
+                    gameState.date = new Date().toDateString();
+                } else {
+                    gameState.date = parsed.date;
+                }
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('armandQuest', JSON.stringify({
+                profile: gameState.profile,
+                completedTasks: Array.from(gameState.completedTasks),
+                todayXP: gameState.todayXP,
+                todayCoins: gameState.todayCoins,
+                date: gameState.date
+            }));
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // ===== ROLE SELECTOR =====
+        function setupRoleSelector() {
+            const grid = document.getElementById('roleGrid');
+            grid.innerHTML = '';
+
+            LDS_TEAM.forEach(member => {
+                const div = document.createElement('div');
+                div.className = 'role-option';
+                div.onclick = () => selectRole(member);
+                div.innerHTML = `
+                    <div class="role-option-icon"><i class="fas ${member.icon}"></i></div>
+                    <div class="role-option-name">${member.name}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function selectRole(member) {
+            // Log authentication event
+            logAudit('login', 'authentication', `User logged in as ${member.role}`, {
+                phi_accessed: canAccessPHI(),
+                extra: { role: member.role, name: member.name }
+            });
+
+            currentRole = member;
+            sessionId = generateSessionId();
+            sessionStart = new Date().toISOString();
+            lastActivity = Date.now();
+
+            document.getElementById('roleSelector').classList.add('hidden');
+            document.getElementById('currentRoleBadge').textContent = member.name;
+
+            // Update UI based on role
+            if (member.role === 'armand') {
+                document.getElementById('userAvatar').innerHTML = '<i class="fas fa-rocket"></i>';
+            } else {
+                document.getElementById('userAvatar').innerHTML = `<i class="fas ${member.icon}"></i>`;
+            }
+
+            // Show compliance badge for admin roles
+            updateComplianceBadge();
+
+            renderAll();
+        }
+
+        function showRoleSelector() {
+            if (currentRole) {
+                logAudit('logout', 'authentication', `User logged out from ${currentRole.role}`);
+            }
+            currentRole = null;
+            document.getElementById('roleSelector').classList.remove('hidden');
+        }
+
+        function updateComplianceBadge() {
+            const badge = document.getElementById('complianceBadge');
+            if (badge && LDS_COMPLIANCE.hipaa_mode) {
+                badge.style.display = 'inline-flex';
+            }
+        }
+
+        // ===== TABS =====
+        function setupTabs() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+                });
+            });
+        }
+
+        // ===== RENDERING =====
+        function renderAll() {
+            updateStats();
+            renderTasks();
+            renderShop();
+            renderAchievements();
+            renderJourney();
+            renderTeam();
+            renderCompliance();
+            renderSettings();
+        }
+
+        function updateStats() {
+            const p = gameState.profile;
+            document.getElementById('currentLevel').textContent = p.currentLevel;
+            document.getElementById('totalXP').textContent = p.totalXP.toLocaleString();
+            document.getElementById('totalCoins').textContent = p.coins.toLocaleString();
+            document.getElementById('currentStreak').textContent = p.currentStreak;
+
+            // Level progress
+            const xpForLevel = getXPForLevel(p.currentLevel);
+            const xpForNextLevel = getXPForLevel(p.currentLevel + 1);
+            const levelXP = p.totalXP - xpForLevel;
+            const neededXP = xpForNextLevel - xpForLevel;
+            const progress = Math.min(100, (levelXP / neededXP) * 100);
+
+            document.getElementById('xpProgress').textContent = `${levelXP} / ${neededXP} XP`;
+            document.getElementById('levelFill').style.width = progress + '%';
+
+            // Daily stats
+            let totalTasks = 0;
+            Object.values(LDS_TASKS).forEach(cat => totalTasks += cat.tasks.length);
+
+            document.getElementById('tasksComplete').textContent = gameState.completedTasks.size;
+            document.getElementById('tasksTotal').textContent = totalTasks;
+            document.getElementById('xpToday').textContent = gameState.todayXP;
+            document.getElementById('coinsToday').textContent = gameState.todayCoins;
+        }
+
+        function getXPForLevel(level) {
+            let total = 0;
+            for (let i = 1; i < level; i++) {
+                total += Math.floor(100 * i * 1.2);
+            }
+            return total;
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('taskCategories');
+            container.innerHTML = '';
+
+            Object.entries(LDS_TASKS).forEach(([key, category]) => {
+                const completedInCat = category.tasks.filter(t => gameState.completedTasks.has(t.id)).length;
+
+                const div = document.createElement('div');
+                div.className = 'task-category';
+                div.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-icon" style="background: ${category.color}20; color: ${category.color};">
+                            <i class="fas ${category.icon}"></i>
+                        </div>
+                        <div class="category-title">
+                            <h3>${category.name}</h3>
+                            <span>${completedInCat}/${category.tasks.length} completed</span>
+                        </div>
+                        <div class="category-progress">${Math.round((completedInCat/category.tasks.length)*100)}%</div>
+                    </div>
+                    <div class="task-list">
+                        ${category.tasks.map(task => renderTask(task)).join('')}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderTask(task) {
+            const completed = gameState.completedTasks.has(task.id);
+            const canInteract = currentRole && (currentRole.role === 'armand' || currentRole.permissions.includes('verify'));
+
+            return `
+                <div class="task-item ${completed ? 'completed' : ''}" onclick="${canInteract ? `toggleTask('${task.id}')` : ''}" style="${canInteract ? 'cursor: pointer;' : ''}">
+                    <div class="task-checkbox">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="task-info">
+                        <div class="task-name"><i class="fas ${task.icon}"></i> ${task.name}</div>
+                        <div class="task-desc">${task.description}</div>
+                    </div>
+                    <div class="task-rewards">
+                        ${task.time_limit ? `<span class="task-timer">${task.time_limit}m</span>` : ''}
+                        <span class="difficulty-badge difficulty-${task.difficulty}">${task.difficulty}</span>
+                        <span class="reward-badge xp"><i class="fas fa-star"></i> ${task.xp}</span>
+                        <span class="reward-badge coins"><i class="fas fa-coins"></i> ${task.coins}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderShop() {
+            const container = document.getElementById('shopGrid');
+            container.innerHTML = '';
+
+            Object.entries(LDS_REWARDS).forEach(([key, category]) => {
+                const div = document.createElement('div');
+                div.className = 'shop-category';
+                div.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-icon" style="background: ${category.color}20; color: ${category.color};">
+                            <i class="fas ${category.icon}"></i>
+                        </div>
+                        <div class="category-title">
+                            <h3>${category.name}</h3>
+                        </div>
+                    </div>
+                    ${category.items.map(item => renderShopItem(item)).join('')}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderShopItem(item) {
+            const canAfford = gameState.profile.coins >= item.cost;
+            const canPurchase = currentRole && (currentRole.role === 'armand' || currentRole.permissions.includes('reward'));
+
+            return `
+                <div class="shop-item ${canAfford ? '' : 'cannot-afford'}" onclick="${canPurchase ? `openPurchaseModal('${item.id}')` : ''}">
+                    <div class="shop-item-icon"><i class="fas ${item.icon}"></i></div>
+                    <div class="shop-item-info">
+                        <div class="shop-item-name">${item.name}</div>
+                        <div class="shop-item-desc">${item.description}</div>
+                    </div>
+                    <div class="shop-item-price">
+                        <i class="fas fa-coins"></i> ${item.cost}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAchievements() {
+            const container = document.getElementById('achievementsGrid');
+            container.innerHTML = '';
+
+            Object.entries(LDS_ACHIEVEMENTS).forEach(([key, category]) => {
+                const div = document.createElement('div');
+                div.className = 'achievement-category';
+                div.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-icon" style="background: rgba(255,215,0,0.2); color: #FFD700;">
+                            <i class="fas ${category.icon}"></i>
+                        </div>
+                        <div class="category-title">
+                            <h3>${category.name}</h3>
+                        </div>
+                    </div>
+                    ${category.achievements.map(a => renderAchievement(a)).join('')}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderAchievement(achievement) {
+            const unlocked = gameState.profile.achievementsUnlocked.includes(achievement.id);
+            const progress = getAchievementProgress(achievement);
+
+            return `
+                <div class="achievement-item rarity-${achievement.rarity} ${unlocked ? 'unlocked' : 'locked'}">
+                    <div class="achievement-icon"><i class="fas ${achievement.icon}"></i></div>
+                    <div class="achievement-info">
+                        <div class="achievement-name">${achievement.name}</div>
+                        <div class="achievement-desc">${achievement.description}</div>
+                        ${!unlocked ? `
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getAchievementProgress(achievement) {
+            const req = achievement.req;
+            let current = 0;
+            let target = req.value;
+
+            switch (req.type) {
+                case 'streak':
+                    current = gameState.profile.currentStreak;
+                    break;
+                case 'level':
+                    current = gameState.profile.currentLevel;
+                    break;
+                case 'task':
+                    current = gameState.profile.taskCompletions[req.id] || 0;
+                    break;
+            }
+
+            return Math.min(100, (current / target) * 100);
+        }
+
+        let selectedDestination = LDS_JOURNEY[0];
+        let currentRegionFilter = 'all';
+
+        function renderJourney() {
+            const container = document.getElementById('journeyPath');
+            container.innerHTML = '';
+
+            // Setup region filter buttons
+            document.querySelectorAll('.region-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentRegionFilter = btn.dataset.region;
+                    renderJourney();
+                };
+            });
+
+            // Filter by region
+            const filtered = currentRegionFilter === 'all'
+                ? LDS_JOURNEY
+                : LDS_JOURNEY.filter(m => m.region === currentRegionFilter);
+
+            filtered.forEach((milestone, i) => {
+                const reached = gameState.profile.currentLevel >= milestone.level;
+                const current = gameState.profile.currentLevel >= milestone.level &&
+                               (i === filtered.length - 1 || gameState.profile.currentLevel < filtered[i+1]?.level);
+                const isLegendary = milestone.region === 'legendary';
+
+                const div = document.createElement('div');
+                div.className = 'journey-milestone';
+                div.onclick = () => selectDestination(milestone);
+                div.innerHTML = `
+                    <div class="milestone-icon ${reached ? 'reached' : 'locked'} ${current ? 'current' : ''} ${isLegendary && reached ? 'legendary' : ''}">
+                        <i class="fas ${milestone.icon}"></i>
+                    </div>
+                    <div class="milestone-label">
+                        <div class="milestone-level">Level ${milestone.level}</div>
+                        <div class="milestone-location" title="${milestone.location}">${milestone.location.split(',')[0]}</div>
+                        <div class="milestone-region">${milestone.region}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Update journey stats
+            const unlockedCount = LDS_JOURNEY.filter(m => gameState.profile.currentLevel >= m.level).length;
+            const nextTown = LDS_JOURNEY.find(m => m.level > gameState.profile.currentLevel);
+
+            document.getElementById('townsUnlocked').textContent = unlockedCount;
+            document.getElementById('townsRemaining').textContent = LDS_JOURNEY.length - unlockedCount;
+            document.getElementById('nextTownLevel').textContent = nextTown ? nextTown.level : 'MAX!';
+
+            // Show current destination
+            const currentDest = LDS_JOURNEY.filter(m => gameState.profile.currentLevel >= m.level).pop() || LDS_JOURNEY[0];
+            selectDestination(currentDest);
+        }
+
+        function selectDestination(milestone) {
+            selectedDestination = milestone;
+            const reached = gameState.profile.currentLevel >= milestone.level;
+
+            document.getElementById('destIcon').innerHTML = `<i class="fas ${milestone.icon}"></i>`;
+            document.getElementById('destLocation').textContent = milestone.location;
+            document.getElementById('destLevel').textContent = reached
+                ? `Level ${milestone.level} - Unlocked!`
+                : `Level ${milestone.level} - Locked (Need ${milestone.level - gameState.profile.currentLevel} more levels)`;
+
+            if (reached) {
+                document.getElementById('destFunFact').textContent = milestone.funFact || 'Explore this amazing town!';
+                document.getElementById('destHiddenGem').textContent = milestone.hiddenGem || 'Discover the secrets!';
+                document.getElementById('googleBtn').style.display = 'inline-flex';
+            } else {
+                document.getElementById('destFunFact').textContent = '🔒 Unlock this town to discover fun facts!';
+                document.getElementById('destHiddenGem').textContent = '🔒 Hidden gems await when you reach this level!';
+                document.getElementById('googleBtn').style.display = 'none';
+            }
+        }
+
+        function searchGoogle() {
+            if (selectedDestination) {
+                const query = encodeURIComponent(selectedDestination.location + ' fun facts for kids');
+                window.open(`https://www.google.com/search?q=${query}`, '_blank');
+            }
+        }
+
+        function renderTeam() {
+            const container = document.getElementById('teamGrid');
+            container.innerHTML = '';
+
+            LDS_TEAM.forEach(member => {
+                const div = document.createElement('div');
+                div.className = 'team-member';
+                div.innerHTML = `
+                    <div class="team-avatar" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                        <i class="fas ${member.icon}"></i>
+                    </div>
+                    <div class="team-info">
+                        <div class="team-name">${member.name}</div>
+                        <div class="team-role">${member.title || member.role}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // ===== COMPLIANCE & AUDIT RENDERING =====
+        function renderCompliance() {
+            // Show compliance tab only for admin roles
+            const complianceTab = document.getElementById('complianceTab');
+            if (complianceTab) {
+                const adminRoles = ['mother', 'father', 'therapist'];
+                complianceTab.style.display = currentRole && adminRoles.includes(currentRole.role) ? 'flex' : 'none';
+            }
+
+            // Update consent status
+            const consent = getConsentStatus();
+            const consentStatusEl = document.getElementById('consentStatus');
+            const consentExpiryEl = document.getElementById('consentExpiry');
+
+            if (consentStatusEl) {
+                consentStatusEl.textContent = consent.active ? (consent.needsRenewal ? 'Renewal Soon' : 'Valid') : 'Expired';
+                consentStatusEl.style.color = consent.active ? (consent.needsRenewal ? 'var(--accent)' : 'var(--success)') : 'var(--danger)';
+            }
+            if (consentExpiryEl) {
+                consentExpiryEl.textContent = consent.expiry + (consent.needsRenewal ? ` (${consent.daysRemaining} days)` : '');
+            }
+
+            // Render audit log
+            renderAuditLog();
+
+            // Render access summary
+            renderAccessSummary();
+        }
+
+        function renderAuditLog(filter = 'all') {
+            const container = document.getElementById('auditLogDisplay');
+            if (!container) return;
+
+            // Load audit log from storage
+            loadAuditLog();
+
+            let entries = [...auditLog].reverse().slice(0, 100);
+
+            if (filter !== 'all') {
+                entries = entries.filter(e => e.event_category === filter);
+            }
+
+            if (entries.length === 0) {
+                container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">No audit entries yet</div>';
+                return;
+            }
+
+            container.innerHTML = entries.map(entry => {
+                const time = new Date(entry.timestamp).toLocaleString();
+                return `
+                    <div class="audit-entry">
+                        <div class="audit-time">${time}</div>
+                        <div class="audit-event">
+                            <div class="audit-type">${entry.event_type}</div>
+                            <div class="audit-action">${entry.action}</div>
+                            <div class="audit-actor">By: ${entry.actor_role}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterAuditLog() {
+            const filter = document.getElementById('auditFilter').value;
+            renderAuditLog(filter);
+        }
+
+        function renderAccessSummary() {
+            const container = document.getElementById('accessSummary');
+            if (!container) return;
+
+            loadAuditLog();
+
+            const summary = {
+                logins: auditLog.filter(e => e.event_type === 'login').length,
+                tasksCompleted: auditLog.filter(e => e.event_type === 'task_complete').length,
+                tasksReverted: auditLog.filter(e => e.event_type === 'task_uncomplete').length,
+                purchases: auditLog.filter(e => e.event_type === 'reward_purchase').length
+            };
+
+            container.innerHTML = `
+                <div class="access-item">
+                    <div class="access-count">${summary.logins}</div>
+                    <div class="access-label">Total Logins</div>
+                </div>
+                <div class="access-item">
+                    <div class="access-count">${summary.tasksCompleted}</div>
+                    <div class="access-label">Tasks Completed</div>
+                </div>
+                <div class="access-item">
+                    <div class="access-count">${summary.tasksReverted}</div>
+                    <div class="access-label">Tasks Reverted</div>
+                </div>
+                <div class="access-item">
+                    <div class="access-count">${summary.purchases}</div>
+                    <div class="access-label">Purchases</div>
+                </div>
+            `;
+        }
+
+        function exportAuditLog() {
+            loadAuditLog();
+
+            const exportData = {
+                exported_at: new Date().toISOString(),
+                exported_by: currentRole ? currentRole.role : 'unknown',
+                compliance_entity: 'lds:audit/armand-quest-schema-v1',
+                total_entries: auditLog.length,
+                entries: auditLog
+            };
+
+            // Log the export
+            logAudit('data_downloaded', 'data_export', 'Audit log exported', { phi_accessed: true });
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `armand-quest-audit-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ===== SETTINGS FUNCTIONS =====
+        function renderSettings() {
+            // Show settings tab only for admin roles
+            const settingsTab = document.getElementById('settingsTab');
+            if (settingsTab) {
+                const adminRoles = ['mother', 'father', 'therapist'];
+                settingsTab.style.display = currentRole && adminRoles.includes(currentRole.role) ? 'flex' : 'none';
+            }
+
+            // Render theme selector
+            renderThemeSelector();
+
+            // Update tenant info display
+            const tenantIdEl = document.getElementById('tenantIdDisplay');
+            const storagePrefixEl = document.getElementById('storagePrefixDisplay');
+
+            if (tenantIdEl) {
+                tenantIdEl.textContent = LDS_TENANT.current_tenant || 'default';
+            }
+            if (storagePrefixEl) {
+                const prefix = LDS_TENANT.storage_prefix;
+                storagePrefixEl.textContent = prefix ? prefix : '(none - default tenant)';
+            }
+
+            // Load saved branding
+            const savedAppName = localStorage.getItem(getTenantStorageKey('customAppName'));
+            const savedTagline = localStorage.getItem(getTenantStorageKey('customTagline'));
+
+            const appNameInput = document.getElementById('appNameInput');
+            const taglineInput = document.getElementById('taglineInput');
+
+            if (appNameInput && savedAppName) {
+                appNameInput.value = savedAppName;
+            }
+            if (taglineInput && savedTagline) {
+                taglineInput.value = savedTagline;
+            }
+        }
+
+        function saveBranding() {
+            const appName = document.getElementById('appNameInput').value.trim();
+            const tagline = document.getElementById('taglineInput').value.trim();
+
+            if (appName) {
+                localStorage.setItem(getTenantStorageKey('customAppName'), appName);
+                const logoTitle = document.querySelector('.logo-title');
+                if (logoTitle) logoTitle.textContent = appName;
+            }
+
+            if (tagline) {
+                localStorage.setItem(getTenantStorageKey('customTagline'), tagline);
+            }
+
+            logAudit('branding_updated', 'settings', 'Branding settings updated', {
+                extra: { app_name: appName, tagline: tagline }
+            });
+
+            // Show feedback
+            alert('Branding saved successfully!');
+        }
+
+        function exportAllData() {
+            const allData = {
+                exported_at: new Date().toISOString(),
+                exported_by: currentRole ? currentRole.role : 'unknown',
+                tenant_id: LDS_TENANT.current_tenant,
+                compliance_entity: 'lds:tenant/armand-quest-config-v1',
+                game_state: gameState,
+                settings: {
+                    theme: currentTheme,
+                    custom_app_name: localStorage.getItem(getTenantStorageKey('customAppName')),
+                    custom_tagline: localStorage.getItem(getTenantStorageKey('customTagline'))
+                },
+                audit_log: auditLog
+            };
+
+            logAudit('data_downloaded', 'data_export', 'All data exported', { phi_accessed: true });
+
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `armand-quest-full-export-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function resetLocalData() {
+            if (!confirm('This will reset all progress for demo purposes. Are you sure?')) {
+                return;
+            }
+
+            logAudit('data_reset', 'data_modification', 'Local data reset requested', { phi_accessed: true });
+
+            // Clear game state but preserve settings
+            localStorage.removeItem(getTenantStorageKey('armandQuestState'));
+            localStorage.removeItem(getTenantStorageKey('armandQuestAudit'));
+
+            location.reload();
+        }
+
+        // ===== TASK ACTIONS =====
+        function toggleTask(taskId) {
+            let task = null;
+            Object.values(LDS_TASKS).forEach(cat => {
+                const found = cat.tasks.find(t => t.id === taskId);
+                if (found) task = found;
+            });
+
+            if (!task) return;
+
+            if (gameState.completedTasks.has(task.id)) {
+                // Uncomplete the task
+                uncompleteTask(task);
+            } else {
+                // Start/complete the task
+                startTask(taskId);
+            }
+        }
+
+        function uncompleteTask(task) {
+            if (!gameState.completedTasks.has(task.id)) return;
+
+            // HIPAA Audit: Log task uncomplete
+            logAudit('task_uncomplete', 'data_modification', `Task uncompleted: ${task.name}`, {
+                extra: { task_id: task.id, xp_removed: task.xp, coins_removed: task.coins, reverted_by: currentRole?.role }
+            });
+
+            // Remove from completed
+            gameState.completedTasks.delete(task.id);
+
+            // Remove XP and coins
+            let xpLoss = task.xp;
+            let coinLoss = task.coins;
+
+            if (task.bonus) {
+                xpLoss *= task.bonus;
+                coinLoss *= task.bonus;
+            }
+
+            gameState.profile.totalXP = Math.max(0, gameState.profile.totalXP - xpLoss);
+            gameState.profile.coins = Math.max(0, gameState.profile.coins - coinLoss);
+            gameState.todayXP = Math.max(0, gameState.todayXP - xpLoss);
+            gameState.todayCoins = Math.max(0, gameState.todayCoins - coinLoss);
+
+            // Recalculate level (in case we dropped below threshold)
+            recalculateLevel();
+
+            // Save and update UI
+            saveState();
+            renderAll();
+        }
+
+        function recalculateLevel() {
+            let level = 1;
+            while (gameState.profile.totalXP >= getXPForLevel(level + 1)) {
+                level++;
+            }
+            gameState.profile.currentLevel = level;
+        }
+
+        function startTask(taskId) {
+            let task = null;
+            Object.values(LDS_TASKS).forEach(cat => {
+                const found = cat.tasks.find(t => t.id === taskId);
+                if (found) task = found;
+            });
+
+            if (!task) return;
+
+            currentTimerTask = task;
+
+            if (task.time_limit) {
+                timerSeconds = task.time_limit * 60;
+                updateTimerDisplay();
+                document.getElementById('timerTask').textContent = task.name;
+                document.getElementById('timerModal').classList.add('active');
+                startTimer();
+            } else {
+                completeTask(task);
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    playSound('complete');
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerValue').textContent =
+                `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function closeTimerModal() {
+            document.getElementById('timerModal').classList.remove('active');
+            if (timerInterval) clearInterval(timerInterval);
+            currentTimerTask = null;
+        }
+
+        function completeTimerTask() {
+            if (currentTimerTask) {
+                completeTask(currentTimerTask);
+                closeTimerModal();
+            }
+        }
+
+        function completeTask(task) {
+            if (gameState.completedTasks.has(task.id)) return;
+
+            // HIPAA Audit: Log task completion
+            logAudit('task_complete', 'data_modification', `Task completed: ${task.name}`, {
+                extra: { task_id: task.id, xp: task.xp, coins: task.coins, verified_by: currentRole?.role }
+            });
+
+            // Add to completed
+            gameState.completedTasks.add(task.id);
+
+            // Award XP and coins
+            let xpGain = task.xp;
+            let coinGain = task.coins;
+
+            // Bonus multiplier
+            if (task.bonus) {
+                xpGain *= task.bonus;
+                coinGain *= task.bonus;
+            }
+
+            gameState.profile.totalXP += xpGain;
+            gameState.profile.coins += coinGain;
+            gameState.todayXP += xpGain;
+            gameState.todayCoins += coinGain;
+
+            // Track task completions for achievements
+            if (!gameState.profile.taskCompletions[task.id]) {
+                gameState.profile.taskCompletions[task.id] = 0;
+            }
+            gameState.profile.taskCompletions[task.id]++;
+
+            // Check for level up
+            checkLevelUp();
+
+            // Check achievements
+            checkAchievements();
+
+            // Celebrate!
+            celebrate();
+            playSound('complete');
+
+            // Save and update UI
+            saveState();
+            renderAll();
+        }
+
+        function checkLevelUp() {
+            const nextLevelXP = getXPForLevel(gameState.profile.currentLevel + 1);
+            while (gameState.profile.totalXP >= nextLevelXP) {
+                gameState.profile.currentLevel++;
+                celebrate();
+                playSound('levelup');
+            }
+        }
+
+        function checkAchievements() {
+            Object.values(LDS_ACHIEVEMENTS).forEach(category => {
+                category.achievements.forEach(achievement => {
+                    if (gameState.profile.achievementsUnlocked.includes(achievement.id)) return;
+
+                    const req = achievement.req;
+                    let unlocked = false;
+
+                    switch (req.type) {
+                        case 'streak':
+                            unlocked = gameState.profile.currentStreak >= req.value;
+                            break;
+                        case 'level':
+                            unlocked = gameState.profile.currentLevel >= req.value;
+                            break;
+                        case 'task':
+                            unlocked = (gameState.profile.taskCompletions[req.id] || 0) >= req.value;
+                            break;
+                    }
+
+                    if (unlocked) {
+                        gameState.profile.achievementsUnlocked.push(achievement.id);
+                        gameState.profile.totalXP += achievement.xp;
+                        gameState.profile.coins += achievement.coins;
+                        celebrate();
+                        playSound('achievement');
+                    }
+                });
+            });
+        }
+
+        // ===== SHOP ACTIONS =====
+        function openPurchaseModal(itemId) {
+            let item = null;
+            Object.values(LDS_REWARDS).forEach(cat => {
+                const found = cat.items.find(i => i.id === itemId);
+                if (found) item = found;
+            });
+
+            if (!item) return;
+
+            currentPurchaseItem = item;
+
+            document.getElementById('purchaseIcon').innerHTML = `<i class="fas ${item.icon}"></i>`;
+            document.getElementById('purchaseName').textContent = item.name;
+            document.getElementById('purchaseDesc').textContent = item.description;
+            document.getElementById('purchaseCost').textContent = item.cost;
+
+            const canAfford = gameState.profile.coins >= item.cost;
+            document.getElementById('confirmPurchaseBtn').disabled = !canAfford;
+            document.getElementById('confirmPurchaseBtn').style.opacity = canAfford ? '1' : '0.5';
+
+            document.getElementById('purchaseModal').classList.add('active');
+        }
+
+        function closePurchaseModal() {
+            document.getElementById('purchaseModal').classList.remove('active');
+            currentPurchaseItem = null;
+        }
+
+        function confirmPurchase() {
+            if (!currentPurchaseItem) return;
+            if (gameState.profile.coins < currentPurchaseItem.cost) return;
+
+            gameState.profile.coins -= currentPurchaseItem.cost;
+
+            // Log purchase (in real app, would trigger actual reward)
+            console.log('Purchased:', currentPurchaseItem.name);
+
+            playSound('purchase');
+            saveState();
+            renderAll();
+            closePurchaseModal();
+
+            alert(`${currentPurchaseItem.name} purchased! Show this to a parent to redeem.`);
+        }
+
+        // ===== CELEBRATION =====
+        function celebrate() {
+            const container = document.getElementById('celebration');
+            container.classList.add('active');
+            container.innerHTML = '';
+
+            const colors = ['#6366f1', '#22d3ee', '#f59e0b', '#10b981', '#ec4899', '#fbbf24'];
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                container.appendChild(confetti);
+            }
+
+            setTimeout(() => {
+                container.classList.remove('active');
+            }, 3000);
+        }
+
+        function playSound(type) {
+            // In production, would play actual sounds
+            console.log('Sound:', type);
+        }
+
+        // ===== VOICE =====
+        function toggleVoice() {
+            const btn = document.getElementById('voiceBtn');
+            btn.classList.toggle('listening');
+
+            if (btn.classList.contains('listening')) {
+                // In production, would start speech recognition
+                speak("Hi Armand! What task would you like to work on?");
+            }
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:theme/presets-v1",
+    "type": "theme.presets",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:theme-presets-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["theming", "white-label", "branding", "customization"]
+  },
+  "core": {
+    "theme_schema": {
+      "id": "string",
+      "name": "string",
+      "description": "string",
+      "colors": {
+        "primary": "hex",
+        "secondary": "hex",
+        "accent": "hex",
+        "success": "hex",
+        "warning": "hex",
+        "danger": "hex",
+        "background_start": "hex",
+        "background_end": "hex",
+        "card_background": "rgba",
+        "text_primary": "hex",
+        "text_secondary": "hex"
+      },
+      "branding": {
+        "app_name": "string",
+        "logo_url": "url|null",
+        "favicon_url": "url|null",
+        "tagline": "string"
+      },
+      "typography": {
+        "font_family": "string",
+        "heading_font": "string|null"
+      },
+      "style": {
+        "border_radius": "px",
+        "card_blur": "px",
+        "shadow_intensity": "float"
+      }
+    },
+    "preset_themes": {
+      "adventure_quest": {
+        "name": "Adventure Quest",
+        "description": "Default explorer theme with vibrant gradients",
+        "colors": {
+          "primary": "#667eea",
+          "secondary": "#764ba2",
+          "accent": "#f093fb",
+          "success": "#00d26a",
+          "warning": "#ffc107",
+          "danger": "#ff5252",
+          "background_start": "#667eea",
+          "background_end": "#764ba2",
+          "card_background": "rgba(255, 255, 255, 0.15)",
+          "text_primary": "#ffffff",
+          "text_secondary": "rgba(255, 255, 255, 0.7)"
+        },
+        "branding": {
+          "app_name": "Adventure Quest",
+          "tagline": "Your Journey Awaits!"
+        },
+        "typography": {
+          "font_family": "'Nunito', sans-serif"
+        },
+        "style": {
+          "border_radius": "20px",
+          "card_blur": "10px",
+          "shadow_intensity": 0.3
+        }
+      },
+      "ocean_explorer": {
+        "name": "Ocean Explorer",
+        "description": "Calm blue ocean theme",
+        "colors": {
+          "primary": "#0077b6",
+          "secondary": "#00b4d8",
+          "accent": "#90e0ef",
+          "success": "#06d6a0",
+          "warning": "#ffd166",
+          "danger": "#ef476f",
+          "background_start": "#023e8a",
+          "background_end": "#0077b6",
+          "card_background": "rgba(255, 255, 255, 0.12)",
+          "text_primary": "#ffffff",
+          "text_secondary": "rgba(255, 255, 255, 0.65)"
+        },
+        "branding": {
+          "app_name": "Ocean Explorer",
+          "tagline": "Dive Into Success!"
+        },
+        "typography": {
+          "font_family": "'Quicksand', sans-serif"
+        },
+        "style": {
+          "border_radius": "16px",
+          "card_blur": "12px",
+          "shadow_intensity": 0.25
+        }
+      },
+      "forest_adventure": {
+        "name": "Forest Adventure",
+        "description": "Nature-inspired green theme",
+        "colors": {
+          "primary": "#2d6a4f",
+          "secondary": "#40916c",
+          "accent": "#95d5b2",
+          "success": "#52b788",
+          "warning": "#e9c46a",
+          "danger": "#e76f51",
+          "background_start": "#1b4332",
+          "background_end": "#2d6a4f",
+          "card_background": "rgba(255, 255, 255, 0.1)",
+          "text_primary": "#ffffff",
+          "text_secondary": "rgba(255, 255, 255, 0.6)"
+        },
+        "branding": {
+          "app_name": "Forest Adventure",
+          "tagline": "Explore the Wild!"
+        },
+        "typography": {
+          "font_family": "'Cabin', sans-serif"
+        },
+        "style": {
+          "border_radius": "12px",
+          "card_blur": "8px",
+          "shadow_intensity": 0.2
+        }
+      },
+      "space_mission": {
+        "name": "Space Mission",
+        "description": "Dark cosmic space theme",
+        "colors": {
+          "primary": "#7209b7",
+          "secondary": "#3a0ca3",
+          "accent": "#f72585",
+          "success": "#4cc9f0",
+          "warning": "#ffd60a",
+          "danger": "#ff006e",
+          "background_start": "#10002b",
+          "background_end": "#240046",
+          "card_background": "rgba(255, 255, 255, 0.08)",
+          "text_primary": "#ffffff",
+          "text_secondary": "rgba(255, 255, 255, 0.6)"
+        },
+        "branding": {
+          "app_name": "Space Mission",
+          "tagline": "Reach for the Stars!"
+        },
+        "typography": {
+          "font_family": "'Orbitron', sans-serif"
+        },
+        "style": {
+          "border_radius": "8px",
+          "card_blur": "15px",
+          "shadow_intensity": 0.4
+        }
+      },
+      "sunshine_day": {
+        "name": "Sunshine Day",
+        "description": "Bright and cheerful yellow theme",
+        "colors": {
+          "primary": "#f77f00",
+          "secondary": "#fcbf49",
+          "accent": "#eae2b7",
+          "success": "#06d6a0",
+          "warning": "#f77f00",
+          "danger": "#d62828",
+          "background_start": "#d62828",
+          "background_end": "#f77f00",
+          "card_background": "rgba(255, 255, 255, 0.2)",
+          "text_primary": "#ffffff",
+          "text_secondary": "rgba(255, 255, 255, 0.75)"
+        },
+        "branding": {
+          "app_name": "Sunshine Day",
+          "tagline": "Shine Bright Every Day!"
+        },
+        "typography": {
+          "font_family": "'Poppins', sans-serif"
+        },
+        "style": {
+          "border_radius": "24px",
+          "card_blur": "10px",
+          "shadow_intensity": 0.35
+        }
+      },
+      "clinical_professional": {
+        "name": "Clinical Professional",
+        "description": "Clean professional theme for healthcare settings",
+        "colors": {
+          "primary": "#1a365d",
+          "secondary": "#2c5282",
+          "accent": "#4299e1",
+          "success": "#38a169",
+          "warning": "#d69e2e",
+          "danger": "#c53030",
+          "background_start": "#1a365d",
+          "background_end": "#2c5282",
+          "card_background": "rgba(255, 255, 255, 0.95)",
+          "text_primary": "#1a202c",
+          "text_secondary": "#4a5568"
+        },
+        "branding": {
+          "app_name": "Task Tracker Pro",
+          "tagline": "Behavioral Support System"
+        },
+        "typography": {
+          "font_family": "'Inter', sans-serif"
+        },
+        "style": {
+          "border_radius": "8px",
+          "card_blur": "0px",
+          "shadow_intensity": 0.1
+        }
+      }
+    }
+  },
+  "inference": {
+    "relates_to": [
+      "lds:tenant/armand-quest-config-v1"
+    ],
+    "implies": [
+      "white_label_ready",
+      "custom_branding_supported",
+      "theme_switching_enabled"
+    ]
+  }
+}

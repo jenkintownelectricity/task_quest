@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LDS Voice OS | Logic Kernel Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--color-primary)',
+                        accent: 'var(--color-accent)',
+                        surface: 'var(--color-surface)',
+                    },
+                    fontFamily: {
+                        sans: ['var(--font-main)', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'breath': 'breath 3s ease-in-out infinite',
+                        'ring': 'ring 1.5s ease-out infinite',
+                    },
+                    keyframes: {
+                        breath: {
+                            '0%, 100%': { transform: 'scale(1)', opacity: '0.8' },
+                            '50%': { transform: 'scale(1.1)', opacity: '1' },
+                        },
+                        ring: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0.5' },
+                            '100%': { transform: 'scale(1.5)', opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            /* DEFAULT: AURA HEALTH (Medical/Luxury) */
+            --color-primary: #0f172a;
+            --color-accent: #38bdf8;
+            --color-surface: rgba(255, 255, 255, 0.6);
+            --font-main: 'Inter';
+            --bg-image: url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+        }
+
+        body {
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: var(--font-main);
+            transition: all 0.5s ease;
+        }
+
+        /* GLASSMORPHISM UTILS */
+        .glass {
+            background: var(--color-surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .phone-frame {
+            border: 8px solid #1e293b;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+        
+        /* TRANSITIONS */
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex text-slate-800 antialiased overflow-hidden selection:bg-accent selection:text-white">
+
+    <script>
+        // --- 1. THE TRUTH STORE (LDS) ---
+        const KERNEL = {
+            tenants: {
+                'aura': {
+                    brand: { name: "Aura Health", type: "medical", tone: "Empathetic & Clinical" },
+                    theme: { 
+                        primary: "#0f4c75", 
+                        accent: "#3282b8", 
+                        font: "Inter", 
+                        bg: "url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=2000&q=80')" 
+                    },
+                    compliance: { hipaa: true, encryption: "AES-256", audit: "Strict" },
+                    voice: { name: "Rachel (Neural)", style: "Calm", fallback: true }
+                },
+                'bolt': {
+                    brand: { name: "Bolt Logistics", type: "industrial", tone: "Direct & Efficient" },
+                    theme: { 
+                        primary: "#111827", 
+                        accent: "#f97316", 
+                        font: "JetBrains Mono", 
+                        bg: "url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=2000&q=80')" 
+                    },
+                    compliance: { hipaa: false, encryption: "Standard", audit: "Basic" },
+                    voice: { name: "Marcus (Fast)", style: "Assertive", fallback: false }
+                }
+            },
+            
+            // --- 2. LOGIC FUNCTIONS ---
+            activeTenant: 'aura',
+            
+            switchTenant: function(id) {
+                this.activeTenant = id;
+                const t = this.tenants[id];
+                
+                // Update CSS Variables (White Labeling)
+                const root = document.documentElement;
+                root.style.setProperty('--color-primary', t.theme.primary);
+                root.style.setProperty('--color-accent', t.theme.accent);
+                root.style.setProperty('--font-main', t.theme.font);
+                root.style.setProperty('--bg-image', t.theme.bg);
+                
+                // Update DOM elements
+                document.getElementById('brandName').innerText = t.brand.name;
+                document.getElementById('brandType').innerText = t.brand.type.toUpperCase() + " • LDS VERIFIED";
+                
+                // Update Compliance Badge
+                const badge = document.getElementById('complianceBadge');
+                if (t.compliance.hipaa) {
+                    badge.innerHTML = '<i class="fas fa-shield-virus mr-1"></i> HIPAA MODE';
+                    badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200";
+                } else {
+                    badge.innerHTML = '<i class="fas fa-lock mr-1"></i> STANDARD SEC';
+                    badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200";
+                }
+
+                // Render Views
+                renderTrustCenter();
+                renderDeck();
+                resetPhone();
+            }
+        };
+
+        function renderTrustCenter() {
+            const t = KERNEL.tenants[KERNEL.activeTenant];
+            const html = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-white/50 rounded-lg border border-white/40">
+                        <div class="text-xs text-slate-500 uppercase font-bold">Privacy Mode</div>
+                        <div class="text-lg font-bold text-primary mt-1">${t.compliance.hipaa ? 'PHI Redaction Active' : 'Standard Logging'}</div>
+                    </div>
+                    <div class="p-4 bg-white/50 rounded-lg border border-white/40">
+                        <div class="text-xs text-slate-500 uppercase font-bold">Voice Model</div>
+                        <div class="text-lg font-bold text-primary mt-1">${t.voice.name}</div>
+                    </div>
+                    <div class="p-4 bg-white/50 rounded-lg border border-white/40 col-span-2">
+                        <div class="text-xs text-slate-500 uppercase font-bold">Audit Trail</div>
+                        <div class="font-mono text-xs mt-2 text-slate-600">
+                            <div class="flex justify-between py-1 border-b border-slate-200">
+                                <span>LDS:audit/auth-check</span>
+                                <span class="text-green-600">PASSED</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200">
+                                <span>LDS:policy/${t.brand.type}</span>
+                                <span class="text-green-600">ENFORCED</span>
+                            </div>
+                            <div class="flex justify-between py-1">
+                                <span>LDS:voice/routing</span>
+                                <span class="text-primary">${t.voice.style.toUpperCase()}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('trustContent').innerHTML = html;
+        }
+
+        function renderDeck() {
+            const t = KERNEL.tenants[KERNEL.activeTenant];
+            document.getElementById('jsonOutput').innerText = JSON.stringify({
+                "slide_1": { "title": "Security First", "claim": t.compliance.hipaa ? "HIPAA Compliant" : "Enterprise Ready" },
+                "slide_2": { "title": "Brand Voice", "model": t.voice.name },
+                "meta": { "generated_by": "LDS Kernel", "timestamp": new Date().toISOString() }
+            }, null, 2);
+        }
+
+        // --- PHONE SIMULATOR LOGIC ---
+        let isCallActive = false;
+        
+        function toggleCall() {
+            const screen = document.getElementById('phoneScreen');
+            const btn = document.getElementById('callBtn');
+            const t = KERNEL.tenants[KERNEL.activeTenant];
+            
+            if (!isCallActive) {
+                // START CALL
+                isCallActive = true;
+                btn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                btn.classList.add('bg-red-500', 'hover:bg-red-600');
+                btn.innerHTML = '<i class="fas fa-phone-slash"></i>';
+                
+                // Show Active UI
+                screen.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-between py-10 fade-in relative">
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-accent opacity-20 blur-3xl rounded-full animate-pulse-slow"></div>
+                        
+                        <div class="text-center z-10">
+                            <h3 class="text-xl font-bold text-slate-800">${t.brand.name}</h3>
+                            <p class="text-sm text-slate-500" id="callStatus">Listening...</p>
+                        </div>
+
+                        <div class="relative z-10">
+                            <div class="absolute inset-0 bg-accent rounded-full animate-ring opacity-50"></div>
+                            <div class="w-20 h-20 bg-gradient-to-tr from-primary to-accent rounded-full flex items-center justify-center shadow-lg text-white text-2xl animate-breath">
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                        </div>
+
+                        <div class="w-full px-6 z-10">
+                            <div class="bg-white/80 backdrop-blur p-4 rounded-xl shadow-sm text-sm border border-white/50">
+                                <p class="text-slate-600 italic">"How can I help you today?"</p>
+                            </div>
+                             ${t.compliance.hipaa ? 
+                                `<div class="mt-2 flex items-center justify-center text-[10px] text-slate-400">
+                                    <i class="fas fa-lock mr-1"></i> PHI SAFE MODE
+                                 </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                resetPhone();
+            }
+        }
+
+        function resetPhone() {
+            isCallActive = false;
+            const btn = document.getElementById('callBtn');
+            const t = KERNEL.tenants[KERNEL.activeTenant];
+            
+            btn.classList.add('bg-green-500', 'hover:bg-green-600');
+            btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+            btn.innerHTML = '<i class="fas fa-phone"></i>';
+
+            document.getElementById('phoneScreen').innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center fade-in space-y-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg text-white text-2xl">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="font-bold text-slate-800 text-lg">Voice Agent</h3>
+                        <p class="text-xs text-slate-500 uppercase tracking-wide">Ready for ${t.brand.name}</p>
+                    </div>
+                    <div class="absolute bottom-10 animate-bounce text-slate-400">
+                        <i class="fas fa-chevron-up"></i>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+
+    <aside class="w-20 lg:w-64 glass border-r border-white/20 flex flex-col z-20 transition-all duration-300">
+        <div class="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-white/10">
+            <div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold mr-0 lg:mr-3 shadow-lg">L</div>
+            <span class="font-bold text-lg text-slate-800 hidden lg:block tracking-tight">LDS<span class="font-light">OS</span></span>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="#" class="flex items-center p-3 text-slate-700 bg-white/40 rounded-xl shadow-sm ring-1 ring-white/50">
+                <i class="fas fa-layer-group w-6 text-accent"></i>
+                <span class="hidden lg:block font-medium ml-2">Console</span>
+            </a>
+            <a href="#" class="flex items-center p-3 text-slate-500 hover:bg-white/20 rounded-xl transition">
+                <i class="fas fa-file-contract w-6"></i>
+                <span class="hidden lg:block font-medium ml-2">LDS Files</span>
+            </a>
+            <a href="#" class="flex items-center p-3 text-slate-500 hover:bg-white/20 rounded-xl transition">
+                <i class="fas fa-users-cog w-6"></i>
+                <span class="hidden lg:block font-medium ml-2">Tenants</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-white/10 bg-white/20 backdrop-blur-sm">
+            <label class="text-[10px] font-bold text-slate-500 uppercase mb-2 block hidden lg:block">Active Tenant Logic</label>
+            <select onchange="KERNEL.switchTenant(this.value)" class="w-full bg-white/60 border border-white/40 rounded-lg p-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent shadow-inner">
+                <option value="aura">🏥 Aura Health</option>
+                <option value="bolt">🏭 Bolt Logistics</option>
+            </select>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+        
+        <header class="h-20 glass border-b border-white/20 flex items-center justify-between px-8 z-10">
+            <div>
+                <h1 id="brandName" class="text-2xl font-bold text-slate-800">Aura Health</h1>
+                <div class="flex items-center space-x-2">
+                    <span id="brandType" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">MEDICAL • LDS VERIFIED</span>
+                    <span id="complianceBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200">
+                        <i class="fas fa-shield-virus mr-1"></i> HIPAA MODE
+                    </span>
+                </div>
+            </div>
+            <div class="flex space-x-4">
+                <button class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center hover:bg-white transition border border-white/40">
+                    <i class="fas fa-bell text-slate-600"></i>
+                </button>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent p-[2px]">
+                    <div class="w-full h-full rounded-full bg-white overflow-hidden">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="User">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-7 space-y-6">
+                
+                <div class="glass rounded-3xl p-8 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition transform group-hover:scale-110">
+                        <i class="fas fa-fingerprint text-9xl text-primary"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-primary mb-4 flex items-center">
+                        <i class="fas fa-check-double mr-2 text-accent"></i> Verified Logic
+                    </h2>
+                    <div id="trustContent" class="fade-in">
+                        </div>
+                </div>
+
+                <div class="glass rounded-3xl p-8">
+                    <h2 class="text-lg font-bold text-slate-700 mb-4 flex items-center">
+                        <i class="fas fa-code mr-2 text-slate-400"></i> Sales Deck Generator
+                    </h2>
+                    <div class="bg-slate-900 rounded-xl p-4 font-mono text-xs text-green-400 shadow-inner overflow-hidden relative">
+                        <div class="absolute top-2 right-2 text-slate-500 text-[10px]">JSON Output</div>
+                        <pre id="jsonOutput" class="whitespace-pre-wrap">Loading...</pre>
+                    </div>
+                    <button class="mt-4 w-full py-2 bg-primary text-white rounded-lg font-medium text-sm hover:opacity-90 transition shadow-lg">
+                        <i class="fas fa-download mr-2"></i> Export PDF Proposal
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 flex items-center justify-center relative">
+                
+                <div class="phone-frame w-[320px] h-[640px] bg-slate-100 relative shadow-2xl z-20 flex flex-col">
+                    
+                    <div class="h-8 bg-slate-900 w-full relative flex justify-center">
+                        <div class="w-32 h-6 bg-black rounded-b-xl absolute top-0"></div>
+                    </div>
+                    
+                    <div id="phoneScreen" class="flex-1 bg-slate-50 relative overflow-hidden">
+                        </div>
+
+                    <div class="h-24 bg-white border-t border-slate-200 flex items-center justify-center pb-4 relative z-30">
+                        <div class="flex space-x-8">
+                            <button class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center hover:bg-slate-200 transition">
+                                <i class="fas fa-keyboard"></i>
+                            </button>
+                            <button onclick="toggleCall()" id="callBtn" class="w-16 h-16 rounded-full bg-green-500 text-white text-2xl flex items-center justify-center shadow-lg hover:bg-green-600 transition transform hover:scale-105 active:scale-95">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                            <button class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center hover:bg-slate-200 transition">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute w-[340px] h-[600px] bg-accent opacity-20 blur-[100px] -z-10 rounded-full animate-pulse-slow"></div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Init System
+        window.onload = function() {
+            KERNEL.switchTenant('aura');
+        }
+    </script>
+</body>
+</html>

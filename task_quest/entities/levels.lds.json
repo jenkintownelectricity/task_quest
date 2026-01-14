@@ -1,0 +1,62 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:levels/progression-v1",
+    "type": "gamification.levels",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:levels-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["levels", "progression", "xp"],
+    "theme": ["adventure", "growth", "achievement"]
+  },
+  "core": {
+    "xp_formula": "100 * level * 1.2",
+    "level_titles": [
+      { "level": 1, "title": "Beginner", "icon": "seedling", "color": "#A8E6CF" },
+      { "level": 2, "title": "Apprentice", "icon": "leaf", "color": "#88D8B0" },
+      { "level": 3, "title": "Student", "icon": "book", "color": "#7EC8A9" },
+      { "level": 4, "title": "Learner", "icon": "graduation-cap", "color": "#6DB89A" },
+      { "level": 5, "title": "Rising Star", "icon": "star", "color": "#FFD93D" },
+      { "level": 6, "title": "Achiever", "icon": "trophy", "color": "#FFC857" },
+      { "level": 7, "title": "Explorer", "icon": "compass", "color": "#4ECDC4" },
+      { "level": 8, "title": "Adventurer", "icon": "map", "color": "#45B7AA" },
+      { "level": 9, "title": "Pathfinder", "icon": "route", "color": "#3CA59D" },
+      { "level": 10, "title": "Champion", "icon": "medal", "color": "#C9B037" },
+      { "level": 15, "title": "Hero", "icon": "shield", "color": "#FF6B6B" },
+      { "level": 20, "title": "Master", "icon": "crown", "color": "#9B59B6" },
+      { "level": 25, "title": "Elite", "icon": "gem", "color": "#3498DB" },
+      { "level": 30, "title": "Legendary", "icon": "dragon", "color": "#E74C3C" },
+      { "level": 40, "title": "Mythic", "icon": "hat-wizard", "color": "#8E44AD" },
+      { "level": 50, "title": "Supreme Master", "icon": "sun", "color": "#F39C12" }
+    ],
+    "level_rewards": {
+      "5": { "bonus_coins": 100, "unlock": "new-avatar-color" },
+      "10": { "bonus_coins": 250, "unlock": "custom-theme" },
+      "15": { "bonus_coins": 400, "unlock": "special-badge-frame" },
+      "20": { "bonus_coins": 600, "unlock": "animated-avatar" },
+      "25": { "bonus_coins": 1000, "unlock": "legendary-title" },
+      "50": { "bonus_coins": 2500, "unlock": "supreme-status" }
+    },
+    "journey_map": {
+      "description": "Armand's journey from Jenkintown to success!",
+      "milestones": [
+        { "level": 1, "location": "Jenkintown, PA", "description": "Home base - where the journey begins!" },
+        { "level": 5, "location": "Philadelphia, PA", "description": "First big city milestone!" },
+        { "level": 10, "location": "Atlantic City, NJ", "description": "Beach destination unlocked!" },
+        { "level": 15, "location": "New York City, NY", "description": "The Big Apple awaits!" },
+        { "level": 20, "location": "Washington, DC", "description": "Capital achievement!" },
+        { "level": 25, "location": "Cape May, NJ", "description": "Your favorite destination!" },
+        { "level": 30, "location": "Boston, MA", "description": "Historic city conquered!" },
+        { "level": 40, "location": "Miami, FL", "description": "Tropical triumph!" },
+        { "level": 50, "location": "Anywhere You Dream", "description": "The world is yours!" }
+      ]
+    }
+  },
+  "inference": {
+    "relates_to": ["lds:profile/armand-lefebvre-v1"],
+    "implies": ["progression-system", "visual-journey"],
+    "requires": ["xp-tracking"]
+  }
+}

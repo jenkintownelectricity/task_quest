@@ -1,0 +1,176 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:roles/armand-quest-rbac-v1",
+    "type": "security.rbac",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:rbac-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["security", "rbac", "access-control", "hipaa"]
+  },
+  "core": {
+    "role_definitions": {
+      "minor_subject": {
+        "description": "The child who is the subject of the behavioral tracking",
+        "phi_access_level": "own_data_only",
+        "permissions": [
+          "view_own_tasks",
+          "complete_own_tasks",
+          "view_own_progress",
+          "view_own_rewards",
+          "purchase_rewards",
+          "view_own_achievements",
+          "view_journey_map"
+        ],
+        "restrictions": [
+          "cannot_view_clinical_notes",
+          "cannot_export_data",
+          "cannot_modify_goals",
+          "cannot_add_tasks",
+          "cannot_view_audit_logs"
+        ]
+      },
+      "guardian_primary": {
+        "description": "Primary legal guardian with full administrative rights",
+        "phi_access_level": "full",
+        "permissions": [
+          "all_permissions",
+          "manage_consent",
+          "view_audit_logs",
+          "export_data",
+          "add_tasks",
+          "modify_goals",
+          "manage_rewards",
+          "invite_users",
+          "revoke_access",
+          "view_clinical_data"
+        ],
+        "restrictions": []
+      },
+      "guardian_secondary": {
+        "description": "Secondary legal guardian (co-parent) with full rights",
+        "phi_access_level": "full",
+        "permissions": [
+          "all_permissions",
+          "view_audit_logs",
+          "export_data",
+          "add_tasks",
+          "modify_goals",
+          "manage_rewards",
+          "view_clinical_data"
+        ],
+        "restrictions": [
+          "cannot_revoke_primary_guardian"
+        ]
+      },
+      "healthcare_provider": {
+        "description": "Licensed therapist or healthcare provider",
+        "phi_access_level": "treatment_relevant",
+        "permissions": [
+          "view_all_tasks",
+          "view_all_progress",
+          "view_behavioral_data",
+          "add_therapeutic_tasks",
+          "modify_therapeutic_goals",
+          "add_clinical_notes",
+          "generate_treatment_reports"
+        ],
+        "restrictions": [
+          "cannot_manage_rewards",
+          "cannot_view_financial_data",
+          "cannot_manage_consent",
+          "cannot_invite_users"
+        ],
+        "requires_consent": "lds:consent/guardian-primary-v1",
+        "credential_verification": "required"
+      },
+      "educator": {
+        "description": "Teacher or school staff with 504 plan involvement",
+        "phi_access_level": "educational_relevant",
+        "permissions": [
+          "view_school_tasks",
+          "verify_school_tasks",
+          "add_school_tasks",
+          "view_school_progress",
+          "add_behavioral_observations"
+        ],
+        "restrictions": [
+          "cannot_view_diagnosis_details",
+          "cannot_view_therapy_notes",
+          "cannot_view_home_tasks",
+          "cannot_manage_rewards",
+          "cannot_export_data",
+          "cannot_view_audit_logs"
+        ],
+        "requires_consent": "lds:consent/guardian-primary-v1",
+        "phi_filter": "school_context_only"
+      },
+      "family_support": {
+        "description": "Extended family members providing support",
+        "phi_access_level": "minimal",
+        "permissions": [
+          "verify_tasks",
+          "send_encouragement",
+          "view_general_progress"
+        ],
+        "restrictions": [
+          "cannot_view_diagnosis",
+          "cannot_view_clinical_notes",
+          "cannot_add_tasks",
+          "cannot_modify_goals",
+          "cannot_manage_rewards",
+          "cannot_export_data"
+        ],
+        "requires_consent": "lds:consent/guardian-primary-v1",
+        "phi_filter": "progress_percentage_only"
+      },
+      "sibling": {
+        "description": "Brother or sister for team activities",
+        "phi_access_level": "none",
+        "permissions": [
+          "view_shared_challenges",
+          "participate_team_tasks",
+          "send_encouragement"
+        ],
+        "restrictions": [
+          "cannot_view_individual_progress",
+          "cannot_view_diagnosis",
+          "cannot_verify_tasks",
+          "cannot_view_rewards"
+        ],
+        "phi_filter": "shared_activities_only"
+      }
+    },
+    "permission_inheritance": {
+      "guardian_primary": "inherits_all",
+      "guardian_secondary": "inherits_from_guardian_primary",
+      "healthcare_provider": "independent",
+      "educator": "independent",
+      "family_support": "independent",
+      "sibling": "independent"
+    },
+    "access_control_rules": {
+      "default_deny": true,
+      "explicit_grant_required": true,
+      "consent_check_on_phi": true,
+      "audit_all_access": true,
+      "session_based_authorization": true
+    }
+  },
+  "inference": {
+    "relates_to": [
+      "lds:compliance/armand-quest-hipaa-v1",
+      "lds:consent/guardian-primary-v1"
+    ],
+    "implies": [
+      "role_based_access_active",
+      "phi_access_controlled",
+      "minimum_necessary_enforced"
+    ],
+    "requires": [
+      "lds:compliance/armand-quest-hipaa-v1"
+    ]
+  }
+}
