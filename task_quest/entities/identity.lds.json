@@ -1,0 +1,93 @@
+{
+  "_lds": {
+    "v": "1.0.0",
+    "id": "lds:identity/digital-id-v1",
+    "type": "identity.schema",
+    "created_at": "2025-01-08T00:00:00Z",
+    "content_hash": "sha256:identity-001",
+    "origin": "armand-quest"
+  },
+  "vectors": {
+    "category": ["identity", "multi-user", "family", "care-team"]
+  },
+  "core": {
+    "child_identity": {
+      "description": "Digital identity for a child in the system",
+      "schema": {
+        "child_id": "uuid - unique identifier",
+        "name": "string - child's first name",
+        "avatar": "string - emoji or icon",
+        "created_at": "iso8601",
+        "invite_code": "string - 6 char code for caregivers to connect",
+        "invite_code_expires": "iso8601 - code expiration (24 hours)"
+      },
+      "example": {
+        "child_id": "c-abc123",
+        "name": "Armand",
+        "avatar": "🐉",
+        "created_at": "2025-01-08T00:00:00Z",
+        "invite_code": "HERO42",
+        "invite_code_expires": "2025-01-09T00:00:00Z"
+      }
+    },
+    "caregiver_identity": {
+      "description": "Identity for parents, therapists, teachers, family",
+      "schema": {
+        "caregiver_id": "uuid - unique identifier",
+        "name": "string - caregiver name",
+        "role": "enum - guardian_primary|guardian_secondary|healthcare_provider|educator|family_support|sibling",
+        "children": "array - list of child_ids they're connected to",
+        "created_at": "iso8601"
+      },
+      "roles_explained": {
+        "guardian_primary": "Parent with full control - can add tasks, manage rewards, invite others",
+        "guardian_secondary": "Co-parent with full access but cannot remove primary guardian",
+        "healthcare_provider": "Therapist/doctor - sees progress, can add therapeutic tasks",
+        "educator": "Teacher - sees school tasks only, can verify completions",
+        "family_support": "Grandparent/aunt/uncle - can verify tasks, send encouragement",
+        "sibling": "Brother/sister - can see shared challenges only"
+      }
+    },
+    "connection": {
+      "description": "Link between caregiver and child",
+      "schema": {
+        "connection_id": "uuid",
+        "child_id": "reference to child",
+        "caregiver_id": "reference to caregiver",
+        "role": "caregiver's role for THIS child",
+        "permissions": "array - specific permissions granted",
+        "connected_at": "iso8601",
+        "invited_by": "caregiver_id who sent invite"
+      }
+    },
+    "family_group": {
+      "description": "Optional grouping for shared activities across families",
+      "schema": {
+        "group_id": "uuid",
+        "name": "string - e.g., 'Cousins Challenge Group'",
+        "children": "array of child_ids",
+        "admins": "array of caregiver_ids",
+        "shared_challenges": "array of challenge definitions",
+        "created_at": "iso8601"
+      }
+    }
+  },
+  "inference": {
+    "relates_to": [
+      "lds:roles/armand-quest-rbac-v1",
+      "lds:compliance/armand-quest-hipaa-v1"
+    ],
+    "implies": [
+      "multi_user_support",
+      "role_based_access",
+      "family_collaboration",
+      "care_team_coordination"
+    ],
+    "security_notes": [
+      "Invite codes expire after 24 hours",
+      "Primary guardian must approve all connections",
+      "Healthcare providers require credential verification",
+      "All access is logged for HIPAA compliance"
+    ]
+  }
+}
