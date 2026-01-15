@@ -1,0 +1,272 @@
+{
+  "$lds": {
+    "v": "1.0.0",
+    "type": "command.authoritative",
+    "id": "cmd.adhd.focusquest.001",
+    "created": "2026-01-14T00:00:00Z",
+    "authority": "L0",
+    "author": "l0:armand.lefebvre"
+  },
+
+  "command": {
+    "title": "FOCUSQUEST — ADHD Kids Task Tracker",
+    "governance": {
+      "chain": "L0 Human → L1 ADHD Kernel → L2 Proposer",
+      "l0_authority": "Armand Lefebvre",
+      "constraint": "Authority flows DOWN only. No unauthorized deviations."
+    },
+    "execution": "SINGLE-COMMAND BUILD",
+    "output": "React JSX Artifact"
+  },
+
+  "mission": {
+    "summary": "Build an ADHD-optimized task tracker for kids with gamification, 100% customizable via built-in LDS viewer",
+    "target_users": ["Little Armand", "Giuliana", "Any ADHD child"],
+    "architecture": {
+      "backend": "NONE — Zero backend",
+      "database": "NONE — localStorage only",
+      "data_format": ".lds.json kernels",
+      "customization": "100% via built-in LDS file viewer/editor"
+    }
+  },
+
+  "sections": {
+
+    "section_1_bar_area": {
+      "name": "CORE FEATURES",
+      "features": [
+        {
+          "id": "feature.task_tracking",
+          "title": "Visual Task Tracking",
+          "description": "Drag-drop task cards with big icons, color coding by category",
+          "adhd_optimized": true,
+          "details": [
+            "Large touch targets (min 48px)",
+            "High contrast colors",
+            "One task visible at a time option (focus mode)",
+            "Visual progress bar per task"
+          ]
+        },
+        {
+          "id": "feature.gamification",
+          "title": "Full Gamification System",
+          "description": "Points, XP, levels, streaks, achievements",
+          "details": [
+            "Points earned per task (configurable)",
+            "XP system with level progression",
+            "Daily streaks with multipliers",
+            "Achievement badges (50+ prebuilt)",
+            "Reward redemption store"
+          ]
+        },
+        {
+          "id": "feature.themes",
+          "title": "Kid Themes (12 Prebuilt)",
+          "themes": [
+            {"id": "minecraft", "icon": "⛏️", "for": "Little Armand"},
+            {"id": "barbie", "icon": "💖", "for": "Giuliana"},
+            {"id": "roblox", "icon": "🎮"},
+            {"id": "pokemon", "icon": "⚡"},
+            {"id": "mario", "icon": "🍄"},
+            {"id": "princess", "icon": "👑"},
+            {"id": "ninja_turtles", "icon": "🐢"},
+            {"id": "space", "icon": "🚀"},
+            {"id": "dinosaur", "icon": "🦖"},
+            {"id": "unicorn", "icon": "🦄"},
+            {"id": "ocean", "icon": "🐠"},
+            {"id": "sports", "icon": "⚽"}
+          ],
+          "customization": "Colors, avatars, sounds, vocabulary all editable"
+        }
+      ]
+    },
+
+    "section_2_main_floor": {
+      "name": "ADHD-SPECIFIC HELPERS",
+      "features": [
+        {
+          "id": "feature.visual_timers",
+          "title": "Visual Countdown Timers",
+          "description": "Big, colorful timers for time-blind kids",
+          "options": ["Pomodoro (25/5)", "Short burst (10/2)", "Custom"]
+        },
+        {
+          "id": "feature.task_breakdown",
+          "title": "Step-by-Step Task Breakdown",
+          "description": "Every task can have micro-steps",
+          "example": {
+            "task": "Clean Room",
+            "steps": ["Pick up clothes", "Make bed", "Put toys in bin", "Done!"]
+          }
+        },
+        {
+          "id": "feature.focus_mode",
+          "title": "Focus Mode",
+          "description": "Shows ONE task at a time, blocks distractions",
+          "details": [
+            "Single task view",
+            "Grays out everything else",
+            "Big celebration on completion",
+            "Auto-advance to next task"
+          ]
+        },
+        {
+          "id": "feature.sensory_feedback",
+          "title": "Multi-Sensory Feedback",
+          "description": "Sound, vibration, visual celebrations",
+          "triggers": [
+            "Task complete → confetti + sound + vibration",
+            "Streak milestone → special animation",
+            "Level up → full-screen celebration",
+            "Points earned → flying coin animation"
+          ]
+        },
+        {
+          "id": "feature.parent_approval",
+          "title": "Parent Approval System",
+          "description": "Some tasks require parent sign-off",
+          "workflow": "Child completes → Parent notified → Parent approves → Points awarded"
+        }
+      ]
+    },
+
+    "section_3_foyer_options": {
+      "name": "CUSTOMIZATION & LDS VIEWER",
+      "description": "Three levels of customization depth",
+
+      "option_a_basic": {
+        "name": "Quick Settings (No Code)",
+        "description": "In-app toggles and sliders",
+        "features": [
+          "Theme selector dropdown",
+          "Avatar picker",
+          "Sound on/off toggle",
+          "Timer duration sliders",
+          "Points per task adjustment"
+        ]
+      },
+
+      "option_b_enhanced": {
+        "name": "LDS Kernel Viewer (Visual Editor)",
+        "description": "See and edit all .lds.json kernels visually",
+        "features": [
+          "Tree view of all kernels",
+          "Click to expand/edit any kernel",
+          "Add new tasks/rewards/themes",
+          "Duplicate and modify existing kernels",
+          "Syntax highlighting for JSON",
+          "Validation before save"
+        ]
+      },
+
+      "option_c_premium": {
+        "name": "Raw LDS File Access",
+        "description": "Full import/export of .lds.json files",
+        "features": [
+          "Export all data as .lds.json bundle",
+          "Import .lds.json files to override settings",
+          "Share configurations between devices",
+          "Backup/restore functionality",
+          "Version history of changes"
+        ]
+      }
+    },
+
+    "section_4_data_kernels": {
+      "name": "PREBUILT LDS KERNELS",
+      "description": "Ship with these kernels embedded",
+
+      "kernel_types": [
+        {
+          "type": "child.profile",
+          "description": "Child user data, points, streaks, settings",
+          "prebuilt": ["child.little_armand", "child.giuliana"]
+        },
+        {
+          "type": "task.definition",
+          "description": "Task templates with ADHD helpers",
+          "prebuilt_count": 60,
+          "categories": [
+            "morning_routine (15 tasks)",
+            "evening_routine (10 tasks)",
+            "academics (8 tasks)",
+            "chores (12 tasks)",
+            "health (8 tasks)",
+            "social (7 tasks)"
+          ]
+        },
+        {
+          "type": "task.completion",
+          "description": "Records of completed tasks",
+          "generated": "Created when child completes task"
+        },
+        {
+          "type": "theme.definition",
+          "description": "Full theme configurations",
+          "prebuilt_count": 12
+        },
+        {
+          "type": "reward.definition",
+          "description": "Rewards kids can redeem points for",
+          "prebuilt_count": 20,
+          "examples": ["Screen time", "Stay up late", "Pick dinner", "Special outing"]
+        },
+        {
+          "type": "achievement.definition",
+          "description": "Badges and milestones",
+          "prebuilt_count": 50,
+          "examples": ["First Task!", "7-Day Streak", "100 Points", "Early Bird"]
+        }
+      ]
+    }
+  },
+
+  "ui_requirements": {
+    "responsive": "Mobile-first, works on tablet/desktop",
+    "accessibility": {
+      "touch_targets": "48px minimum",
+      "contrast": "WCAG AA minimum",
+      "font_size": "Large, adjustable"
+    },
+    "navigation": [
+      "Dashboard (today's tasks)",
+      "All Tasks (browse/manage)",
+      "Rewards Store",
+      "Achievements",
+      "Settings",
+      "LDS Viewer (parent access)"
+    ],
+    "styling": "Glassmorphism with theme color overlays"
+  },
+
+  "validation_requirements": [
+    "All navigation items functional",
+    "Task completion updates points/XP/streaks",
+    "Theme switching applies instantly",
+    "LDS Viewer shows all kernels",
+    "LDS Viewer allows editing",
+    "Export downloads valid .lds.json",
+    "Import loads .lds.json correctly",
+    "Focus mode isolates single task",
+    "Timers count down visually",
+    "Celebrations trigger on completion",
+    "Parent approval workflow functions",
+    "Offline-capable (no network required)"
+  ],
+
+  "acceptance_criteria": [
+    "Single .jsx file under 1200 lines",
+    "No external dependencies except React and Lucide icons",
+    "All kernels embedded as default data",
+    "Full CRUD for all kernel types via LDS Viewer",
+    "12 themes working with full customization",
+    "60+ prebuilt tasks",
+    "Mobile responsive",
+    "ADHD-friendly UX throughout"
+  ],
+
+  "instruction": {
+    "confirm_with": "ACKNOWLEDGED - L0 COMMAND RECEIVED - BUILDING FOCUSQUEST ADHD KERNEL",
+    "then": "Produce single React artifact"
+  }
+}

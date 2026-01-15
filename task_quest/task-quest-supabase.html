@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,644 +17,719 @@
             --color-xp: #3b82f6;
             --color-coins: #eab308;
         }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .task-card { transition: all 0.2s; }
-        .task-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1); }
-        .task-card.completed { opacity: 0.6; }
-        .xp-bar { background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
-        .coin-glow { text-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
-        .streak-fire { animation: flicker 0.5s infinite alternate; }
-        @keyframes flicker { from { opacity: 0.8; } to { opacity: 1; } }
-        .confetti { position: fixed; pointer-events: none; z-index: 9999; }
-        .btn-primary { background: var(--color-primary); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.2s; }
-        .btn-primary:hover { background: var(--color-secondary); transform: scale(1.02); }
-        .modal-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .tab-active { border-bottom: 3px solid var(--color-primary); color: var(--color-primary); }
-        [x-cloak] { display: none !important; }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-card {
+            transition: all 0.2s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-card.completed {
+            opacity: 0.6;
+        }
+
+        .xp-bar {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+
+        .coin-glow {
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+        }
+
+        .streak-fire {
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            from {
+                opacity: 0.8;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-secondary);
+            transform: scale(1.02);
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .tab-active {
+            border-bottom: 3px solid var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
+
 <body class="bg-gray-100 min-h-screen">
 
-<div id="app">
-    <!-- Loading State -->
-    <div id="loading" class="fixed inset-0 gradient-bg flex items-center justify-center z-50">
-        <div class="text-center text-white">
-            <i class="fas fa-dragon text-6xl mb-4 animate-bounce"></i>
-            <h1 class="text-2xl font-bold">Task Quest</h1>
-            <p class="opacity-75">Loading your adventure...</p>
+    <div id="app">
+        <!-- Loading State -->
+        <div id="loading" class="fixed inset-0 gradient-bg flex items-center justify-center z-50">
+            <div class="text-center text-white">
+                <i class="fas fa-dragon text-6xl mb-4 animate-bounce"></i>
+                <h1 class="text-2xl font-bold">Task Quest</h1>
+                <p class="opacity-75">Loading your adventure...</p>
+            </div>
+        </div>
+
+        <!-- Auth Screen -->
+        <div id="auth-screen" class="hidden fixed inset-0 gradient-bg flex items-center justify-center">
+            <div class="card p-8 w-full max-w-md mx-4">
+                <div class="text-center mb-6">
+                    <i class="fas fa-dragon text-5xl text-indigo-500 mb-2"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">Task Quest</h1>
+                    <p class="text-gray-500">Begin your adventure!</p>
+                </div>
+
+                <div id="auth-tabs" class="flex border-b mb-6">
+                    <button onclick="showAuthTab('login')" id="tab-login" class="flex-1 py-2 tab-active">Login</button>
+                    <button onclick="showAuthTab('signup')" id="tab-signup" class="flex-1 py-2 text-gray-500">Sign
+                        Up</button>
+                </div>
+
+                <form id="auth-form" onsubmit="handleAuth(event)">
+                    <div id="signup-fields" class="hidden space-y-4 mb-4">
+                        <input type="text" id="auth-name" placeholder="Your Name" class="w-full p-3 border rounded-lg">
+                        <select id="auth-role" class="w-full p-3 border rounded-lg">
+                            <option value="child">I'm the Quest Hero (Child)</option>
+                            <option value="guardian">I'm a Guardian (Parent)</option>
+                            <option value="family_support">I'm Family Support</option>
+                        </select>
+                    </div>
+                    <div class="space-y-4">
+                        <input type="email" id="auth-email" placeholder="Email" required
+                            class="w-full p-3 border rounded-lg">
+                        <input type="password" id="auth-password" placeholder="Password" required
+                            class="w-full p-3 border rounded-lg">
+                    </div>
+                    <button type="submit" class="btn-primary w-full mt-6 py-3 text-lg font-semibold">
+                        <span id="auth-btn-text">Login</span>
+                    </button>
+                    <p id="auth-error" class="text-red-500 text-center mt-4 hidden"></p>
+                </form>
+
+                <div id="family-code-section" class="mt-6 pt-6 border-t hidden">
+                    <p class="text-sm text-gray-500 mb-2">Have a family code?</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="family-code-input" placeholder="Enter code"
+                            class="flex-1 p-2 border rounded-lg">
+                        <button onclick="joinFamily()" class="btn-primary">Join</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="main-app" class="hidden">
+            <!-- Header -->
+            <header class="gradient-bg text-white p-4 sticky top-0 z-40">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user-astronaut text-2xl"></i>
+                            </div>
+                            <div>
+                                <h1 id="user-name" class="font-bold text-lg">Hero</h1>
+                                <div class="flex items-center gap-2 text-sm opacity-90">
+                                    <span id="user-level">Level 1</span>
+                                    <span>•</span>
+                                    <span id="user-title">Beginner</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-center">
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-fire streak-fire text-orange-300"></i>
+                                    <span id="streak-count" class="font-bold">0</span>
+                                </div>
+                                <span class="text-xs opacity-75">Streak</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="flex items-center gap-1 coin-glow">
+                                    <i class="fas fa-coins text-yellow-300"></i>
+                                    <span id="coin-count" class="font-bold">0</span>
+                                </div>
+                                <span class="text-xs opacity-75">Coins</span>
+                            </div>
+                            <button onclick="logout()" class="p-2 hover:bg-white/20 rounded-lg" title="Logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- XP Bar -->
+                    <div class="mt-3">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span id="xp-current">0 XP</span>
+                            <span id="xp-needed">120 XP to next level</span>
+                        </div>
+                        <div class="h-3 bg-white/20 rounded-full overflow-hidden">
+                            <div id="xp-bar" class="h-full xp-bar rounded-full transition-all duration-500"
+                                style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Navigation Tabs -->
+            <nav class="bg-white shadow-sm sticky top-[140px] z-30">
+                <div class="max-w-4xl mx-auto flex">
+                    <button onclick="showTab('tasks')" id="nav-tasks"
+                        class="flex-1 py-3 text-center font-medium tab-active">
+                        <i class="fas fa-tasks mr-2"></i>Tasks
+                    </button>
+                    <button onclick="showTab('shop')" id="nav-shop"
+                        class="flex-1 py-3 text-center font-medium text-gray-500">
+                        <i class="fas fa-store mr-2"></i>Shop
+                    </button>
+                    <button onclick="showTab('achievements')" id="nav-achievements"
+                        class="flex-1 py-3 text-center font-medium text-gray-500">
+                        <i class="fas fa-trophy mr-2"></i>Badges
+                    </button>
+                    <button onclick="showTab('journey')" id="nav-journey"
+                        class="flex-1 py-3 text-center font-medium text-gray-500">
+                        <i class="fas fa-map mr-2"></i>Map
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="max-w-4xl mx-auto p-4 pb-20">
+                <!-- Tasks Tab -->
+                <div id="tab-tasks" class="space-y-6">
+                    <!-- Today's Progress -->
+                    <div class="card p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="font-bold text-gray-700">Today's Progress</h2>
+                            <span id="today-progress" class="text-indigo-500 font-bold">0/0</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div id="today-bar"
+                                class="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all"
+                                style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Task Categories -->
+                    <div id="task-categories"></div>
+                </div>
+
+                <!-- Shop Tab -->
+                <div id="tab-shop" class="hidden space-y-6">
+                    <div class="card p-4 flex items-center justify-between">
+                        <span class="text-gray-600">Your Balance:</span>
+                        <span class="text-2xl font-bold text-yellow-500">
+                            <i class="fas fa-coins mr-2"></i><span id="shop-coins">0</span>
+                        </span>
+                    </div>
+                    <div id="shop-categories"></div>
+                </div>
+
+                <!-- Achievements Tab -->
+                <div id="tab-achievements" class="hidden space-y-6">
+                    <div id="achievement-categories"></div>
+                </div>
+
+                <!-- Journey Map Tab -->
+                <div id="tab-journey" class="hidden">
+                    <div class="card p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-map-marked-alt mr-2 text-indigo-500"></i>Your Journey
+                        </h2>
+                        <div id="journey-map" class="space-y-4"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Task Completion Modal -->
+        <div id="task-modal" class="fixed inset-0 modal-overlay hidden items-center justify-center z-50">
+            <div class="card p-6 m-4 max-w-sm w-full text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-3xl text-green-500"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Quest Complete!</h3>
+                <p id="modal-task-name" class="text-gray-600 mb-4"></p>
+                <div class="flex justify-center gap-6 mb-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-500">+<span id="modal-xp">0</span></div>
+                        <div class="text-xs text-gray-500">XP</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-yellow-500">+<span id="modal-coins">0</span></div>
+                        <div class="text-xs text-gray-500">Coins</div>
+                    </div>
+                </div>
+                <button onclick="closeTaskModal()" class="btn-primary w-full">Awesome!</button>
+            </div>
         </div>
     </div>
 
-    <!-- Auth Screen -->
-    <div id="auth-screen" class="hidden fixed inset-0 gradient-bg flex items-center justify-center">
-        <div class="card p-8 w-full max-w-md mx-4">
-            <div class="text-center mb-6">
-                <i class="fas fa-dragon text-5xl text-indigo-500 mb-2"></i>
-                <h1 class="text-2xl font-bold text-gray-800">Task Quest</h1>
-                <p class="text-gray-500">Begin your adventure!</p>
-            </div>
+    <script>
+        // ============================================
+        // SUPABASE CONFIG - UPDATE THESE VALUES!
+        // ============================================
+        const SUPABASE_URL = 'https://etofgqxycitcmkvbjidw.supabase.co';  // e.g., https://xxxxx.supabase.co
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0b2ZncXh5Y2l0Y21rdmJqaWR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMzY5MjYsImV4cCI6MjA3ODgxMjkyNn0.F7hMxiubtFRPEn9_LUZqQkCjVaKCt-n76LIAbwdXKUI';
 
-            <div id="auth-tabs" class="flex border-b mb-6">
-                <button onclick="showAuthTab('login')" id="tab-login" class="flex-1 py-2 tab-active">Login</button>
-                <button onclick="showAuthTab('signup')" id="tab-signup" class="flex-1 py-2 text-gray-500">Sign Up</button>
-            </div>
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            <form id="auth-form" onsubmit="handleAuth(event)">
-                <div id="signup-fields" class="hidden space-y-4 mb-4">
-                    <input type="text" id="auth-name" placeholder="Your Name" class="w-full p-3 border rounded-lg">
-                    <select id="auth-role" class="w-full p-3 border rounded-lg">
-                        <option value="child">I'm the Quest Hero (Child)</option>
-                        <option value="guardian">I'm a Guardian (Parent)</option>
-                        <option value="family_support">I'm Family Support</option>
-                    </select>
-                </div>
-                <div class="space-y-4">
-                    <input type="email" id="auth-email" placeholder="Email" required class="w-full p-3 border rounded-lg">
-                    <input type="password" id="auth-password" placeholder="Password" required class="w-full p-3 border rounded-lg">
-                </div>
-                <button type="submit" class="btn-primary w-full mt-6 py-3 text-lg font-semibold">
-                    <span id="auth-btn-text">Login</span>
-                </button>
-                <p id="auth-error" class="text-red-500 text-center mt-4 hidden"></p>
-            </form>
+        // ============================================
+        // LDS EMBEDDED DATA (Static Config)
+        // ============================================
+        const LDS = {
+            tasks: {
+                morning_routine: {
+                    icon: "sunrise", color: "#FFB347", name: "Morning Routine",
+                    tasks: [
+                        { id: "wake-up", name: "Wake Up On Time", description: "Get out of bed when alarm goes off", xp: 10, coins: 5, difficulty: "easy", icon: "bed" },
+                        { id: "make-bed", name: "Make Your Bed", description: "Pull up covers and arrange pillows", xp: 15, coins: 5, difficulty: "easy", icon: "bed" },
+                        { id: "brush-teeth-am", name: "Brush Teeth (Morning)", description: "Brush for 2 full minutes", xp: 15, coins: 5, difficulty: "easy", icon: "tooth" },
+                        { id: "get-dressed", name: "Get Dressed", description: "Put on clothes for the day", xp: 15, coins: 5, difficulty: "easy", icon: "shirt" },
+                        { id: "eat-breakfast", name: "Eat Breakfast", description: "Finish your breakfast at the table", xp: 20, coins: 10, difficulty: "easy", icon: "utensils" },
+                        { id: "pack-backpack", name: "Pack Backpack", description: "Check list and pack everything needed", xp: 25, coins: 10, difficulty: "medium", icon: "backpack" }
+                    ]
+                },
+                school_day: {
+                    icon: "school", color: "#87CEEB", name: "School Challenges",
+                    tasks: [
+                        { id: "stay-seated", name: "Stay in Seat Challenge", description: "Stay in seat for full class period", xp: 50, coins: 25, difficulty: "hero", icon: "chair" },
+                        { id: "raise-hand", name: "Raise Hand First", description: "Raise hand instead of calling out", xp: 40, coins: 20, difficulty: "hard", icon: "hand" },
+                        { id: "homework-written", name: "Write Down Homework", description: "Write all assignments in planner", xp: 30, coins: 15, difficulty: "medium", icon: "pencil" },
+                        { id: "bring-materials", name: "Bring All Materials Home", description: "Check backpack before leaving school", xp: 35, coins: 15, difficulty: "medium", icon: "clipboard-check" }
+                    ]
+                },
+                afternoon: {
+                    icon: "sun", color: "#98FB98", name: "Afternoon",
+                    tasks: [
+                        { id: "snack-healthy", name: "Healthy Snack", description: "Eat a healthy snack after school", xp: 15, coins: 5, difficulty: "easy", icon: "apple-whole" },
+                        { id: "homework-start", name: "Start Homework", description: "Begin homework within 30 min of getting home", xp: 40, coins: 20, difficulty: "hard", icon: "book-open" },
+                        { id: "homework-complete", name: "Complete Homework", description: "Finish all homework assignments", xp: 50, coins: 25, difficulty: "hero", icon: "check-double" },
+                        { id: "reading-20", name: "Read for 20 Minutes", description: "Read a book for 20 minutes", xp: 30, coins: 15, difficulty: "medium", icon: "book" }
+                    ]
+                },
+                evening: {
+                    icon: "moon", color: "#DDA0DD", name: "Evening Routine",
+                    tasks: [
+                        { id: "dinner-table", name: "Dinner at Table", description: "Eat dinner at the table with family", xp: 20, coins: 10, difficulty: "easy", icon: "utensils" },
+                        { id: "chore-complete", name: "Complete Daily Chore", description: "Do your assigned chore for the day", xp: 35, coins: 20, difficulty: "medium", icon: "broom" },
+                        { id: "screen-off", name: "Screens Off On Time", description: "Turn off all screens at designated time", xp: 45, coins: 25, difficulty: "hard", icon: "power-off" },
+                        { id: "brush-teeth-pm", name: "Brush Teeth (Night)", description: "Brush for 2 full minutes before bed", xp: 15, coins: 5, difficulty: "easy", icon: "tooth" },
+                        { id: "clothes-ready", name: "Tomorrow's Clothes Ready", description: "Pick out and lay out clothes for tomorrow", xp: 20, coins: 10, difficulty: "easy", icon: "shirt" },
+                        { id: "bed-on-time", name: "In Bed On Time", description: "Be in bed by bedtime", xp: 25, coins: 15, difficulty: "medium", icon: "bed" }
+                    ]
+                },
+                bonus_quests: {
+                    icon: "star", color: "#FFD700", name: "Bonus Quests",
+                    tasks: [
+                        { id: "help-giuliana", name: "Help Giuliana", description: "Do something kind for your sister", xp: 40, coins: 30, difficulty: "special", icon: "heart" },
+                        { id: "no-reminders", name: "Zero Reminders Day", description: "Complete all tasks without any reminders", xp: 100, coins: 50, difficulty: "legendary", icon: "crown" },
+                        { id: "math-challenge", name: "Math Challenge", description: "Complete a bonus math problem", xp: 35, coins: 20, difficulty: "medium", icon: "calculator" },
+                        { id: "map-quest", name: "Map Explorer Quest", description: "Learn about a new place on the map", xp: 30, coins: 20, difficulty: "medium", icon: "map" }
+                    ]
+                }
+            },
 
-            <div id="family-code-section" class="mt-6 pt-6 border-t hidden">
-                <p class="text-sm text-gray-500 mb-2">Have a family code?</p>
-                <div class="flex gap-2">
-                    <input type="text" id="family-code-input" placeholder="Enter code" class="flex-1 p-2 border rounded-lg">
-                    <button onclick="joinFamily()" class="btn-primary">Join</button>
-                </div>
-            </div>
-        </div>
-    </div>
+            levels: [
+                { level: 1, title: "Beginner", icon: "seedling", color: "#A8E6CF" },
+                { level: 2, title: "Apprentice", icon: "leaf", color: "#88D8B0" },
+                { level: 3, title: "Student", icon: "book", color: "#7EC8A9" },
+                { level: 4, title: "Learner", icon: "graduation-cap", color: "#6DB89A" },
+                { level: 5, title: "Rising Star", icon: "star", color: "#FFD93D" },
+                { level: 6, title: "Achiever", icon: "trophy", color: "#FFC857" },
+                { level: 7, title: "Explorer", icon: "compass", color: "#4ECDC4" },
+                { level: 8, title: "Adventurer", icon: "map", color: "#45B7AA" },
+                { level: 9, title: "Pathfinder", icon: "route", color: "#3CA59D" },
+                { level: 10, title: "Champion", icon: "medal", color: "#C9B037" },
+                { level: 15, title: "Hero", icon: "shield", color: "#FF6B6B" },
+                { level: 20, title: "Master", icon: "crown", color: "#9B59B6" },
+                { level: 25, title: "Elite", icon: "gem", color: "#3498DB" },
+                { level: 30, title: "Legendary", icon: "dragon", color: "#E74C3C" },
+                { level: 40, title: "Mythic", icon: "hat-wizard", color: "#8E44AD" },
+                { level: 50, title: "Supreme Master", icon: "sun", color: "#F39C12" }
+            ],
 
-    <!-- Main App -->
-    <div id="main-app" class="hidden">
-        <!-- Header -->
-        <header class="gradient-bg text-white p-4 sticky top-0 z-40">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-astronaut text-2xl"></i>
-                        </div>
-                        <div>
-                            <h1 id="user-name" class="font-bold text-lg">Hero</h1>
-                            <div class="flex items-center gap-2 text-sm opacity-90">
-                                <span id="user-level">Level 1</span>
-                                <span>•</span>
-                                <span id="user-title">Beginner</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="text-center">
-                            <div class="flex items-center gap-1">
-                                <i class="fas fa-fire streak-fire text-orange-300"></i>
-                                <span id="streak-count" class="font-bold">0</span>
-                            </div>
-                            <span class="text-xs opacity-75">Streak</span>
-                        </div>
-                        <div class="text-center">
-                            <div class="flex items-center gap-1 coin-glow">
-                                <i class="fas fa-coins text-yellow-300"></i>
-                                <span id="coin-count" class="font-bold">0</span>
-                            </div>
-                            <span class="text-xs opacity-75">Coins</span>
-                        </div>
-                        <button onclick="logout()" class="p-2 hover:bg-white/20 rounded-lg" title="Logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </div>
-                </div>
+            journey: [
+                { level: 1, location: "Jenkintown, PA", description: "Home base - where the journey begins!" },
+                { level: 5, location: "Philadelphia, PA", description: "First big city milestone!" },
+                { level: 10, location: "Atlantic City, NJ", description: "Beach destination unlocked!" },
+                { level: 15, location: "New York City, NY", description: "The Big Apple awaits!" },
+                { level: 20, location: "Washington, DC", description: "Capital achievement!" },
+                { level: 25, location: "Cape May, NJ", description: "Your favorite destination!" },
+                { level: 30, location: "Boston, MA", description: "Historic city conquered!" },
+                { level: 40, location: "Miami, FL", description: "Tropical triumph!" },
+                { level: 50, location: "Anywhere You Dream", description: "The world is yours!" }
+            ],
 
-                <!-- XP Bar -->
-                <div class="mt-3">
-                    <div class="flex justify-between text-xs mb-1">
-                        <span id="xp-current">0 XP</span>
-                        <span id="xp-needed">120 XP to next level</span>
-                    </div>
-                    <div class="h-3 bg-white/20 rounded-full overflow-hidden">
-                        <div id="xp-bar" class="h-full xp-bar rounded-full transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-        </header>
+            shop: {
+                screen_time: {
+                    icon: "gamepad", color: "#9B59B6", name: "Screen Time",
+                    items: [
+                        { id: "roblox-15", name: "15 Min Roblox", cost: 50, icon: "gamepad" },
+                        { id: "roblox-30", name: "30 Min Roblox", cost: 90, icon: "gamepad" },
+                        { id: "roblox-60", name: "1 Hour Roblox", cost: 150, icon: "gamepad" },
+                        { id: "youtube-15", name: "15 Min YouTube", cost: 40, icon: "play" },
+                        { id: "movie-night", name: "Movie Night Pick", cost: 200, icon: "film" }
+                    ]
+                },
+                activities: {
+                    icon: "basketball", color: "#E67E22", name: "Activities",
+                    items: [
+                        { id: "stay-up-15", name: "Stay Up 15 Min Late", cost: 75, icon: "moon" },
+                        { id: "friend-playdate", name: "Friend Playdate", cost: 250, icon: "users" },
+                        { id: "special-outing", name: "Special Outing", cost: 400, icon: "ticket" },
+                        { id: "skip-chore", name: "Skip One Chore", cost: 100, icon: "forward" }
+                    ]
+                },
+                treats: {
+                    icon: "ice-cream", color: "#F1C40F", name: "Treats",
+                    items: [
+                        { id: "dessert-extra", name: "Extra Dessert", cost: 60, icon: "cookie" },
+                        { id: "ice-cream", name: "Ice Cream Trip", cost: 200, icon: "ice-cream" },
+                        { id: "choice-dinner", name: "Dinner Choice", cost: 150, icon: "utensils" }
+                    ]
+                },
+                special: {
+                    icon: "gem", color: "#1ABC9C", name: "Special Rewards",
+                    items: [
+                        { id: "robux-100", name: "100 Robux", cost: 500, icon: "coins" },
+                        { id: "new-game", name: "New Game (under $20)", cost: 1000, icon: "gift" },
+                        { id: "sleepover", name: "Sleepover Permission", cost: 600, icon: "house" }
+                    ]
+                }
+            },
 
-        <!-- Navigation Tabs -->
-        <nav class="bg-white shadow-sm sticky top-[140px] z-30">
-            <div class="max-w-4xl mx-auto flex">
-                <button onclick="showTab('tasks')" id="nav-tasks" class="flex-1 py-3 text-center font-medium tab-active">
-                    <i class="fas fa-tasks mr-2"></i>Tasks
-                </button>
-                <button onclick="showTab('shop')" id="nav-shop" class="flex-1 py-3 text-center font-medium text-gray-500">
-                    <i class="fas fa-store mr-2"></i>Shop
-                </button>
-                <button onclick="showTab('achievements')" id="nav-achievements" class="flex-1 py-3 text-center font-medium text-gray-500">
-                    <i class="fas fa-trophy mr-2"></i>Badges
-                </button>
-                <button onclick="showTab('journey')" id="nav-journey" class="flex-1 py-3 text-center font-medium text-gray-500">
-                    <i class="fas fa-map mr-2"></i>Map
-                </button>
-            </div>
-        </nav>
+            achievements: {
+                streaks: {
+                    icon: "fire", name: "Streak Badges",
+                    items: [
+                        { id: "first-flame", name: "First Flame", description: "Complete all daily tasks for 1 day", rarity: "common", requirement: { type: "streak", days: 1 } },
+                        { id: "warming-up", name: "Warming Up", description: "3-day task streak", rarity: "common", requirement: { type: "streak", days: 3 } },
+                        { id: "on-fire", name: "On Fire!", description: "7-day task streak", rarity: "uncommon", requirement: { type: "streak", days: 7 } },
+                        { id: "unstoppable", name: "Unstoppable", description: "14-day task streak", rarity: "rare", requirement: { type: "streak", days: 14 } },
+                        { id: "legendary-streak", name: "Legendary Warrior", description: "30-day task streak", rarity: "legendary", requirement: { type: "streak", days: 30 } }
+                    ]
+                },
+                levels: {
+                    icon: "trophy", name: "Level Milestones",
+                    items: [
+                        { id: "level-5", name: "Rising Star", description: "Reach Level 5", rarity: "common", requirement: { type: "level", level: 5 } },
+                        { id: "level-10", name: "Task Champion", description: "Reach Level 10", rarity: "uncommon", requirement: { type: "level", level: 10 } },
+                        { id: "level-25", name: "Elite Achiever", description: "Reach Level 25", rarity: "rare", requirement: { type: "level", level: 25 } },
+                        { id: "level-50", name: "Legendary Master", description: "Reach Level 50", rarity: "legendary", requirement: { type: "level", level: 50 } }
+                    ]
+                }
+            }
+        };
 
-        <!-- Content Area -->
-        <main class="max-w-4xl mx-auto p-4 pb-20">
-            <!-- Tasks Tab -->
-            <div id="tab-tasks" class="space-y-6">
-                <!-- Today's Progress -->
-                <div class="card p-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="font-bold text-gray-700">Today's Progress</h2>
-                        <span id="today-progress" class="text-indigo-500 font-bold">0/0</span>
-                    </div>
-                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div id="today-bar" class="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all" style="width: 0%"></div>
-                    </div>
-                </div>
+        // ============================================
+        // APP STATE
+        // ============================================
+        let currentUser = null;
+        let userProfile = null;
+        let todayCompletions = [];
 
-                <!-- Task Categories -->
-                <div id="task-categories"></div>
-            </div>
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        async function init() {
+            // Check for existing session
+            const { data: { session } } = await supabase.auth.getSession();
 
-            <!-- Shop Tab -->
-            <div id="tab-shop" class="hidden space-y-6">
-                <div class="card p-4 flex items-center justify-between">
-                    <span class="text-gray-600">Your Balance:</span>
-                    <span class="text-2xl font-bold text-yellow-500">
-                        <i class="fas fa-coins mr-2"></i><span id="shop-coins">0</span>
-                    </span>
-                </div>
-                <div id="shop-categories"></div>
-            </div>
+            if (session) {
+                currentUser = session.user;
+                await loadUserProfile();
+                showMainApp();
+            } else {
+                showAuthScreen();
+            }
 
-            <!-- Achievements Tab -->
-            <div id="tab-achievements" class="hidden space-y-6">
-                <div id="achievement-categories"></div>
-            </div>
-
-            <!-- Journey Map Tab -->
-            <div id="tab-journey" class="hidden">
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">
-                        <i class="fas fa-map-marked-alt mr-2 text-indigo-500"></i>Your Journey
-                    </h2>
-                    <div id="journey-map" class="space-y-4"></div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Task Completion Modal -->
-    <div id="task-modal" class="fixed inset-0 modal-overlay hidden items-center justify-center z-50">
-        <div class="card p-6 m-4 max-w-sm w-full text-center">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-check text-3xl text-green-500"></i>
-            </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Quest Complete!</h3>
-            <p id="modal-task-name" class="text-gray-600 mb-4"></p>
-            <div class="flex justify-center gap-6 mb-4">
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-blue-500">+<span id="modal-xp">0</span></div>
-                    <div class="text-xs text-gray-500">XP</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-yellow-500">+<span id="modal-coins">0</span></div>
-                    <div class="text-xs text-gray-500">Coins</div>
-                </div>
-            </div>
-            <button onclick="closeTaskModal()" class="btn-primary w-full">Awesome!</button>
-        </div>
-    </div>
-</div>
-
-<script>
-// ============================================
-// SUPABASE CONFIG - UPDATE THESE VALUES!
-// ============================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';  // e.g., https://xxxxx.supabase.co
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ============================================
-// LDS EMBEDDED DATA (Static Config)
-// ============================================
-const LDS = {
-    tasks: {
-        morning_routine: {
-            icon: "sunrise", color: "#FFB347", name: "Morning Routine",
-            tasks: [
-                { id: "wake-up", name: "Wake Up On Time", description: "Get out of bed when alarm goes off", xp: 10, coins: 5, difficulty: "easy", icon: "bed" },
-                { id: "make-bed", name: "Make Your Bed", description: "Pull up covers and arrange pillows", xp: 15, coins: 5, difficulty: "easy", icon: "bed" },
-                { id: "brush-teeth-am", name: "Brush Teeth (Morning)", description: "Brush for 2 full minutes", xp: 15, coins: 5, difficulty: "easy", icon: "tooth" },
-                { id: "get-dressed", name: "Get Dressed", description: "Put on clothes for the day", xp: 15, coins: 5, difficulty: "easy", icon: "shirt" },
-                { id: "eat-breakfast", name: "Eat Breakfast", description: "Finish your breakfast at the table", xp: 20, coins: 10, difficulty: "easy", icon: "utensils" },
-                { id: "pack-backpack", name: "Pack Backpack", description: "Check list and pack everything needed", xp: 25, coins: 10, difficulty: "medium", icon: "backpack" }
-            ]
-        },
-        school_day: {
-            icon: "school", color: "#87CEEB", name: "School Challenges",
-            tasks: [
-                { id: "stay-seated", name: "Stay in Seat Challenge", description: "Stay in seat for full class period", xp: 50, coins: 25, difficulty: "hero", icon: "chair" },
-                { id: "raise-hand", name: "Raise Hand First", description: "Raise hand instead of calling out", xp: 40, coins: 20, difficulty: "hard", icon: "hand" },
-                { id: "homework-written", name: "Write Down Homework", description: "Write all assignments in planner", xp: 30, coins: 15, difficulty: "medium", icon: "pencil" },
-                { id: "bring-materials", name: "Bring All Materials Home", description: "Check backpack before leaving school", xp: 35, coins: 15, difficulty: "medium", icon: "clipboard-check" }
-            ]
-        },
-        afternoon: {
-            icon: "sun", color: "#98FB98", name: "Afternoon",
-            tasks: [
-                { id: "snack-healthy", name: "Healthy Snack", description: "Eat a healthy snack after school", xp: 15, coins: 5, difficulty: "easy", icon: "apple-whole" },
-                { id: "homework-start", name: "Start Homework", description: "Begin homework within 30 min of getting home", xp: 40, coins: 20, difficulty: "hard", icon: "book-open" },
-                { id: "homework-complete", name: "Complete Homework", description: "Finish all homework assignments", xp: 50, coins: 25, difficulty: "hero", icon: "check-double" },
-                { id: "reading-20", name: "Read for 20 Minutes", description: "Read a book for 20 minutes", xp: 30, coins: 15, difficulty: "medium", icon: "book" }
-            ]
-        },
-        evening: {
-            icon: "moon", color: "#DDA0DD", name: "Evening Routine",
-            tasks: [
-                { id: "dinner-table", name: "Dinner at Table", description: "Eat dinner at the table with family", xp: 20, coins: 10, difficulty: "easy", icon: "utensils" },
-                { id: "chore-complete", name: "Complete Daily Chore", description: "Do your assigned chore for the day", xp: 35, coins: 20, difficulty: "medium", icon: "broom" },
-                { id: "screen-off", name: "Screens Off On Time", description: "Turn off all screens at designated time", xp: 45, coins: 25, difficulty: "hard", icon: "power-off" },
-                { id: "brush-teeth-pm", name: "Brush Teeth (Night)", description: "Brush for 2 full minutes before bed", xp: 15, coins: 5, difficulty: "easy", icon: "tooth" },
-                { id: "clothes-ready", name: "Tomorrow's Clothes Ready", description: "Pick out and lay out clothes for tomorrow", xp: 20, coins: 10, difficulty: "easy", icon: "shirt" },
-                { id: "bed-on-time", name: "In Bed On Time", description: "Be in bed by bedtime", xp: 25, coins: 15, difficulty: "medium", icon: "bed" }
-            ]
-        },
-        bonus_quests: {
-            icon: "star", color: "#FFD700", name: "Bonus Quests",
-            tasks: [
-                { id: "help-giuliana", name: "Help Giuliana", description: "Do something kind for your sister", xp: 40, coins: 30, difficulty: "special", icon: "heart" },
-                { id: "no-reminders", name: "Zero Reminders Day", description: "Complete all tasks without any reminders", xp: 100, coins: 50, difficulty: "legendary", icon: "crown" },
-                { id: "math-challenge", name: "Math Challenge", description: "Complete a bonus math problem", xp: 35, coins: 20, difficulty: "medium", icon: "calculator" },
-                { id: "map-quest", name: "Map Explorer Quest", description: "Learn about a new place on the map", xp: 30, coins: 20, difficulty: "medium", icon: "map" }
-            ]
+            document.getElementById('loading').classList.add('hidden');
         }
-    },
 
-    levels: [
-        { level: 1, title: "Beginner", icon: "seedling", color: "#A8E6CF" },
-        { level: 2, title: "Apprentice", icon: "leaf", color: "#88D8B0" },
-        { level: 3, title: "Student", icon: "book", color: "#7EC8A9" },
-        { level: 4, title: "Learner", icon: "graduation-cap", color: "#6DB89A" },
-        { level: 5, title: "Rising Star", icon: "star", color: "#FFD93D" },
-        { level: 6, title: "Achiever", icon: "trophy", color: "#FFC857" },
-        { level: 7, title: "Explorer", icon: "compass", color: "#4ECDC4" },
-        { level: 8, title: "Adventurer", icon: "map", color: "#45B7AA" },
-        { level: 9, title: "Pathfinder", icon: "route", color: "#3CA59D" },
-        { level: 10, title: "Champion", icon: "medal", color: "#C9B037" },
-        { level: 15, title: "Hero", icon: "shield", color: "#FF6B6B" },
-        { level: 20, title: "Master", icon: "crown", color: "#9B59B6" },
-        { level: 25, title: "Elite", icon: "gem", color: "#3498DB" },
-        { level: 30, title: "Legendary", icon: "dragon", color: "#E74C3C" },
-        { level: 40, title: "Mythic", icon: "hat-wizard", color: "#8E44AD" },
-        { level: 50, title: "Supreme Master", icon: "sun", color: "#F39C12" }
-    ],
+        // ============================================
+        // AUTHENTICATION
+        // ============================================
+        let authMode = 'login';
 
-    journey: [
-        { level: 1, location: "Jenkintown, PA", description: "Home base - where the journey begins!" },
-        { level: 5, location: "Philadelphia, PA", description: "First big city milestone!" },
-        { level: 10, location: "Atlantic City, NJ", description: "Beach destination unlocked!" },
-        { level: 15, location: "New York City, NY", description: "The Big Apple awaits!" },
-        { level: 20, location: "Washington, DC", description: "Capital achievement!" },
-        { level: 25, location: "Cape May, NJ", description: "Your favorite destination!" },
-        { level: 30, location: "Boston, MA", description: "Historic city conquered!" },
-        { level: 40, location: "Miami, FL", description: "Tropical triumph!" },
-        { level: 50, location: "Anywhere You Dream", description: "The world is yours!" }
-    ],
-
-    shop: {
-        screen_time: {
-            icon: "gamepad", color: "#9B59B6", name: "Screen Time",
-            items: [
-                { id: "roblox-15", name: "15 Min Roblox", cost: 50, icon: "gamepad" },
-                { id: "roblox-30", name: "30 Min Roblox", cost: 90, icon: "gamepad" },
-                { id: "roblox-60", name: "1 Hour Roblox", cost: 150, icon: "gamepad" },
-                { id: "youtube-15", name: "15 Min YouTube", cost: 40, icon: "play" },
-                { id: "movie-night", name: "Movie Night Pick", cost: 200, icon: "film" }
-            ]
-        },
-        activities: {
-            icon: "basketball", color: "#E67E22", name: "Activities",
-            items: [
-                { id: "stay-up-15", name: "Stay Up 15 Min Late", cost: 75, icon: "moon" },
-                { id: "friend-playdate", name: "Friend Playdate", cost: 250, icon: "users" },
-                { id: "special-outing", name: "Special Outing", cost: 400, icon: "ticket" },
-                { id: "skip-chore", name: "Skip One Chore", cost: 100, icon: "forward" }
-            ]
-        },
-        treats: {
-            icon: "ice-cream", color: "#F1C40F", name: "Treats",
-            items: [
-                { id: "dessert-extra", name: "Extra Dessert", cost: 60, icon: "cookie" },
-                { id: "ice-cream", name: "Ice Cream Trip", cost: 200, icon: "ice-cream" },
-                { id: "choice-dinner", name: "Dinner Choice", cost: 150, icon: "utensils" }
-            ]
-        },
-        special: {
-            icon: "gem", color: "#1ABC9C", name: "Special Rewards",
-            items: [
-                { id: "robux-100", name: "100 Robux", cost: 500, icon: "coins" },
-                { id: "new-game", name: "New Game (under $20)", cost: 1000, icon: "gift" },
-                { id: "sleepover", name: "Sleepover Permission", cost: 600, icon: "house" }
-            ]
+        function showAuthTab(tab) {
+            authMode = tab;
+            document.getElementById('tab-login').classList.toggle('tab-active', tab === 'login');
+            document.getElementById('tab-signup').classList.toggle('tab-active', tab === 'signup');
+            document.getElementById('tab-login').classList.toggle('text-gray-500', tab !== 'login');
+            document.getElementById('tab-signup').classList.toggle('text-gray-500', tab !== 'signup');
+            document.getElementById('signup-fields').classList.toggle('hidden', tab === 'login');
+            document.getElementById('auth-btn-text').textContent = tab === 'login' ? 'Login' : 'Sign Up';
+            document.getElementById('family-code-section').classList.toggle('hidden', tab === 'login');
         }
-    },
 
-    achievements: {
-        streaks: {
-            icon: "fire", name: "Streak Badges",
-            items: [
-                { id: "first-flame", name: "First Flame", description: "Complete all daily tasks for 1 day", rarity: "common", requirement: { type: "streak", days: 1 } },
-                { id: "warming-up", name: "Warming Up", description: "3-day task streak", rarity: "common", requirement: { type: "streak", days: 3 } },
-                { id: "on-fire", name: "On Fire!", description: "7-day task streak", rarity: "uncommon", requirement: { type: "streak", days: 7 } },
-                { id: "unstoppable", name: "Unstoppable", description: "14-day task streak", rarity: "rare", requirement: { type: "streak", days: 14 } },
-                { id: "legendary-streak", name: "Legendary Warrior", description: "30-day task streak", rarity: "legendary", requirement: { type: "streak", days: 30 } }
-            ]
-        },
-        levels: {
-            icon: "trophy", name: "Level Milestones",
-            items: [
-                { id: "level-5", name: "Rising Star", description: "Reach Level 5", rarity: "common", requirement: { type: "level", level: 5 } },
-                { id: "level-10", name: "Task Champion", description: "Reach Level 10", rarity: "uncommon", requirement: { type: "level", level: 10 } },
-                { id: "level-25", name: "Elite Achiever", description: "Reach Level 25", rarity: "rare", requirement: { type: "level", level: 25 } },
-                { id: "level-50", name: "Legendary Master", description: "Reach Level 50", rarity: "legendary", requirement: { type: "level", level: 50 } }
-            ]
+        async function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const errorEl = document.getElementById('auth-error');
+            errorEl.classList.add('hidden');
+
+            try {
+                if (authMode === 'login') {
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    currentUser = data.user;
+                    await loadUserProfile();
+                    showMainApp();
+                } else {
+                    const name = document.getElementById('auth-name').value;
+                    const role = document.getElementById('auth-role').value;
+
+                    const { data, error } = await supabase.auth.signUp({ email, password });
+                    if (error) throw error;
+
+                    currentUser = data.user;
+
+                    // Create profile
+                    const { error: profileError } = await supabase.from('tq_profiles').insert({
+                        id: currentUser.id,
+                        name: name,
+                        role: role
+                    });
+
+                    if (profileError) throw profileError;
+
+                    await loadUserProfile();
+                    showMainApp();
+                }
+            } catch (error) {
+                errorEl.textContent = error.message;
+                errorEl.classList.remove('hidden');
+            }
         }
-    }
-};
 
-// ============================================
-// APP STATE
-// ============================================
-let currentUser = null;
-let userProfile = null;
-let todayCompletions = [];
+        async function logout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            userProfile = null;
+            showAuthScreen();
+        }
 
-// ============================================
-// INITIALIZATION
-// ============================================
-async function init() {
-    // Check for existing session
-    const { data: { session } } = await supabase.auth.getSession();
+        function showAuthScreen() {
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+        }
 
-    if (session) {
-        currentUser = session.user;
-        await loadUserProfile();
-        showMainApp();
-    } else {
-        showAuthScreen();
-    }
+        function showMainApp() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            renderAll();
+        }
 
-    document.getElementById('loading').classList.add('hidden');
-}
+        // ============================================
+        // DATA LOADING
+        // ============================================
+        async function loadUserProfile() {
+            const { data, error } = await supabase
+                .from('tq_profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
 
-// ============================================
-// AUTHENTICATION
-// ============================================
-let authMode = 'login';
+            if (error) {
+                console.error('Error loading profile:', error);
+                return;
+            }
 
-function showAuthTab(tab) {
-    authMode = tab;
-    document.getElementById('tab-login').classList.toggle('tab-active', tab === 'login');
-    document.getElementById('tab-signup').classList.toggle('tab-active', tab === 'signup');
-    document.getElementById('tab-login').classList.toggle('text-gray-500', tab !== 'login');
-    document.getElementById('tab-signup').classList.toggle('text-gray-500', tab !== 'signup');
-    document.getElementById('signup-fields').classList.toggle('hidden', tab === 'login');
-    document.getElementById('auth-btn-text').textContent = tab === 'login' ? 'Login' : 'Sign Up';
-    document.getElementById('family-code-section').classList.toggle('hidden', tab === 'login');
-}
+            userProfile = data;
 
-async function handleAuth(e) {
-    e.preventDefault();
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    const errorEl = document.getElementById('auth-error');
-    errorEl.classList.add('hidden');
+            // Load today's completions
+            const today = new Date().toISOString().split('T')[0];
+            const { data: completions } = await supabase
+                .from('tq_task_completions')
+                .select('task_id')
+                .eq('profile_id', currentUser.id)
+                .eq('completion_date', today);
 
-    try {
-        if (authMode === 'login') {
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-            currentUser = data.user;
-            await loadUserProfile();
-            showMainApp();
-        } else {
-            const name = document.getElementById('auth-name').value;
-            const role = document.getElementById('auth-role').value;
+            todayCompletions = completions?.map(c => c.task_id) || [];
+        }
 
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            if (error) throw error;
+        // ============================================
+        // TASK COMPLETION
+        // ============================================
+        async function completeTask(taskId, category) {
+            if (todayCompletions.includes(taskId)) return;
 
-            currentUser = data.user;
+            const task = LDS.tasks[category].tasks.find(t => t.id === taskId);
+            if (!task) return;
 
-            // Create profile
-            const { error: profileError } = await supabase.from('tq_profiles').insert({
-                id: currentUser.id,
-                name: name,
-                role: role
+            // Save to Supabase
+            const { error } = await supabase.from('tq_task_completions').insert({
+                profile_id: currentUser.id,
+                task_id: taskId,
+                task_category: category,
+                xp_earned: task.xp,
+                coins_earned: task.coins
             });
 
-            if (profileError) throw profileError;
+            if (error) {
+                console.error('Error completing task:', error);
+                return;
+            }
 
-            await loadUserProfile();
-            showMainApp();
+            // Update profile
+            const newXp = userProfile.total_xp + task.xp;
+            const newCoins = userProfile.coins + task.coins;
+            const newLevel = calculateLevel(newXp);
+
+            await supabase.from('tq_profiles').update({
+                total_xp: newXp,
+                coins: newCoins,
+                current_level: newLevel,
+                last_task_date: new Date().toISOString().split('T')[0]
+            }).eq('id', currentUser.id);
+
+            // Update local state
+            userProfile.total_xp = newXp;
+            userProfile.coins = newCoins;
+            userProfile.current_level = newLevel;
+            todayCompletions.push(taskId);
+
+            // Show modal
+            showTaskModal(task);
+
+            // Re-render
+            renderAll();
         }
-    } catch (error) {
-        errorEl.textContent = error.message;
-        errorEl.classList.remove('hidden');
-    }
-}
 
-async function logout() {
-    await supabase.auth.signOut();
-    currentUser = null;
-    userProfile = null;
-    showAuthScreen();
-}
+        function calculateLevel(xp) {
+            let level = 1;
+            let xpNeeded = 120;
+            while (xp >= xpNeeded && level < 50) {
+                level++;
+                xpNeeded += Math.floor(100 * level * 1.2);
+            }
+            return level;
+        }
 
-function showAuthScreen() {
-    document.getElementById('auth-screen').classList.remove('hidden');
-    document.getElementById('main-app').classList.add('hidden');
-}
+        function getXpForNextLevel(level) {
+            let xpNeeded = 120;
+            for (let l = 1; l < level; l++) {
+                xpNeeded += Math.floor(100 * (l + 1) * 1.2);
+            }
+            return xpNeeded;
+        }
 
-function showMainApp() {
-    document.getElementById('auth-screen').classList.add('hidden');
-    document.getElementById('main-app').classList.remove('hidden');
-    renderAll();
-}
+        // ============================================
+        // SHOP
+        // ============================================
+        async function purchaseReward(rewardId, category) {
+            const item = LDS.shop[category].items.find(i => i.id === rewardId);
+            if (!item || userProfile.coins < item.cost) return;
 
-// ============================================
-// DATA LOADING
-// ============================================
-async function loadUserProfile() {
-    const { data, error } = await supabase
-        .from('tq_profiles')
-        .select('*')
-        .eq('id', currentUser.id)
-        .single();
+            // Save purchase
+            await supabase.from('tq_reward_purchases').insert({
+                profile_id: currentUser.id,
+                reward_id: rewardId,
+                cost_coins: item.cost
+            });
 
-    if (error) {
-        console.error('Error loading profile:', error);
-        return;
-    }
+            // Deduct coins
+            const newCoins = userProfile.coins - item.cost;
+            await supabase.from('tq_profiles').update({ coins: newCoins }).eq('id', currentUser.id);
 
-    userProfile = data;
+            userProfile.coins = newCoins;
 
-    // Load today's completions
-    const today = new Date().toISOString().split('T')[0];
-    const { data: completions } = await supabase
-        .from('tq_task_completions')
-        .select('task_id')
-        .eq('profile_id', currentUser.id)
-        .eq('completion_date', today);
+            alert(`You purchased: ${item.name}! Show this to your parent to redeem.`);
+            renderAll();
+        }
 
-    todayCompletions = completions?.map(c => c.task_id) || [];
-}
+        // ============================================
+        // RENDERING
+        // ============================================
+        function renderAll() {
+            renderHeader();
+            renderTasks();
+            renderShop();
+            renderAchievements();
+            renderJourney();
+        }
 
-// ============================================
-// TASK COMPLETION
-// ============================================
-async function completeTask(taskId, category) {
-    if (todayCompletions.includes(taskId)) return;
+        function renderHeader() {
+            if (!userProfile) return;
 
-    const task = LDS.tasks[category].tasks.find(t => t.id === taskId);
-    if (!task) return;
+            document.getElementById('user-name').textContent = userProfile.name || 'Hero';
+            document.getElementById('user-level').textContent = `Level ${userProfile.current_level}`;
 
-    // Save to Supabase
-    const { error } = await supabase.from('tq_task_completions').insert({
-        profile_id: currentUser.id,
-        task_id: taskId,
-        task_category: category,
-        xp_earned: task.xp,
-        coins_earned: task.coins
-    });
+            const levelInfo = getLevelInfo(userProfile.current_level);
+            document.getElementById('user-title').textContent = levelInfo.title;
 
-    if (error) {
-        console.error('Error completing task:', error);
-        return;
-    }
+            document.getElementById('streak-count').textContent = userProfile.current_streak || 0;
+            document.getElementById('coin-count').textContent = userProfile.coins || 0;
 
-    // Update profile
-    const newXp = userProfile.total_xp + task.xp;
-    const newCoins = userProfile.coins + task.coins;
-    const newLevel = calculateLevel(newXp);
+            const currentLevelXp = userProfile.current_level > 1 ? getXpForNextLevel(userProfile.current_level - 1) : 0;
+            const nextLevelXp = getXpForNextLevel(userProfile.current_level);
+            const progressXp = userProfile.total_xp - currentLevelXp;
+            const neededXp = nextLevelXp - currentLevelXp;
+            const percent = Math.min(100, (progressXp / neededXp) * 100);
 
-    await supabase.from('tq_profiles').update({
-        total_xp: newXp,
-        coins: newCoins,
-        current_level: newLevel,
-        last_task_date: new Date().toISOString().split('T')[0]
-    }).eq('id', currentUser.id);
+            document.getElementById('xp-current').textContent = `${userProfile.total_xp} XP`;
+            document.getElementById('xp-needed').textContent = `${nextLevelXp - userProfile.total_xp} XP to next level`;
+            document.getElementById('xp-bar').style.width = `${percent}%`;
+        }
 
-    // Update local state
-    userProfile.total_xp = newXp;
-    userProfile.coins = newCoins;
-    userProfile.current_level = newLevel;
-    todayCompletions.push(taskId);
+        function getLevelInfo(level) {
+            let info = LDS.levels[0];
+            for (const l of LDS.levels) {
+                if (level >= l.level) info = l;
+            }
+            return info;
+        }
 
-    // Show modal
-    showTaskModal(task);
+        function renderTasks() {
+            const container = document.getElementById('task-categories');
+            let totalTasks = 0;
+            let completedTasks = 0;
+            let html = '';
 
-    // Re-render
-    renderAll();
-}
-
-function calculateLevel(xp) {
-    let level = 1;
-    let xpNeeded = 120;
-    while (xp >= xpNeeded && level < 50) {
-        level++;
-        xpNeeded += Math.floor(100 * level * 1.2);
-    }
-    return level;
-}
-
-function getXpForNextLevel(level) {
-    let xpNeeded = 120;
-    for (let l = 1; l < level; l++) {
-        xpNeeded += Math.floor(100 * (l + 1) * 1.2);
-    }
-    return xpNeeded;
-}
-
-// ============================================
-// SHOP
-// ============================================
-async function purchaseReward(rewardId, category) {
-    const item = LDS.shop[category].items.find(i => i.id === rewardId);
-    if (!item || userProfile.coins < item.cost) return;
-
-    // Save purchase
-    await supabase.from('tq_reward_purchases').insert({
-        profile_id: currentUser.id,
-        reward_id: rewardId,
-        cost_coins: item.cost
-    });
-
-    // Deduct coins
-    const newCoins = userProfile.coins - item.cost;
-    await supabase.from('tq_profiles').update({ coins: newCoins }).eq('id', currentUser.id);
-
-    userProfile.coins = newCoins;
-
-    alert(`You purchased: ${item.name}! Show this to your parent to redeem.`);
-    renderAll();
-}
-
-// ============================================
-// RENDERING
-// ============================================
-function renderAll() {
-    renderHeader();
-    renderTasks();
-    renderShop();
-    renderAchievements();
-    renderJourney();
-}
-
-function renderHeader() {
-    if (!userProfile) return;
-
-    document.getElementById('user-name').textContent = userProfile.name || 'Hero';
-    document.getElementById('user-level').textContent = `Level ${userProfile.current_level}`;
-
-    const levelInfo = getLevelInfo(userProfile.current_level);
-    document.getElementById('user-title').textContent = levelInfo.title;
-
-    document.getElementById('streak-count').textContent = userProfile.current_streak || 0;
-    document.getElementById('coin-count').textContent = userProfile.coins || 0;
-
-    const currentLevelXp = userProfile.current_level > 1 ? getXpForNextLevel(userProfile.current_level - 1) : 0;
-    const nextLevelXp = getXpForNextLevel(userProfile.current_level);
-    const progressXp = userProfile.total_xp - currentLevelXp;
-    const neededXp = nextLevelXp - currentLevelXp;
-    const percent = Math.min(100, (progressXp / neededXp) * 100);
-
-    document.getElementById('xp-current').textContent = `${userProfile.total_xp} XP`;
-    document.getElementById('xp-needed').textContent = `${nextLevelXp - userProfile.total_xp} XP to next level`;
-    document.getElementById('xp-bar').style.width = `${percent}%`;
-}
-
-function getLevelInfo(level) {
-    let info = LDS.levels[0];
-    for (const l of LDS.levels) {
-        if (level >= l.level) info = l;
-    }
-    return info;
-}
-
-function renderTasks() {
-    const container = document.getElementById('task-categories');
-    let totalTasks = 0;
-    let completedTasks = 0;
-    let html = '';
-
-    for (const [catKey, cat] of Object.entries(LDS.tasks)) {
-        html += `
+            for (const [catKey, cat] of Object.entries(LDS.tasks)) {
+                html += `
             <div class="card p-4 mb-4">
                 <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: ${cat.color}20">
@@ -664,12 +740,12 @@ function renderTasks() {
                 <div class="space-y-2">
         `;
 
-        for (const task of cat.tasks) {
-            totalTasks++;
-            const isCompleted = todayCompletions.includes(task.id);
-            if (isCompleted) completedTasks++;
+                for (const task of cat.tasks) {
+                    totalTasks++;
+                    const isCompleted = todayCompletions.includes(task.id);
+                    if (isCompleted) completedTasks++;
 
-            html += `
+                    html += `
                 <div class="task-card p-3 rounded-lg border ${isCompleted ? 'completed bg-green-50 border-green-200' : 'bg-white border-gray-200 cursor-pointer hover:border-indigo-300'}"
                      onclick="${isCompleted ? '' : `completeTask('${task.id}', '${catKey}')`}">
                     <div class="flex items-center gap-3">
@@ -687,25 +763,25 @@ function renderTasks() {
                     </div>
                 </div>
             `;
+                }
+
+                html += '</div></div>';
+            }
+
+            container.innerHTML = html;
+
+            document.getElementById('today-progress').textContent = `${completedTasks}/${totalTasks}`;
+            document.getElementById('today-bar').style.width = `${(completedTasks / totalTasks) * 100}%`;
         }
 
-        html += '</div></div>';
-    }
+        function renderShop() {
+            document.getElementById('shop-coins').textContent = userProfile?.coins || 0;
 
-    container.innerHTML = html;
+            const container = document.getElementById('shop-categories');
+            let html = '';
 
-    document.getElementById('today-progress').textContent = `${completedTasks}/${totalTasks}`;
-    document.getElementById('today-bar').style.width = `${(completedTasks / totalTasks) * 100}%`;
-}
-
-function renderShop() {
-    document.getElementById('shop-coins').textContent = userProfile?.coins || 0;
-
-    const container = document.getElementById('shop-categories');
-    let html = '';
-
-    for (const [catKey, cat] of Object.entries(LDS.shop)) {
-        html += `
+            for (const [catKey, cat] of Object.entries(LDS.shop)) {
+                html += `
             <div class="card p-4 mb-4">
                 <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: ${cat.color}20">
@@ -716,9 +792,9 @@ function renderShop() {
                 <div class="grid grid-cols-2 gap-2">
         `;
 
-        for (const item of cat.items) {
-            const canAfford = userProfile && userProfile.coins >= item.cost;
-            html += `
+                for (const item of cat.items) {
+                    const canAfford = userProfile && userProfile.coins >= item.cost;
+                    html += `
                 <div class="p-3 rounded-lg border ${canAfford ? 'border-gray-200 hover:border-indigo-300 cursor-pointer' : 'border-gray-100 opacity-50'}"
                      onclick="${canAfford ? `purchaseReward('${item.id}', '${catKey}')` : ''}">
                     <div class="flex items-center gap-2 mb-1">
@@ -730,20 +806,20 @@ function renderShop() {
                     </div>
                 </div>
             `;
+                }
+
+                html += '</div></div>';
+            }
+
+            container.innerHTML = html;
         }
 
-        html += '</div></div>';
-    }
+        function renderAchievements() {
+            const container = document.getElementById('achievement-categories');
+            let html = '';
 
-    container.innerHTML = html;
-}
-
-function renderAchievements() {
-    const container = document.getElementById('achievement-categories');
-    let html = '';
-
-    for (const [catKey, cat] of Object.entries(LDS.achievements)) {
-        html += `
+            for (const [catKey, cat] of Object.entries(LDS.achievements)) {
+                html += `
             <div class="card p-4 mb-4">
                 <h3 class="font-bold text-gray-700 mb-3">
                     <i class="fas fa-${cat.icon} mr-2 text-indigo-500"></i>${cat.name}
@@ -751,17 +827,17 @@ function renderAchievements() {
                 <div class="grid grid-cols-2 gap-3">
         `;
 
-        for (const item of cat.items) {
-            const isUnlocked = checkAchievementUnlocked(item);
-            const rarityColors = {
-                common: 'bg-gray-100 border-gray-300',
-                uncommon: 'bg-green-50 border-green-300',
-                rare: 'bg-blue-50 border-blue-300',
-                epic: 'bg-purple-50 border-purple-300',
-                legendary: 'bg-yellow-50 border-yellow-400'
-            };
+                for (const item of cat.items) {
+                    const isUnlocked = checkAchievementUnlocked(item);
+                    const rarityColors = {
+                        common: 'bg-gray-100 border-gray-300',
+                        uncommon: 'bg-green-50 border-green-300',
+                        rare: 'bg-blue-50 border-blue-300',
+                        epic: 'bg-purple-50 border-purple-300',
+                        legendary: 'bg-yellow-50 border-yellow-400'
+                    };
 
-            html += `
+                    html += `
                 <div class="p-3 rounded-lg border-2 ${isUnlocked ? rarityColors[item.rarity] : 'bg-gray-50 border-gray-200 opacity-50'}">
                     <div class="text-center">
                         <div class="w-12 h-12 mx-auto rounded-full ${isUnlocked ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-400'} flex items-center justify-center mb-2">
@@ -772,29 +848,29 @@ function renderAchievements() {
                     </div>
                 </div>
             `;
+                }
+
+                html += '</div></div>';
+            }
+
+            container.innerHTML = html;
         }
 
-        html += '</div></div>';
-    }
+        function checkAchievementUnlocked(achievement) {
+            if (!userProfile) return false;
+            const req = achievement.requirement;
+            if (req.type === 'level') return userProfile.current_level >= req.level;
+            if (req.type === 'streak') return userProfile.longest_streak >= req.days;
+            return false;
+        }
 
-    container.innerHTML = html;
-}
+        function renderJourney() {
+            const container = document.getElementById('journey-map');
+            let html = '';
 
-function checkAchievementUnlocked(achievement) {
-    if (!userProfile) return false;
-    const req = achievement.requirement;
-    if (req.type === 'level') return userProfile.current_level >= req.level;
-    if (req.type === 'streak') return userProfile.longest_streak >= req.days;
-    return false;
-}
-
-function renderJourney() {
-    const container = document.getElementById('journey-map');
-    let html = '';
-
-    for (const milestone of LDS.journey) {
-        const isReached = userProfile && userProfile.current_level >= milestone.level;
-        html += `
+            for (const milestone of LDS.journey) {
+                const isReached = userProfile && userProfile.current_level >= milestone.level;
+                html += `
             <div class="flex items-center gap-4 ${isReached ? '' : 'opacity-40'}">
                 <div class="w-12 h-12 rounded-full ${isReached ? 'bg-green-500' : 'bg-gray-300'} flex items-center justify-center text-white font-bold">
                     ${isReached ? '<i class="fas fa-check"></i>' : milestone.level}
@@ -807,40 +883,41 @@ function renderJourney() {
                 ${isReached ? '<i class="fas fa-map-marker-alt text-2xl text-green-500"></i>' : ''}
             </div>
         `;
-    }
+            }
 
-    container.innerHTML = html;
-}
+            container.innerHTML = html;
+        }
 
-// ============================================
-// UI HELPERS
-// ============================================
-function showTab(tab) {
-    ['tasks', 'shop', 'achievements', 'journey'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
-        document.getElementById(`nav-${t}`).classList.toggle('tab-active', t === tab);
-        document.getElementById(`nav-${t}`).classList.toggle('text-gray-500', t !== tab);
-    });
-}
+        // ============================================
+        // UI HELPERS
+        // ============================================
+        function showTab(tab) {
+            ['tasks', 'shop', 'achievements', 'journey'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+                document.getElementById(`nav-${t}`).classList.toggle('tab-active', t === tab);
+                document.getElementById(`nav-${t}`).classList.toggle('text-gray-500', t !== tab);
+            });
+        }
 
-function showTaskModal(task) {
-    document.getElementById('modal-task-name').textContent = task.name;
-    document.getElementById('modal-xp').textContent = task.xp;
-    document.getElementById('modal-coins').textContent = task.coins;
-    document.getElementById('task-modal').classList.remove('hidden');
-    document.getElementById('task-modal').classList.add('flex');
-}
+        function showTaskModal(task) {
+            document.getElementById('modal-task-name').textContent = task.name;
+            document.getElementById('modal-xp').textContent = task.xp;
+            document.getElementById('modal-coins').textContent = task.coins;
+            document.getElementById('task-modal').classList.remove('hidden');
+            document.getElementById('task-modal').classList.add('flex');
+        }
 
-function closeTaskModal() {
-    document.getElementById('task-modal').classList.add('hidden');
-    document.getElementById('task-modal').classList.remove('flex');
-}
+        function closeTaskModal() {
+            document.getElementById('task-modal').classList.add('hidden');
+            document.getElementById('task-modal').classList.remove('flex');
+        }
 
-// ============================================
-// START APP
-// ============================================
-init();
-</script>
+        // ============================================
+        // START APP
+        // ============================================
+        init();
+    </script>
 
 </body>
+
 </html>
