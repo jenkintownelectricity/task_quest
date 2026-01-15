@@ -218,14 +218,56 @@ const LDS = {
             { "level": 50, "title": "Supreme Master", "icon": "sun" }
         ],
         "journey": [
-            { "level": 1, "place": "Jenkintown, PA", "desc": "Home base - journey begins!" },
-            { "level": 5, "place": "Philadelphia, PA", "desc": "First big city milestone!" },
-            { "level": 10, "place": "Atlantic City, NJ", "desc": "Beach destination unlocked!" },
-            { "level": 15, "place": "New York City, NY", "desc": "The Big Apple awaits!" },
-            { "level": 20, "place": "Washington, DC", "desc": "Capital achievement!" },
-            { "level": 25, "place": "Cape May, NJ", "desc": "Your favorite destination!" },
-            { "level": 30, "place": "Boston, MA", "desc": "Historic city conquered!" },
-            { "level": 50, "place": "Anywhere You Dream", "desc": "The world is yours!" }
+            // HOME BASE
+            { "level": 1, "place": "Jenkintown, PA", "icon": "home", "region": "home", "desc": "Home base - your journey begins!", "gem": "The town is named after William Jenkins who built a mill here in 1697!" },
+
+            // EAST COAST ADVENTURE (Levels 2-15)
+            { "level": 2, "place": "Doylestown, PA", "icon": "chess-rook", "region": "east", "desc": "Home to Fonthill Castle!", "gem": "The Mercer Museum has over 40,000 tools from the past!" },
+            { "level": 3, "place": "Jim Thorpe, PA", "icon": "mountain", "region": "east", "desc": "The Switzerland of America!", "gem": "Ride a scenic train through Lehigh Gorge!" },
+            { "level": 4, "place": "Cape May, NJ", "icon": "umbrella-beach", "region": "east", "desc": "Victorian beach paradise!", "gem": "Find 'Cape May Diamonds' (quartz crystals) on the beach!" },
+            { "level": 5, "place": "Philadelphia, PA", "icon": "bell", "region": "east", "desc": "Home of the Liberty Bell!", "gem": "There's a 45-foot tall clothespin sculpture downtown!" },
+            { "level": 6, "place": "Mystic, CT", "icon": "anchor", "region": "east", "desc": "Historic seaport town!", "gem": "Mystic Pizza from the movie is a real restaurant!" },
+            { "level": 7, "place": "Salem, MA", "icon": "hat-wizard", "region": "east", "desc": "Witch trial history!", "gem": "Peabody Museum has a 200-year-old Chinese house inside!" },
+            { "level": 8, "place": "Bar Harbor, ME", "icon": "tree", "region": "east", "desc": "Gateway to Acadia!", "gem": "Thunder Hole makes a booming sound when waves crash!" },
+            { "level": 10, "place": "New York City, NY", "icon": "city", "region": "east", "desc": "The Big Apple!", "gem": "Secret train platform under the Waldorf Astoria hotel!" },
+            { "level": 12, "place": "Sleepy Hollow, NY", "icon": "ghost", "region": "east", "desc": "Headless Horseman territory!", "gem": "Washington Irving is buried in the local cemetery!" },
+            { "level": 15, "place": "Washington, DC", "icon": "landmark", "region": "east", "desc": "The nation's capital!", "gem": "Library of Congress has 838 miles of bookshelves!" },
+
+            // SOUTHERN CHARM (Levels 16-25)
+            { "level": 16, "place": "Williamsburg, VA", "icon": "scroll", "region": "south", "desc": "Colonial living museum!", "gem": "Watch blacksmiths make real horseshoes!" },
+            { "level": 17, "place": "Asheville, NC", "icon": "palette", "region": "south", "desc": "Biltmore Estate awaits!", "gem": "250 rooms with secret passages and a bowling alley!" },
+            { "level": 18, "place": "Charleston, SC", "icon": "horse", "region": "south", "desc": "Rainbow Row beauty!", "gem": "Haunted jail you can tour at night!" },
+            { "level": 20, "place": "Savannah, GA", "icon": "tree", "region": "south", "desc": "City of beautiful squares!", "gem": "Waving Girl waved at ships for 44 years!" },
+            { "level": 22, "place": "St. Augustine, FL", "icon": "fort", "region": "south", "desc": "Oldest US city (1565)!", "gem": "Fort is made of seashells that absorb cannonballs!" },
+            { "level": 25, "place": "Key West, FL", "icon": "sun", "region": "south", "desc": "Closer to Cuba than Miami!", "gem": "Hemingway's house has 60 cats, many with 6 toes!" },
+
+            // MIDWEST ADVENTURE (Levels 26-35)
+            { "level": 26, "place": "Put-in-Bay, OH", "icon": "ship", "region": "midwest", "desc": "Lake Erie island fun!", "gem": "Crystal Cave has a geode big enough to walk inside!" },
+            { "level": 27, "place": "Galena, IL", "icon": "building-columns", "region": "midwest", "desc": "Ulysses Grant's town!", "gem": "Toy store with over 3,000 kinds of toys!" },
+            { "level": 28, "place": "Mackinac Island, MI", "icon": "horse-head", "region": "midwest", "desc": "No cars allowed!", "gem": "Grand Hotel has world's longest porch (660 feet)!" },
+            { "level": 30, "place": "Duluth, MN", "icon": "water", "region": "midwest", "desc": "Gateway to Lake Superior!", "gem": "Lake Superior is so big it creates its own weather!" },
+            { "level": 32, "place": "Hannibal, MO", "icon": "book", "region": "midwest", "desc": "Mark Twain's hometown!", "gem": "Explore the actual cave from Tom Sawyer!" },
+            { "level": 35, "place": "Wall, SD", "icon": "store", "region": "midwest", "desc": "Wall Drug adventure!", "gem": "80-foot dinosaur and free donuts for veterans!" },
+
+            // MOUNTAIN & DESERT WEST (Levels 36-45)
+            { "level": 36, "place": "Roswell, NM", "icon": "rocket", "region": "west", "desc": "UFO capital of the world!", "gem": "Even the McDonald's is shaped like a spaceship!" },
+            { "level": 37, "place": "Sedona, AZ", "icon": "mountain-sun", "region": "west", "desc": "Stunning red rocks!", "gem": "There's a chapel built INTO the red rocks!" },
+            { "level": 38, "place": "Moab, UT", "icon": "archway", "region": "west", "desc": "Arches National Park!", "gem": "Over 2,000 natural stone arches!" },
+            { "level": 40, "place": "Jackson Hole, WY", "icon": "mountain", "region": "west", "desc": "Elk antler arches!", "gem": "Take a ski lift UP a mountain just to eat lunch!" },
+            { "level": 42, "place": "Bozeman, MT", "icon": "bone", "region": "west", "desc": "Dinosaur fossil heaven!", "gem": "Museum of the Rockies has a real T-Rex skeleton!" },
+            { "level": 45, "place": "Leavenworth, WA", "icon": "snowflake", "region": "west", "desc": "Bavarian village!", "gem": "Nutcracker Museum has over 7,000 nutcrackers!" },
+
+            // PACIFIC COAST (Levels 46-50)
+            { "level": 46, "place": "Carmel-by-the-Sea, CA", "icon": "dog", "region": "pacific", "desc": "No addresses, dogs rule!", "gem": "Clint Eastwood was once the mayor!" },
+            { "level": 47, "place": "Astoria, OR", "icon": "film", "region": "pacific", "desc": "The Goonies was filmed here!", "gem": "You can visit the actual Goonies house!" },
+            { "level": 48, "place": "Friday Harbor, WA", "icon": "whale", "region": "pacific", "desc": "Best orca whale watching!", "gem": "The Pig War of 1859 started over a pig eating potatoes!" },
+            { "level": 50, "place": "Ketchikan, AK", "icon": "fish", "region": "pacific", "desc": "Salmon Capital of the World!", "gem": "World's largest collection of totem poles!" },
+
+            // LEGENDARY DESTINATIONS (51+)
+            { "level": 55, "place": "Tombstone, AZ", "icon": "hat-cowboy", "region": "legendary", "desc": "O.K. Corral gunfight site!", "gem": "Bird Cage Theatre is one of most haunted places!" },
+            { "level": 60, "place": "Whittier, AK", "icon": "building", "region": "legendary", "desc": "Everyone lives in ONE building!", "gem": "Only reachable by tunnel or boat!" },
+            { "level": 75, "place": "Centralia, PA", "icon": "fire", "region": "legendary", "desc": "Underground fire since 1962!", "gem": "Steam rises from cracks in abandoned roads!" },
+            { "level": 100, "place": "ANYWHERE IN THE WORLD!", "icon": "globe", "region": "legendary", "desc": "You've mastered the USA!", "gem": "Your hard work can take you anywhere!" }
         ]
     },
 
@@ -568,23 +610,59 @@ const UI = {
     renderJourney() {
         const container = document.getElementById('journey-list');
         let html = '';
+        let currentRegion = '';
 
-        for (const milestone of LDS.levels.journey) {
-            const reached = LDS.profile.level >= milestone.level;
+        const regionColors = {
+            home: 'bg-purple-500', east: 'bg-blue-500', south: 'bg-green-500',
+            midwest: 'bg-yellow-500', west: 'bg-orange-500', pacific: 'bg-cyan-500', legendary: 'bg-red-500'
+        };
+        const regionNames = {
+            home: 'Home Base', east: 'East Coast Adventure', south: 'Southern Charm',
+            midwest: 'Midwest Adventure', west: 'Mountain & Desert West', pacific: 'Pacific Coast', legendary: 'Legendary Destinations'
+        };
+
+        for (const m of LDS.levels.journey) {
+            const reached = LDS.profile.level >= m.level;
+            const isNext = !reached && LDS.profile.level === m.level - 1;
+            const regionColor = regionColors[m.region] || 'bg-gray-500';
+
+            // Region header
+            if (m.region !== currentRegion) {
+                currentRegion = m.region;
+                html += `<div class="text-sm font-bold text-gray-500 mt-6 mb-2 flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full ${regionColor}"></span> ${regionNames[m.region] || m.region}
+                </div>`;
+            }
 
             html += `
-                <div class="card p-4 flex items-center gap-4 ${reached ? '' : 'opacity-50'}">
-                    <div class="w-12 h-12 rounded-full ${reached ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'} flex items-center justify-center font-bold">
-                        ${milestone.level}
+                <div class="card p-4 ${reached ? '' : isNext ? 'ring-2 ring-purple-400' : 'opacity-40'} ${isNext ? 'bg-purple-50' : ''}">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-full ${reached ? regionColor + ' text-white' : 'bg-gray-200 text-gray-400'} flex items-center justify-center text-xl">
+                            <i class="fas fa-${m.icon || 'map-marker-alt'}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold ${reached ? 'text-green-600' : 'text-gray-400'}">LVL ${m.level}</span>
+                                ${reached ? '<i class="fas fa-check-circle text-green-500 text-xs"></i>' : ''}
+                                ${isNext ? '<span class="text-xs bg-purple-500 text-white px-2 py-0.5 rounded-full">NEXT</span>' : ''}
+                            </div>
+                            <div class="font-bold ${reached ? 'text-gray-800' : 'text-gray-500'}">${m.place}</div>
+                            <div class="text-sm text-gray-500">${m.desc}</div>
+                            ${reached && m.gem ? `<div class="text-xs text-purple-600 mt-1"><i class="fas fa-gem mr-1"></i>${m.gem}</div>` : ''}
+                        </div>
+                        ${reached ? '<i class="fas fa-map-marker-alt text-2xl text-green-500"></i>' : '<i class="fas fa-lock text-gray-300"></i>'}
                     </div>
-                    <div class="flex-1">
-                        <div class="font-semibold ${reached ? 'text-gray-800' : 'text-gray-500'}">${milestone.place}</div>
-                        <div class="text-sm text-gray-500">${milestone.desc}</div>
-                    </div>
-                    ${reached ? '<i class="fas fa-map-marker-alt text-2xl text-green-500"></i>' : '<i class="fas fa-lock text-gray-300"></i>'}
                 </div>
             `;
         }
+
+        // Summary
+        const totalCities = LDS.levels.journey.length;
+        const unlockedCities = LDS.levels.journey.filter(m => LDS.profile.level >= m.level).length;
+        html = `<div class="text-center mb-4 p-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl">
+            <div class="text-2xl font-bold">${unlockedCities} / ${totalCities}</div>
+            <div class="text-sm opacity-90">Cities Unlocked</div>
+        </div>` + html;
 
         container.innerHTML = html;
     },
