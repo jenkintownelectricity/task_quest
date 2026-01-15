@@ -29,6 +29,17 @@
         @keyframes flicker { from { opacity: 0.8; } to { opacity: 1; } }
         @keyframes confetti-fall { 0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
         .confetti { position: fixed; top: -10px; font-size: 24px; animation: confetti-fall 3s linear forwards; pointer-events: none; z-index: 9999; }
+        .screen-time-glow { text-shadow: 0 0 10px rgba(34, 197, 94, 0.8); }
+        .hero-task { border-left: 4px solid #8b5cf6; background: linear-gradient(90deg, rgba(139,92,246,0.1) 0%, transparent 100%); }
+        .legendary-task { border-left: 4px solid #eab308; background: linear-gradient(90deg, rgba(234,179,8,0.15) 0%, transparent 100%); }
+        .bonus-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        /* Timer Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 1.5rem; padding: 2rem; max-width: 90%; width: 400px; text-align: center; }
+        .timer-display { font-size: 4rem; font-weight: bold; color: var(--primary); font-family: monospace; }
+        @keyframes timer-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .timer-active { animation: timer-pulse 1s infinite; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -47,14 +58,18 @@
                     </div>
                 </div>
             </div>
-            <div class="flex items-center gap-4 text-center">
-                <div>
-                    <div class="text-xl font-bold" id="hero-coins">0</div>
-                    <div class="text-xs opacity-75"><i class="fas fa-coins text-yellow-300"></i> Coins</div>
+            <div class="flex items-center gap-3 text-center">
+                <div class="bg-green-500/30 rounded-lg px-2 py-1">
+                    <div class="text-xl font-bold screen-time-glow" id="hero-screentime">0</div>
+                    <div class="text-xs opacity-90"><i class="fas fa-tv"></i> min</div>
                 </div>
                 <div>
-                    <div class="text-xl font-bold streak-fire" id="hero-streak">0</div>
-                    <div class="text-xs opacity-75"><i class="fas fa-fire text-orange-400"></i> Streak</div>
+                    <div class="text-lg font-bold" id="hero-coins">0</div>
+                    <div class="text-xs opacity-75"><i class="fas fa-coins text-yellow-300"></i></div>
+                </div>
+                <div>
+                    <div class="text-lg font-bold streak-fire" id="hero-streak">0</div>
+                    <div class="text-xs opacity-75"><i class="fas fa-fire text-orange-400"></i></div>
                 </div>
             </div>
         </div>
@@ -109,6 +124,34 @@
             <div id="journey-list" class="space-y-4"></div>
         </section>
     </main>
+
+    <!-- TIMER MODAL -->
+    <div class="modal-overlay" id="timer-modal">
+        <div class="modal-content">
+            <div class="text-gray-500 text-sm mb-2">TASK TIMER</div>
+            <div class="timer-display" id="timer-display">5:00</div>
+            <div class="text-lg font-semibold text-gray-700 mt-2" id="timer-task-name">Task Name</div>
+            <div class="text-sm text-gray-500 mb-4" id="timer-xp-preview">+0 XP • +0 min screen time</div>
+            <div class="flex gap-3 justify-center">
+                <button onclick="Timer.cancel()" class="btn bg-gray-200 text-gray-700">Cancel</button>
+                <button onclick="Timer.complete()" class="btn btn-primary"><i class="fas fa-check mr-1"></i> Done!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN TIME REDEEM MODAL -->
+    <div class="modal-overlay" id="redeem-modal">
+        <div class="modal-content">
+            <div class="text-5xl mb-4">📺</div>
+            <h3 class="text-xl font-bold text-gray-800">Redeem Screen Time</h3>
+            <div class="text-4xl font-bold text-green-500 my-4" id="redeem-amount">0 min</div>
+            <p class="text-gray-500 mb-4">Show this to Mom or Dad to start your screen time!</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeRedeemModal()" class="btn bg-gray-200 text-gray-700">Cancel</button>
+                <button onclick="useScreenTime()" class="btn bg-green-500 text-white"><i class="fas fa-play mr-1"></i> Start Timer</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -126,36 +169,36 @@ const LDS = {
         "_lds": { "v": "1.0.0", "id": "lds:tasks/daily-v1", "type": "task.collection" },
         "categories": {
             "morning": { "icon": "sunrise", "color": "#FFB347", "tasks": [
-                { "id": "wake-up", "name": "Wake Up On Time", "desc": "Get out of bed when alarm goes off", "xp": 10, "coins": 5, "icon": "bed" },
-                { "id": "make-bed", "name": "Make Your Bed", "desc": "Pull up covers and arrange pillows", "xp": 15, "coins": 5, "icon": "bed" },
-                { "id": "brush-am", "name": "Brush Teeth (AM)", "desc": "Brush for 2 full minutes", "xp": 15, "coins": 5, "icon": "tooth" },
-                { "id": "get-dressed", "name": "Get Dressed", "desc": "Put on clothes for the day", "xp": 15, "coins": 5, "icon": "shirt" },
-                { "id": "breakfast", "name": "Eat Breakfast", "desc": "Finish breakfast at the table", "xp": 20, "coins": 10, "icon": "utensils" },
-                { "id": "pack-bag", "name": "Pack Backpack", "desc": "Check list and pack everything", "xp": 25, "coins": 10, "icon": "backpack" }
+                { "id": "wake-up", "name": "Wake Up On Time", "desc": "Get out of bed when alarm goes off", "xp": 10, "coins": 5, "icon": "bed", "time": 5 },
+                { "id": "make-bed", "name": "Make Your Bed", "desc": "Pull up covers and arrange pillows", "xp": 15, "coins": 5, "icon": "bed", "time": 5 },
+                { "id": "brush-am", "name": "Brush Teeth (AM)", "desc": "Brush for 2 full minutes", "xp": 15, "coins": 5, "icon": "tooth", "time": 3 },
+                { "id": "get-dressed", "name": "Get Dressed", "desc": "Put on clothes for the day", "xp": 15, "coins": 5, "icon": "shirt", "time": 10 },
+                { "id": "breakfast", "name": "Eat Breakfast", "desc": "Finish breakfast at the table", "xp": 20, "coins": 10, "icon": "utensils", "time": 20 },
+                { "id": "pack-bag", "name": "Pack Backpack", "desc": "Check list and pack everything", "xp": 25, "coins": 10, "icon": "backpack", "time": 10 }
             ]},
             "school": { "icon": "school", "color": "#87CEEB", "tasks": [
-                { "id": "stay-seated", "name": "Stay in Seat Challenge", "desc": "Stay seated for full class", "xp": 50, "coins": 25, "icon": "chair", "hero": true },
-                { "id": "raise-hand", "name": "Raise Hand First", "desc": "Raise hand instead of calling out", "xp": 40, "coins": 20, "icon": "hand" },
+                { "id": "stay-seated", "name": "Stay in Seat Challenge", "desc": "Stay seated for full class", "xp": 50, "coins": 25, "icon": "chair", "hero": true, "bonus": 2 },
+                { "id": "raise-hand", "name": "Raise Hand First", "desc": "Raise hand instead of calling out", "xp": 40, "coins": 20, "icon": "hand", "hero": true },
                 { "id": "homework-write", "name": "Write Down Homework", "desc": "Write all assignments in planner", "xp": 30, "coins": 15, "icon": "pencil" },
                 { "id": "bring-home", "name": "Bring Materials Home", "desc": "Check backpack before leaving", "xp": 35, "coins": 15, "icon": "clipboard-check" }
             ]},
             "afternoon": { "icon": "sun", "color": "#98FB98", "tasks": [
-                { "id": "healthy-snack", "name": "Healthy Snack", "desc": "Eat a healthy snack", "xp": 15, "coins": 5, "icon": "apple-whole" },
-                { "id": "start-hw", "name": "Start Homework", "desc": "Begin homework within 30 min", "xp": 40, "coins": 20, "icon": "book-open" },
-                { "id": "complete-hw", "name": "Complete Homework", "desc": "Finish all assignments", "xp": 50, "coins": 25, "icon": "check-double", "hero": true },
-                { "id": "reading", "name": "Read 20 Minutes", "desc": "Read a book for 20 min", "xp": 30, "coins": 15, "icon": "book" }
+                { "id": "healthy-snack", "name": "Healthy Snack", "desc": "Eat a healthy snack", "xp": 15, "coins": 5, "icon": "apple-whole", "time": 15 },
+                { "id": "start-hw", "name": "Start Homework", "desc": "Begin homework within 30 min", "xp": 40, "coins": 20, "icon": "book-open", "hero": true },
+                { "id": "complete-hw", "name": "Complete Homework", "desc": "Finish all assignments", "xp": 50, "coins": 25, "icon": "check-double", "hero": true, "bonus": 2 },
+                { "id": "reading", "name": "Read 20 Minutes", "desc": "Read a book for 20 min", "xp": 30, "coins": 15, "icon": "book", "time": 20 }
             ]},
             "evening": { "icon": "moon", "color": "#DDA0DD", "tasks": [
-                { "id": "dinner", "name": "Dinner at Table", "desc": "Eat dinner with family", "xp": 20, "coins": 10, "icon": "utensils" },
-                { "id": "chore", "name": "Complete Daily Chore", "desc": "Do your assigned chore", "xp": 35, "coins": 20, "icon": "broom" },
-                { "id": "screens-off", "name": "Screens Off On Time", "desc": "Turn off screens at bedtime", "xp": 45, "coins": 25, "icon": "power-off" },
-                { "id": "brush-pm", "name": "Brush Teeth (PM)", "desc": "Brush before bed", "xp": 15, "coins": 5, "icon": "tooth" },
-                { "id": "clothes-ready", "name": "Tomorrow's Clothes", "desc": "Lay out clothes for tomorrow", "xp": 20, "coins": 10, "icon": "shirt" },
+                { "id": "dinner", "name": "Dinner at Table", "desc": "Eat dinner with family", "xp": 20, "coins": 10, "icon": "utensils", "time": 30 },
+                { "id": "chore", "name": "Complete Daily Chore", "desc": "Do your assigned chore", "xp": 35, "coins": 20, "icon": "broom", "time": 20 },
+                { "id": "screens-off", "name": "Screens Off On Time", "desc": "Turn off screens at bedtime", "xp": 45, "coins": 25, "icon": "power-off", "hero": true },
+                { "id": "brush-pm", "name": "Brush Teeth (PM)", "desc": "Brush before bed", "xp": 15, "coins": 5, "icon": "tooth", "time": 3 },
+                { "id": "clothes-ready", "name": "Tomorrow's Clothes", "desc": "Lay out clothes for tomorrow", "xp": 20, "coins": 10, "icon": "shirt", "time": 10 },
                 { "id": "bed-time", "name": "In Bed On Time", "desc": "Be in bed by bedtime", "xp": 25, "coins": 15, "icon": "bed" }
             ]},
             "bonus": { "icon": "star", "color": "#FFD700", "tasks": [
-                { "id": "help-giuliana", "name": "Help Giuliana", "desc": "Do something kind for your sister", "xp": 40, "coins": 30, "icon": "heart", "special": true },
-                { "id": "zero-reminders", "name": "Zero Reminders Day", "desc": "All tasks without reminders", "xp": 100, "coins": 50, "icon": "crown", "legendary": true },
+                { "id": "help-giuliana", "name": "Help Giuliana", "desc": "Do something kind for your sister", "xp": 40, "coins": 30, "icon": "heart", "special": true, "bonus": 1.5 },
+                { "id": "zero-reminders", "name": "Zero Reminders Day", "desc": "All tasks without reminders", "xp": 100, "coins": 50, "icon": "crown", "legendary": true, "bonus": 3 },
                 { "id": "math-challenge", "name": "Math Challenge", "desc": "Complete a bonus math problem", "xp": 35, "coins": 20, "icon": "calculator" },
                 { "id": "map-quest", "name": "Map Explorer Quest", "desc": "Learn about a new place", "xp": 30, "coins": 20, "icon": "map" }
             ]}
@@ -279,6 +322,8 @@ const LDS = {
         "level": 1,
         "streak": 0,
         "longestStreak": 0,
+        "screenTime": 0,
+        "totalXpEarned": 0,
         "lastCompletedDate": null,
         "taskCounts": {},
         "unlockedBadges": [],
@@ -404,9 +449,20 @@ const Actions = {
         const task = tasks.find(t => t.id === taskId);
         if (!task) return;
 
+        // Calculate XP/coins with bonus multiplier
+        const bonus = task.bonus || 1;
+        const xpGain = Math.floor(task.xp * bonus);
+        const coinGain = Math.floor(task.coins * bonus);
+
         // Award XP and coins
-        LDS.profile.xp += task.xp;
-        LDS.profile.coins += task.coins;
+        LDS.profile.xp += xpGain;
+        LDS.profile.coins += coinGain;
+        LDS.profile.totalXpEarned = (LDS.profile.totalXpEarned || 0) + xpGain;
+
+        // 🎮 SCREEN TIME: 10 XP = 1 minute
+        const screenTimeEarned = Math.floor(xpGain / 10);
+        LDS.profile.screenTime = (LDS.profile.screenTime || 0) + screenTimeEarned;
+
         LDS.profile.todayCompleted.push(taskId);
         LDS.profile.lastCompletedDate = Context.today;
 
@@ -437,7 +493,7 @@ const Actions = {
 
         Storage.save();
         UI.render();
-        UI.celebrate(task);
+        UI.celebrate(task, xpGain, screenTimeEarned);
 
         for (const badge of newBadges) {
             setTimeout(() => UI.showBadgeUnlock(badge), 1000);
@@ -492,9 +548,15 @@ const UI = {
         document.getElementById('hero-title').textContent = title.title;
         document.getElementById('hero-coins').textContent = p.coins;
         document.getElementById('hero-streak').textContent = p.streak;
+        document.getElementById('hero-screentime').textContent = p.screenTime || 0;
         document.getElementById('xp-current').textContent = `${p.xp} XP`;
         document.getElementById('xp-next').textContent = `${xpNeeded} XP to Level ${p.level + 1}`;
         document.getElementById('xp-bar').style.width = `${xpPercent}%`;
+
+        // Make screen time clickable to redeem
+        const screenEl = document.getElementById('hero-screentime').parentElement;
+        screenEl.style.cursor = p.screenTime > 0 ? 'pointer' : 'default';
+        screenEl.onclick = p.screenTime > 0 ? () => openRedeemModal() : null;
     },
 
     renderTasks() {
@@ -517,9 +579,31 @@ const UI = {
                 </div>`;
             }
 
-            const heroClass = task.hero ? 'border-l-4 border-purple-500' : '';
+            const heroClass = task.hero ? 'hero-task' : '';
             const specialClass = task.special ? 'border-l-4 border-pink-500' : '';
-            const legendaryClass = task.legendary ? 'border-l-4 border-yellow-500 bg-yellow-50' : '';
+            const legendaryClass = task.legendary ? 'legendary-task' : '';
+
+            // Calculate actual XP with bonus
+            const bonus = task.bonus || 1;
+            const actualXp = Math.floor(task.xp * bonus);
+            const actualCoins = Math.floor(task.coins * bonus);
+            const screenTimePreview = Math.floor(actualXp / 10);
+
+            // Bonus badge
+            let bonusBadge = '';
+            if (task.legendary) {
+                bonusBadge = '<span class="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-0.5 rounded-full ml-1">👑 3x</span>';
+            } else if (task.hero && task.bonus >= 2) {
+                bonusBadge = '<span class="text-xs bg-purple-500 text-white px-2 py-0.5 rounded-full ml-1">⚔️ 2x</span>';
+            } else if (task.hero) {
+                bonusBadge = '<span class="text-xs bg-purple-400 text-white px-2 py-0.5 rounded-full ml-1">⭐ Hero</span>';
+            }
+
+            // Time limit badge
+            let timeBadge = '';
+            if (task.time) {
+                timeBadge = `<span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full"><i class="fas fa-clock mr-1"></i>${task.time}m</span>`;
+            }
 
             html += `
                 <div class="task-card card p-4 ${done ? 'done' : ''} ${heroClass} ${specialClass} ${legendaryClass}"
@@ -529,12 +613,18 @@ const UI = {
                             <i class="fas fa-${done ? 'check' : task.icon}"></i>
                         </div>
                         <div class="flex-1">
-                            <div class="font-semibold ${done ? 'line-through text-gray-400' : 'text-gray-800'}">${task.name}</div>
-                            <div class="text-sm text-gray-500">${task.desc}</div>
+                            <div class="font-semibold ${done ? 'line-through text-gray-400' : 'text-gray-800'}">
+                                ${task.name}${bonusBadge}
+                            </div>
+                            <div class="text-sm text-gray-500 flex items-center gap-2">
+                                ${task.desc}
+                                ${timeBadge}
+                            </div>
                         </div>
                         <div class="text-right text-sm">
-                            <div class="text-blue-600 font-semibold">+${task.xp} XP</div>
-                            <div class="text-yellow-600">+${task.coins} <i class="fas fa-coins"></i></div>
+                            <div class="text-blue-600 font-semibold">+${actualXp} XP</div>
+                            <div class="text-yellow-600">+${actualCoins} <i class="fas fa-coins"></i></div>
+                            <div class="text-green-500 text-xs">+${screenTimePreview}m <i class="fas fa-tv"></i></div>
                         </div>
                     </div>
                 </div>
@@ -667,10 +757,14 @@ const UI = {
         container.innerHTML = html;
     },
 
-    celebrate(task) {
-        // Confetti
-        const emojis = ['🎉', '⭐', '🔥', '💎', '🏆', '✨'];
-        for (let i = 0; i < 15; i++) {
+    celebrate(task, xpGain, screenTimeEarned) {
+        // Confetti - more for hero/legendary tasks
+        const emojis = task.legendary ? ['👑', '💎', '🌟', '✨', '🔥', '🏆'] :
+                       task.hero ? ['⭐', '⚔️', '🔥', '💪', '🎯', '✨'] :
+                       ['🎉', '⭐', '🔥', '💎', '🏆', '✨'];
+        const confettiCount = task.legendary ? 30 : task.hero ? 20 : 15;
+
+        for (let i = 0; i < confettiCount; i++) {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
             confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -680,9 +774,18 @@ const UI = {
             setTimeout(() => confetti.remove(), 3500);
         }
 
-        // Sound feedback (if available)
+        // Sound feedback with screen time announcement
         if ('speechSynthesis' in window) {
-            const msg = new SpeechSynthesisUtterance(`Great job! Plus ${task.xp} XP!`);
+            let message = `Great job! Plus ${xpGain} XP!`;
+            if (screenTimeEarned > 0) {
+                message += ` You earned ${screenTimeEarned} minutes of screen time!`;
+            }
+            if (task.legendary) {
+                message = `Legendary achievement! ${message}`;
+            } else if (task.hero) {
+                message = `Hero task complete! ${message}`;
+            }
+            const msg = new SpeechSynthesisUtterance(message);
             msg.rate = 1.1;
             msg.pitch = 1.2;
             speechSynthesis.speak(msg);
@@ -702,6 +805,161 @@ const UI = {
         alert(`🛒 Purchased!\n\n${reward.name}\n\nGo tell Mom or Dad to redeem your reward!`);
     }
 };
+
+// ─────────────────────────────────────────────────────────────────────────
+// TIMER SYSTEM — For timed tasks
+// ─────────────────────────────────────────────────────────────────────────
+const Timer = {
+    currentTask: null,
+    interval: null,
+    secondsRemaining: 0,
+
+    start(taskId) {
+        const tasks = Knowledge.getAllTasks();
+        const task = tasks.find(t => t.id === taskId);
+        if (!task || !task.time) return;
+
+        this.currentTask = task;
+        this.secondsRemaining = task.time * 60;
+
+        const bonus = task.bonus || 1;
+        const xpGain = Math.floor(task.xp * bonus);
+        const screenTime = Math.floor(xpGain / 10);
+
+        document.getElementById('timer-task-name').textContent = task.name;
+        document.getElementById('timer-xp-preview').textContent = `+${xpGain} XP • +${screenTime} min screen time`;
+        document.getElementById('timer-modal').classList.add('active');
+
+        this.updateDisplay();
+        this.interval = setInterval(() => this.tick(), 1000);
+    },
+
+    tick() {
+        this.secondsRemaining--;
+        this.updateDisplay();
+
+        if (this.secondsRemaining <= 0) {
+            this.complete();
+        }
+    },
+
+    updateDisplay() {
+        const mins = Math.floor(this.secondsRemaining / 60);
+        const secs = this.secondsRemaining % 60;
+        const display = `${mins}:${secs.toString().padStart(2, '0')}`;
+        document.getElementById('timer-display').textContent = display;
+
+        // Pulse when under 30 seconds
+        const displayEl = document.getElementById('timer-display');
+        if (this.secondsRemaining <= 30 && this.secondsRemaining > 0) {
+            displayEl.classList.add('timer-active');
+            displayEl.style.color = '#ef4444';
+        } else {
+            displayEl.classList.remove('timer-active');
+            displayEl.style.color = '';
+        }
+    },
+
+    cancel() {
+        clearInterval(this.interval);
+        this.currentTask = null;
+        document.getElementById('timer-modal').classList.remove('active');
+    },
+
+    complete() {
+        clearInterval(this.interval);
+        document.getElementById('timer-modal').classList.remove('active');
+
+        if (this.currentTask) {
+            Actions.completeTask(this.currentTask.id);
+        }
+        this.currentTask = null;
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// SCREEN TIME REDEMPTION
+// ─────────────────────────────────────────────────────────────────────────
+let screenTimeCountdown = null;
+
+function openRedeemModal() {
+    const screenTime = LDS.profile.screenTime || 0;
+    if (screenTime <= 0) return;
+
+    document.getElementById('redeem-amount').textContent = `${screenTime} min`;
+    document.getElementById('redeem-modal').classList.add('active');
+}
+
+function closeRedeemModal() {
+    document.getElementById('redeem-modal').classList.remove('active');
+}
+
+function useScreenTime() {
+    const screenTime = LDS.profile.screenTime || 0;
+    if (screenTime <= 0) return;
+
+    // Set screen time to 0 after use
+    LDS.profile.screenTime = 0;
+    Storage.save();
+    UI.render();
+
+    closeRedeemModal();
+
+    // Start countdown display
+    startScreenTimeCountdown(screenTime);
+}
+
+function startScreenTimeCountdown(minutes) {
+    let secondsRemaining = minutes * 60;
+
+    // Create floating timer
+    const timerEl = document.createElement('div');
+    timerEl.id = 'screen-time-countdown';
+    timerEl.className = 'fixed bottom-4 right-4 bg-green-500 text-white rounded-2xl px-6 py-4 shadow-xl z-50';
+    timerEl.innerHTML = `
+        <div class="text-center">
+            <div class="text-xs opacity-80">SCREEN TIME</div>
+            <div class="text-3xl font-bold font-mono" id="countdown-display">${minutes}:00</div>
+            <button onclick="cancelScreenTime()" class="text-xs mt-1 opacity-80 hover:opacity-100">Cancel</button>
+        </div>
+    `;
+    document.body.appendChild(timerEl);
+
+    screenTimeCountdown = setInterval(() => {
+        secondsRemaining--;
+        const mins = Math.floor(secondsRemaining / 60);
+        const secs = secondsRemaining % 60;
+        document.getElementById('countdown-display').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+        if (secondsRemaining <= 60) {
+            timerEl.classList.remove('bg-green-500');
+            timerEl.classList.add('bg-orange-500');
+        }
+        if (secondsRemaining <= 0) {
+            clearInterval(screenTimeCountdown);
+            timerEl.classList.remove('bg-orange-500');
+            timerEl.classList.add('bg-red-500');
+            document.getElementById('countdown-display').textContent = "TIME'S UP!";
+
+            // Announce time's up
+            if ('speechSynthesis' in window) {
+                const msg = new SpeechSynthesisUtterance('Screen time is over!');
+                msg.rate = 1.0;
+                speechSynthesis.speak(msg);
+            }
+
+            setTimeout(() => timerEl.remove(), 5000);
+        }
+    }, 1000);
+}
+
+function cancelScreenTime() {
+    if (screenTimeCountdown) {
+        clearInterval(screenTimeCountdown);
+        const el = document.getElementById('screen-time-countdown');
+        if (el) el.remove();
+    }
+}
 
 // ─────────────────────────────────────────────────────────────────────────
 // TAB NAVIGATION
