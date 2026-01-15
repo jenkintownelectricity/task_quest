@@ -2,7 +2,7 @@
   "name": "Task Quest - ADHD Task Tracker",
   "short_name": "Task Quest",
   "description": "Gamified task tracker for kids with ADHD. Complete quests, earn XP, unlock achievements!",
-  "start_url": "/task-quest-supabase.html",
+  "start_url": "/index-lds.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -75,14 +75,14 @@
       "name": "Today's Tasks",
       "short_name": "Tasks",
       "description": "View today's tasks",
-      "url": "/task-quest-supabase.html#tasks",
+      "url": "/index-lds.html#tasks",
       "icons": [{ "src": "icons/shortcut-tasks.png", "sizes": "96x96" }]
     },
     {
       "name": "Rewards Shop",
       "short_name": "Shop",
       "description": "Spend your coins",
-      "url": "/task-quest-supabase.html#shop",
+      "url": "/index-lds.html#shop",
       "icons": [{ "src": "icons/shortcut-shop.png", "sizes": "96x96" }]
     }
   ],

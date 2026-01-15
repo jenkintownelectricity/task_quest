@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Task Quest | Armand's Adventure</title>
+    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="ADHD-optimized task tracker. Complete quests, earn XP, unlock achievements!">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #6366f1; --secondary: #8b5cf6; --success: #22c55e; --warning: #f59e0b; --xp: #3b82f6; --coins: #eab308; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card { background: white; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .task-card { transition: all 0.2s; cursor: pointer; }
+        .task-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .task-card.done { opacity: 0.5; background: #f0fdf4; }
+        .xp-bar { background: linear-gradient(90deg, var(--xp), var(--secondary)); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--secondary); transform: scale(1.02); }
+        .tab { padding: 0.75rem 1rem; border-bottom: 3px solid transparent; cursor: pointer; }
+        .tab.active { border-color: var(--primary); color: var(--primary); }
+        .streak-fire { animation: flicker 0.5s infinite alternate; }
+        @keyframes flicker { from { opacity: 0.8; } to { opacity: 1; } }
+        @keyframes confetti-fall { 0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        .confetti { position: fixed; top: -10px; font-size: 24px; animation: confetti-fall 3s linear forwards; pointer-events: none; z-index: 9999; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+<div id="app">
+    <!-- HEADER -->
+    <header class="gradient-bg text-white p-4 sticky top-0 z-40">
+        <div class="max-w-2xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
+                    <i class="fas fa-dragon"></i>
+                </div>
+                <div>
+                    <h1 id="hero-name" class="font-bold text-lg">Armand</h1>
+                    <div class="text-sm opacity-90">
+                        <span id="hero-level">Level 1</span> • <span id="hero-title">Beginner</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 text-center">
+                <div>
+                    <div class="text-xl font-bold" id="hero-coins">0</div>
+                    <div class="text-xs opacity-75"><i class="fas fa-coins text-yellow-300"></i> Coins</div>
+                </div>
+                <div>
+                    <div class="text-xl font-bold streak-fire" id="hero-streak">0</div>
+                    <div class="text-xs opacity-75"><i class="fas fa-fire text-orange-400"></i> Streak</div>
+                </div>
+            </div>
+        </div>
+        <!-- XP BAR -->
+        <div class="max-w-2xl mx-auto mt-3">
+            <div class="flex justify-between text-xs mb-1">
+                <span id="xp-current">0 XP</span>
+                <span id="xp-next">100 XP to Level 2</span>
+            </div>
+            <div class="bg-white/20 rounded-full h-3 overflow-hidden">
+                <div id="xp-bar" class="xp-bar h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAV TABS -->
+    <nav class="bg-white shadow-sm sticky top-32 z-30">
+        <div class="max-w-2xl mx-auto flex">
+            <button class="tab active flex-1" data-tab="tasks" onclick="showTab('tasks')"><i class="fas fa-tasks mr-1"></i> Tasks</button>
+            <button class="tab flex-1" data-tab="shop" onclick="showTab('shop')"><i class="fas fa-store mr-1"></i> Shop</button>
+            <button class="tab flex-1" data-tab="badges" onclick="showTab('badges')"><i class="fas fa-medal mr-1"></i> Badges</button>
+            <button class="tab flex-1" data-tab="journey" onclick="showTab('journey')"><i class="fas fa-map mr-1"></i> Map</button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-2xl mx-auto p-4 pb-24">
+        <!-- TASKS TAB -->
+        <section id="tab-tasks">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Today's Quests</h2>
+                <span id="tasks-progress" class="text-sm text-gray-500">0/0 Complete</span>
+            </div>
+            <div id="task-list" class="space-y-3"></div>
+        </section>
+
+        <!-- SHOP TAB -->
+        <section id="tab-shop" class="hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Reward Shop</h2>
+            <div id="shop-list" class="grid gap-3"></div>
+        </section>
+
+        <!-- BADGES TAB -->
+        <section id="tab-badges" class="hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Achievements</h2>
+            <div id="badge-list" class="grid grid-cols-2 gap-3"></div>
+        </section>
+
+        <!-- JOURNEY TAB -->
+        <section id="tab-journey" class="hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Journey Map</h2>
+            <div id="journey-list" class="space-y-4"></div>
+        </section>
+    </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// L0 KERNEL — PURE LDS STORAGE (NO BACKEND)
+// Authority: L0 Human (Armand Lefebvre)
+// All data stored in localStorage as LDS entities
+// ═══════════════════════════════════════════════════════════════════════════
+
+const LDS = {
+    // ─────────────────────────────────────────────────────────────────────────
+    // EMBEDDED LDS ENTITIES (Tasks, Achievements, Rewards, Levels)
+    // ─────────────────────────────────────────────────────────────────────────
+    tasks: {
+        "_lds": { "v": "1.0.0", "id": "lds:tasks/daily-v1", "type": "task.collection" },
+        "categories": {
+            "morning": { "icon": "sunrise", "color": "#FFB347", "tasks": [
+                { "id": "wake-up", "name": "Wake Up On Time", "desc": "Get out of bed when alarm goes off", "xp": 10, "coins": 5, "icon": "bed" },
+                { "id": "make-bed", "name": "Make Your Bed", "desc": "Pull up covers and arrange pillows", "xp": 15, "coins": 5, "icon": "bed" },
+                { "id": "brush-am", "name": "Brush Teeth (AM)", "desc": "Brush for 2 full minutes", "xp": 15, "coins": 5, "icon": "tooth" },
+                { "id": "get-dressed", "name": "Get Dressed", "desc": "Put on clothes for the day", "xp": 15, "coins": 5, "icon": "shirt" },
+                { "id": "breakfast", "name": "Eat Breakfast", "desc": "Finish breakfast at the table", "xp": 20, "coins": 10, "icon": "utensils" },
+                { "id": "pack-bag", "name": "Pack Backpack", "desc": "Check list and pack everything", "xp": 25, "coins": 10, "icon": "backpack" }
+            ]},
+            "school": { "icon": "school", "color": "#87CEEB", "tasks": [
+                { "id": "stay-seated", "name": "Stay in Seat Challenge", "desc": "Stay seated for full class", "xp": 50, "coins": 25, "icon": "chair", "hero": true },
+                { "id": "raise-hand", "name": "Raise Hand First", "desc": "Raise hand instead of calling out", "xp": 40, "coins": 20, "icon": "hand" },
+                { "id": "homework-write", "name": "Write Down Homework", "desc": "Write all assignments in planner", "xp": 30, "coins": 15, "icon": "pencil" },
+                { "id": "bring-home", "name": "Bring Materials Home", "desc": "Check backpack before leaving", "xp": 35, "coins": 15, "icon": "clipboard-check" }
+            ]},
+            "afternoon": { "icon": "sun", "color": "#98FB98", "tasks": [
+                { "id": "healthy-snack", "name": "Healthy Snack", "desc": "Eat a healthy snack", "xp": 15, "coins": 5, "icon": "apple-whole" },
+                { "id": "start-hw", "name": "Start Homework", "desc": "Begin homework within 30 min", "xp": 40, "coins": 20, "icon": "book-open" },
+                { "id": "complete-hw", "name": "Complete Homework", "desc": "Finish all assignments", "xp": 50, "coins": 25, "icon": "check-double", "hero": true },
+                { "id": "reading", "name": "Read 20 Minutes", "desc": "Read a book for 20 min", "xp": 30, "coins": 15, "icon": "book" }
+            ]},
+            "evening": { "icon": "moon", "color": "#DDA0DD", "tasks": [
+                { "id": "dinner", "name": "Dinner at Table", "desc": "Eat dinner with family", "xp": 20, "coins": 10, "icon": "utensils" },
+                { "id": "chore", "name": "Complete Daily Chore", "desc": "Do your assigned chore", "xp": 35, "coins": 20, "icon": "broom" },
+                { "id": "screens-off", "name": "Screens Off On Time", "desc": "Turn off screens at bedtime", "xp": 45, "coins": 25, "icon": "power-off" },
+                { "id": "brush-pm", "name": "Brush Teeth (PM)", "desc": "Brush before bed", "xp": 15, "coins": 5, "icon": "tooth" },
+                { "id": "clothes-ready", "name": "Tomorrow's Clothes", "desc": "Lay out clothes for tomorrow", "xp": 20, "coins": 10, "icon": "shirt" },
+                { "id": "bed-time", "name": "In Bed On Time", "desc": "Be in bed by bedtime", "xp": 25, "coins": 15, "icon": "bed" }
+            ]},
+            "bonus": { "icon": "star", "color": "#FFD700", "tasks": [
+                { "id": "help-giuliana", "name": "Help Giuliana", "desc": "Do something kind for your sister", "xp": 40, "coins": 30, "icon": "heart", "special": true },
+                { "id": "zero-reminders", "name": "Zero Reminders Day", "desc": "All tasks without reminders", "xp": 100, "coins": 50, "icon": "crown", "legendary": true },
+                { "id": "math-challenge", "name": "Math Challenge", "desc": "Complete a bonus math problem", "xp": 35, "coins": 20, "icon": "calculator" },
+                { "id": "map-quest", "name": "Map Explorer Quest", "desc": "Learn about a new place", "xp": 30, "coins": 20, "icon": "map" }
+            ]}
+        }
+    },
+
+    achievements: {
+        "_lds": { "v": "1.0.0", "id": "lds:achievements/badges-v1", "type": "achievement.collection" },
+        "badges": [
+            { "id": "first-flame", "name": "First Flame", "desc": "Complete all daily tasks for 1 day", "icon": "fire", "rarity": "common", "xp": 50, "coins": 25, "req": { "type": "streak", "val": 1 } },
+            { "id": "warming-up", "name": "Warming Up", "desc": "3-day task streak", "icon": "fire", "rarity": "common", "xp": 100, "coins": 50, "req": { "type": "streak", "val": 3 } },
+            { "id": "on-fire", "name": "On Fire!", "desc": "7-day task streak", "icon": "fire-flame-curved", "rarity": "uncommon", "xp": 250, "coins": 125, "req": { "type": "streak", "val": 7 } },
+            { "id": "unstoppable", "name": "Unstoppable", "desc": "14-day task streak", "icon": "meteor", "rarity": "rare", "xp": 500, "coins": 300, "req": { "type": "streak", "val": 14 } },
+            { "id": "legendary", "name": "Legendary Warrior", "desc": "30-day task streak", "icon": "dragon", "rarity": "legendary", "xp": 1500, "coins": 1000, "req": { "type": "streak", "val": 30 } },
+            { "id": "seat-master", "name": "Seat Master", "desc": "Stay in seat 20 times", "icon": "chair", "rarity": "rare", "xp": 400, "coins": 200, "req": { "type": "task", "task": "stay-seated", "val": 20 } },
+            { "id": "homework-hero", "name": "Homework Hero", "desc": "Complete homework 10 times", "icon": "book-open", "rarity": "uncommon", "xp": 250, "coins": 125, "req": { "type": "task", "task": "complete-hw", "val": 10 } },
+            { "id": "kind-heart", "name": "Kind Heart", "desc": "Help Giuliana 5 times", "icon": "heart", "rarity": "uncommon", "xp": 200, "coins": 150, "req": { "type": "task", "task": "help-giuliana", "val": 5 } },
+            { "id": "super-brother", "name": "Super Brother", "desc": "Help Giuliana 20 times", "icon": "heart", "rarity": "epic", "xp": 600, "coins": 400, "req": { "type": "task", "task": "help-giuliana", "val": 20 } },
+            { "id": "math-wizard", "name": "Math Wizard", "desc": "Complete 50 math challenges", "icon": "hat-wizard", "rarity": "legendary", "xp": 1000, "coins": 600, "req": { "type": "task", "task": "math-challenge", "val": 50 } },
+            { "id": "cartographer", "name": "Master Cartographer", "desc": "Complete 25 map quests", "icon": "map-location-dot", "rarity": "epic", "xp": 500, "coins": 350, "req": { "type": "task", "task": "map-quest", "val": 25 } },
+            { "id": "level-5", "name": "Rising Star", "desc": "Reach Level 5", "icon": "star", "rarity": "common", "xp": 100, "coins": 100, "req": { "type": "level", "val": 5 } },
+            { "id": "level-10", "name": "Task Champion", "desc": "Reach Level 10", "icon": "medal", "rarity": "uncommon", "xp": 300, "coins": 250, "req": { "type": "level", "val": 10 } },
+            { "id": "level-25", "name": "Elite Achiever", "desc": "Reach Level 25", "icon": "trophy", "rarity": "rare", "xp": 750, "coins": 500, "req": { "type": "level", "val": 25 } },
+            { "id": "level-50", "name": "Legendary Master", "desc": "Reach Level 50", "icon": "crown", "rarity": "legendary", "xp": 2000, "coins": 1500, "req": { "type": "level", "val": 50 } }
+        ]
+    },
+
+    rewards: {
+        "_lds": { "v": "1.0.0", "id": "lds:rewards/shop-v1", "type": "reward.shop" },
+        "items": [
+            { "id": "roblox-15", "name": "15 Min Roblox", "desc": "15 minutes of Roblox", "cost": 50, "icon": "gamepad", "cat": "screen" },
+            { "id": "roblox-30", "name": "30 Min Roblox", "desc": "30 minutes of Roblox", "cost": 90, "icon": "gamepad", "cat": "screen" },
+            { "id": "roblox-60", "name": "1 Hour Roblox", "desc": "Full hour of Roblox", "cost": 150, "icon": "gamepad", "cat": "screen" },
+            { "id": "youtube-15", "name": "15 Min YouTube", "desc": "15 minutes of YouTube", "cost": 40, "icon": "play", "cat": "screen" },
+            { "id": "movie-night", "name": "Movie Night Pick", "desc": "You pick family movie", "cost": 200, "icon": "film", "cat": "screen" },
+            { "id": "stay-up-15", "name": "Stay Up 15 Min", "desc": "15 min past bedtime", "cost": 75, "icon": "moon", "cat": "activity" },
+            { "id": "playdate", "name": "Friend Playdate", "desc": "Have a friend over", "cost": 250, "icon": "users", "cat": "activity" },
+            { "id": "special-outing", "name": "Special Outing", "desc": "Trip to fun place", "cost": 400, "icon": "ticket", "cat": "activity" },
+            { "id": "skip-chore", "name": "Skip One Chore", "desc": "Skip one daily chore", "cost": 100, "icon": "forward", "cat": "activity" },
+            { "id": "extra-dessert", "name": "Extra Dessert", "desc": "Extra dessert treat", "cost": 60, "icon": "cookie", "cat": "treat" },
+            { "id": "ice-cream", "name": "Ice Cream Trip", "desc": "Trip for ice cream", "cost": 200, "icon": "ice-cream", "cat": "treat" },
+            { "id": "dinner-pick", "name": "Dinner Choice", "desc": "Pick what's for dinner", "cost": 150, "icon": "utensils", "cat": "treat" },
+            { "id": "robux-100", "name": "100 Robux", "desc": "Get 100 Robux", "cost": 500, "icon": "coins", "cat": "special" },
+            { "id": "new-game", "name": "New Game", "desc": "New game (under $20)", "cost": 1000, "icon": "gift", "cat": "special" },
+            { "id": "sleepover", "name": "Sleepover", "desc": "Have or attend sleepover", "cost": 600, "icon": "house", "cat": "special" }
+        ]
+    },
+
+    levels: {
+        "_lds": { "v": "1.0.0", "id": "lds:levels/progression-v1", "type": "gamification.levels" },
+        "titles": [
+            { "level": 1, "title": "Beginner", "icon": "seedling" },
+            { "level": 2, "title": "Apprentice", "icon": "leaf" },
+            { "level": 5, "title": "Rising Star", "icon": "star" },
+            { "level": 10, "title": "Champion", "icon": "medal" },
+            { "level": 15, "title": "Hero", "icon": "shield" },
+            { "level": 20, "title": "Master", "icon": "crown" },
+            { "level": 25, "title": "Elite", "icon": "gem" },
+            { "level": 30, "title": "Legendary", "icon": "dragon" },
+            { "level": 50, "title": "Supreme Master", "icon": "sun" }
+        ],
+        "journey": [
+            { "level": 1, "place": "Jenkintown, PA", "desc": "Home base - journey begins!" },
+            { "level": 5, "place": "Philadelphia, PA", "desc": "First big city milestone!" },
+            { "level": 10, "place": "Atlantic City, NJ", "desc": "Beach destination unlocked!" },
+            { "level": 15, "place": "New York City, NY", "desc": "The Big Apple awaits!" },
+            { "level": 20, "place": "Washington, DC", "desc": "Capital achievement!" },
+            { "level": 25, "place": "Cape May, NJ", "desc": "Your favorite destination!" },
+            { "level": 30, "place": "Boston, MA", "desc": "Historic city conquered!" },
+            { "level": 50, "place": "Anywhere You Dream", "desc": "The world is yours!" }
+        ]
+    },
+
+    profile: {
+        "_lds": { "v": "1.0.0", "id": "lds:profile/armand-v1", "type": "user.profile" },
+        "name": "Armand",
+        "xp": 0,
+        "coins": 0,
+        "level": 1,
+        "streak": 0,
+        "longestStreak": 0,
+        "lastCompletedDate": null,
+        "taskCounts": {},
+        "unlockedBadges": [],
+        "purchasedRewards": [],
+        "todayCompleted": []
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// L1 ABYSS — PERSISTENCE (localStorage)
+// ─────────────────────────────────────────────────────────────────────────
+const Storage = {
+    KEY: 'tq_profile_v1',
+
+    load() {
+        const saved = localStorage.getItem(this.KEY);
+        if (saved) {
+            const data = JSON.parse(saved);
+            Object.assign(LDS.profile, data);
+        }
+        return LDS.profile;
+    },
+
+    save() {
+        localStorage.setItem(this.KEY, JSON.stringify(LDS.profile));
+    },
+
+    reset() {
+        if (confirm('Reset ALL progress? This cannot be undone!')) {
+            localStorage.removeItem(this.KEY);
+            location.reload();
+        }
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// L2 DEEP — KNOWLEDGE (XP Calculations)
+// ─────────────────────────────────────────────────────────────────────────
+const Knowledge = {
+    xpForLevel(level) {
+        return Math.floor(100 * level * 1.2);
+    },
+
+    getTitle(level) {
+        let title = LDS.levels.titles[0];
+        for (const t of LDS.levels.titles) {
+            if (level >= t.level) title = t;
+        }
+        return title;
+    },
+
+    getAllTasks() {
+        const tasks = [];
+        for (const [catId, cat] of Object.entries(LDS.tasks.categories)) {
+            for (const task of cat.tasks) {
+                tasks.push({ ...task, category: catId, categoryIcon: cat.icon, categoryColor: cat.color });
+            }
+        }
+        return tasks;
+    },
+
+    getTaskCount(taskId) {
+        return LDS.profile.taskCounts[taskId] || 0;
+    },
+
+    checkAchievements() {
+        const newBadges = [];
+        for (const badge of LDS.achievements.badges) {
+            if (LDS.profile.unlockedBadges.includes(badge.id)) continue;
+
+            let earned = false;
+            const req = badge.req;
+
+            if (req.type === 'streak' && LDS.profile.streak >= req.val) earned = true;
+            if (req.type === 'level' && LDS.profile.level >= req.val) earned = true;
+            if (req.type === 'task' && this.getTaskCount(req.task) >= req.val) earned = true;
+
+            if (earned) {
+                LDS.profile.unlockedBadges.push(badge.id);
+                LDS.profile.xp += badge.xp;
+                LDS.profile.coins += badge.coins;
+                newBadges.push(badge);
+            }
+        }
+        return newBadges;
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// L3 THERMOCLINE — CONTEXT (Session State)
+// ─────────────────────────────────────────────────────────────────────────
+const Context = {
+    today: new Date().toISOString().split('T')[0],
+
+    isTaskDoneToday(taskId) {
+        return LDS.profile.todayCompleted.includes(taskId);
+    },
+
+    resetIfNewDay() {
+        if (LDS.profile.lastCompletedDate !== this.today) {
+            // Check if streak continues or breaks
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+            if (LDS.profile.lastCompletedDate !== yesterdayStr && LDS.profile.lastCompletedDate !== null) {
+                LDS.profile.streak = 0; // Streak broken
+            }
+
+            LDS.profile.todayCompleted = [];
+        }
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// L4 CURRENT — ACTIONS
+// ─────────────────────────────────────────────────────────────────────────
+const Actions = {
+    completeTask(taskId) {
+        if (Context.isTaskDoneToday(taskId)) return;
+
+        const tasks = Knowledge.getAllTasks();
+        const task = tasks.find(t => t.id === taskId);
+        if (!task) return;
+
+        // Award XP and coins
+        LDS.profile.xp += task.xp;
+        LDS.profile.coins += task.coins;
+        LDS.profile.todayCompleted.push(taskId);
+        LDS.profile.lastCompletedDate = Context.today;
+
+        // Track task count for achievements
+        LDS.profile.taskCounts[taskId] = (LDS.profile.taskCounts[taskId] || 0) + 1;
+
+        // Check level up
+        this.checkLevelUp();
+
+        // Check streak
+        const allTasks = Knowledge.getAllTasks();
+        const requiredTasks = allTasks.filter(t => !t.special && !t.legendary);
+        const completedRequired = requiredTasks.filter(t => Context.isTaskDoneToday(t.id)).length;
+
+        if (completedRequired >= Math.floor(requiredTasks.length * 0.8)) {
+            if (!LDS.profile._streakIncrementedToday) {
+                LDS.profile.streak++;
+                LDS.profile._streakIncrementedToday = true;
+                if (LDS.profile.streak > LDS.profile.longestStreak) {
+                    LDS.profile.longestStreak = LDS.profile.streak;
+                }
+            }
+        }
+
+        // Check achievements
+        const newBadges = Knowledge.checkAchievements();
+        this.checkLevelUp(); // Re-check after achievement XP
+
+        Storage.save();
+        UI.render();
+        UI.celebrate(task);
+
+        for (const badge of newBadges) {
+            setTimeout(() => UI.showBadgeUnlock(badge), 1000);
+        }
+    },
+
+    checkLevelUp() {
+        let leveled = false;
+        while (LDS.profile.xp >= Knowledge.xpForLevel(LDS.profile.level)) {
+            LDS.profile.xp -= Knowledge.xpForLevel(LDS.profile.level);
+            LDS.profile.level++;
+            leveled = true;
+        }
+        if (leveled) {
+            setTimeout(() => UI.showLevelUp(), 500);
+        }
+    },
+
+    purchaseReward(rewardId) {
+        const reward = LDS.rewards.items.find(r => r.id === rewardId);
+        if (!reward || LDS.profile.coins < reward.cost) return false;
+
+        LDS.profile.coins -= reward.cost;
+        LDS.profile.purchasedRewards.push({ id: rewardId, date: new Date().toISOString() });
+        Storage.save();
+        UI.render();
+        UI.showPurchase(reward);
+        return true;
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// L5 SURFACE — UI RENDERING
+// ─────────────────────────────────────────────────────────────────────────
+const UI = {
+    render() {
+        this.renderHeader();
+        this.renderTasks();
+        this.renderShop();
+        this.renderBadges();
+        this.renderJourney();
+    },
+
+    renderHeader() {
+        const p = LDS.profile;
+        const title = Knowledge.getTitle(p.level);
+        const xpNeeded = Knowledge.xpForLevel(p.level);
+        const xpPercent = (p.xp / xpNeeded) * 100;
+
+        document.getElementById('hero-name').textContent = p.name;
+        document.getElementById('hero-level').textContent = `Level ${p.level}`;
+        document.getElementById('hero-title').textContent = title.title;
+        document.getElementById('hero-coins').textContent = p.coins;
+        document.getElementById('hero-streak').textContent = p.streak;
+        document.getElementById('xp-current').textContent = `${p.xp} XP`;
+        document.getElementById('xp-next').textContent = `${xpNeeded} XP to Level ${p.level + 1}`;
+        document.getElementById('xp-bar').style.width = `${xpPercent}%`;
+    },
+
+    renderTasks() {
+        const container = document.getElementById('task-list');
+        const tasks = Knowledge.getAllTasks();
+        let completed = 0;
+
+        let html = '';
+        let currentCat = '';
+
+        for (const task of tasks) {
+            const done = Context.isTaskDoneToday(task.id);
+            if (done) completed++;
+
+            if (task.category !== currentCat) {
+                currentCat = task.category;
+                const cat = LDS.tasks.categories[currentCat];
+                html += `<div class="text-sm font-semibold text-gray-500 mt-4 mb-2 flex items-center gap-2">
+                    <i class="fas fa-${cat.icon}" style="color: ${cat.color}"></i> ${currentCat.charAt(0).toUpperCase() + currentCat.slice(1)}
+                </div>`;
+            }
+
+            const heroClass = task.hero ? 'border-l-4 border-purple-500' : '';
+            const specialClass = task.special ? 'border-l-4 border-pink-500' : '';
+            const legendaryClass = task.legendary ? 'border-l-4 border-yellow-500 bg-yellow-50' : '';
+
+            html += `
+                <div class="task-card card p-4 ${done ? 'done' : ''} ${heroClass} ${specialClass} ${legendaryClass}"
+                     onclick="${done ? '' : `Actions.completeTask('${task.id}')`}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center ${done ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}">
+                            <i class="fas fa-${done ? 'check' : task.icon}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-semibold ${done ? 'line-through text-gray-400' : 'text-gray-800'}">${task.name}</div>
+                            <div class="text-sm text-gray-500">${task.desc}</div>
+                        </div>
+                        <div class="text-right text-sm">
+                            <div class="text-blue-600 font-semibold">+${task.xp} XP</div>
+                            <div class="text-yellow-600">+${task.coins} <i class="fas fa-coins"></i></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+        document.getElementById('tasks-progress').textContent = `${completed}/${tasks.length} Complete`;
+    },
+
+    renderShop() {
+        const container = document.getElementById('shop-list');
+        let html = '';
+
+        for (const item of LDS.rewards.items) {
+            const canAfford = LDS.profile.coins >= item.cost;
+
+            html += `
+                <div class="card p-4 ${canAfford ? 'cursor-pointer hover:shadow-lg' : 'opacity-50'}"
+                     onclick="${canAfford ? `Actions.purchaseReward('${item.id}')` : ''}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xl">
+                            <i class="fas fa-${item.icon}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-800">${item.name}</div>
+                            <div class="text-sm text-gray-500">${item.desc}</div>
+                        </div>
+                        <div class="text-lg font-bold ${canAfford ? 'text-yellow-600' : 'text-gray-400'}">
+                            ${item.cost} <i class="fas fa-coins"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+    },
+
+    renderBadges() {
+        const container = document.getElementById('badge-list');
+        let html = '';
+
+        const rarityColors = {
+            common: 'bg-gray-100 text-gray-600',
+            uncommon: 'bg-green-100 text-green-600',
+            rare: 'bg-blue-100 text-blue-600',
+            epic: 'bg-purple-100 text-purple-600',
+            legendary: 'bg-yellow-100 text-yellow-600'
+        };
+
+        for (const badge of LDS.achievements.badges) {
+            const unlocked = LDS.profile.unlockedBadges.includes(badge.id);
+            const colors = rarityColors[badge.rarity];
+
+            html += `
+                <div class="card p-4 ${unlocked ? '' : 'opacity-40 grayscale'}">
+                    <div class="text-center">
+                        <div class="w-16 h-16 mx-auto rounded-full ${colors} flex items-center justify-center text-2xl mb-2">
+                            <i class="fas fa-${badge.icon}"></i>
+                        </div>
+                        <div class="font-semibold text-sm">${badge.name}</div>
+                        <div class="text-xs text-gray-500 mt-1">${badge.desc}</div>
+                        ${unlocked ? '<div class="text-xs text-green-600 mt-2"><i class="fas fa-check"></i> Unlocked</div>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+    },
+
+    renderJourney() {
+        const container = document.getElementById('journey-list');
+        let html = '';
+
+        for (const milestone of LDS.levels.journey) {
+            const reached = LDS.profile.level >= milestone.level;
+
+            html += `
+                <div class="card p-4 flex items-center gap-4 ${reached ? '' : 'opacity-50'}">
+                    <div class="w-12 h-12 rounded-full ${reached ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'} flex items-center justify-center font-bold">
+                        ${milestone.level}
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-semibold ${reached ? 'text-gray-800' : 'text-gray-500'}">${milestone.place}</div>
+                        <div class="text-sm text-gray-500">${milestone.desc}</div>
+                    </div>
+                    ${reached ? '<i class="fas fa-map-marker-alt text-2xl text-green-500"></i>' : '<i class="fas fa-lock text-gray-300"></i>'}
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+    },
+
+    celebrate(task) {
+        // Confetti
+        const emojis = ['🎉', '⭐', '🔥', '💎', '🏆', '✨'];
+        for (let i = 0; i < 15; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDelay = Math.random() * 0.5 + 's';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3500);
+        }
+
+        // Sound feedback (if available)
+        if ('speechSynthesis' in window) {
+            const msg = new SpeechSynthesisUtterance(`Great job! Plus ${task.xp} XP!`);
+            msg.rate = 1.1;
+            msg.pitch = 1.2;
+            speechSynthesis.speak(msg);
+        }
+    },
+
+    showBadgeUnlock(badge) {
+        alert(`🏆 ACHIEVEMENT UNLOCKED!\n\n${badge.name}\n${badge.desc}\n\n+${badge.xp} XP  +${badge.coins} Coins`);
+    },
+
+    showLevelUp() {
+        const title = Knowledge.getTitle(LDS.profile.level);
+        alert(`🎉 LEVEL UP!\n\nYou are now Level ${LDS.profile.level}!\n"${title.title}"`);
+    },
+
+    showPurchase(reward) {
+        alert(`🛒 Purchased!\n\n${reward.name}\n\nGo tell Mom or Dad to redeem your reward!`);
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// TAB NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────
+function showTab(tab) {
+    ['tasks', 'shop', 'badges', 'journey'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+        document.querySelector(`[data-tab="${t}"]`).classList.toggle('active', t === tab);
+    });
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// INIT — APP STARTUP
+// ─────────────────────────────────────────────────────────────────────────
+function init() {
+    Storage.load();
+    Context.resetIfNewDay();
+    UI.render();
+}
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+// Start App
+init();
+</script>
+</body>
+</html>

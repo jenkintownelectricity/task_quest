@@ -1,11 +1,11 @@
-// Task Quest Service Worker v1.0.0
-const CACHE_NAME = 'task-quest-v1';
-const OFFLINE_URL = '/task-quest-supabase.html';
+// Task Quest Service Worker v2.0.0 - Pure LDS (No Backend)
+const CACHE_NAME = 'task-quest-v2';
+const OFFLINE_URL = '/index-lds.html';
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
   '/',
-  '/task-quest-supabase.html',
+  '/index-lds.html',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
