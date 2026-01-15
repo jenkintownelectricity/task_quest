@@ -289,7 +289,14 @@
                 <div id="care-team-list" class="space-y-2"></div>
             </div>
 
-            <button onclick="closeCareTeamModal()" class="btn bg-gray-200 text-gray-700 w-full mt-4">Close</button>
+            <!-- Sync Button -->
+            <div class="border-t border-gray-200 mt-4 pt-4">
+                <button onclick="openSyncModal()" class="btn bg-blue-500 text-white w-full">
+                    <i class="fas fa-sync mr-2"></i>Sync to Another Device
+                </button>
+            </div>
+
+            <button onclick="closeCareTeamModal()" class="btn bg-gray-200 text-gray-700 w-full mt-3">Close</button>
         </div>
     </div>
 
@@ -300,6 +307,53 @@
             <h3 class="text-xl font-bold text-gray-800 mb-4">Switch Child</h3>
             <div id="child-selector-list" class="space-y-2"></div>
             <button onclick="closeChildSelectorModal()" class="btn bg-gray-200 text-gray-700 w-full mt-4">Cancel</button>
+        </div>
+    </div>
+
+    <!-- SYNC MODAL -->
+    <div class="modal-overlay" id="sync-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="text-4xl mb-4">🔄</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Sync Between Devices</h3>
+            <p class="text-gray-500 text-sm mb-4">Copy this code to another device, or paste a code from another device</p>
+
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-4">
+                <button id="sync-tab-export" class="flex-1 py-2 px-4 rounded-lg bg-purple-500 text-white font-semibold" onclick="Sync.showTab('export')">
+                    <i class="fas fa-upload mr-1"></i> Export
+                </button>
+                <button id="sync-tab-import" class="flex-1 py-2 px-4 rounded-lg bg-gray-200 text-gray-700 font-semibold" onclick="Sync.showTab('import')">
+                    <i class="fas fa-download mr-1"></i> Import
+                </button>
+            </div>
+
+            <!-- Export Tab -->
+            <div id="sync-export-panel">
+                <div class="text-left text-sm text-gray-500 mb-2">Your sync code:</div>
+                <textarea id="sync-export-code" readonly
+                    class="w-full h-32 p-3 border-2 border-gray-200 rounded-xl font-mono text-xs bg-gray-50 resize-none"
+                    placeholder="Generating..."></textarea>
+                <button onclick="Sync.copyCode()" class="btn btn-primary w-full mt-3">
+                    <i class="fas fa-copy mr-2"></i>Copy to Clipboard
+                </button>
+                <div id="sync-copy-status" class="text-green-500 text-sm mt-2 hidden">
+                    <i class="fas fa-check"></i> Copied!
+                </div>
+            </div>
+
+            <!-- Import Tab -->
+            <div id="sync-import-panel" class="hidden">
+                <div class="text-left text-sm text-gray-500 mb-2">Paste sync code from other device:</div>
+                <textarea id="sync-import-code"
+                    class="w-full h-32 p-3 border-2 border-gray-200 rounded-xl font-mono text-xs resize-none focus:border-purple-500 outline-none"
+                    placeholder="Paste sync code here..."></textarea>
+                <button onclick="Sync.importCode()" class="btn bg-green-500 text-white w-full mt-3">
+                    <i class="fas fa-download mr-2"></i>Import & Sync
+                </button>
+                <div id="sync-import-status" class="text-sm mt-2 hidden"></div>
+            </div>
+
+            <button onclick="closeSyncModal()" class="btn bg-gray-200 text-gray-700 w-full mt-4">Close</button>
         </div>
     </div>
 </div>
@@ -937,6 +991,187 @@ function openChildSelectorModal() {
 
 function closeChildSelectorModal() {
     document.getElementById('child-selector-modal').classList.remove('active');
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// SYNC SYSTEM — Share codes between devices
+// ─────────────────────────────────────────────────────────────────────────
+const Sync = {
+    // Generate sync code from all data
+    generateCode() {
+        const data = {
+            v: '1.0',
+            ts: Date.now(),
+            profile: LDS.profile,
+            identities: LDS.identities,
+            session: Storage.getSession()
+        };
+
+        // Convert to JSON, then base64
+        const json = JSON.stringify(data);
+        const base64 = btoa(unescape(encodeURIComponent(json)));
+
+        // Add prefix for identification
+        return 'TQ1:' + base64;
+    },
+
+    // Parse and validate sync code
+    parseCode(code) {
+        try {
+            // Check prefix
+            if (!code.startsWith('TQ1:')) {
+                throw new Error('Invalid sync code format');
+            }
+
+            // Decode base64
+            const base64 = code.substring(4);
+            const json = decodeURIComponent(escape(atob(base64)));
+            const data = JSON.parse(json);
+
+            // Validate structure
+            if (!data.v || !data.profile || !data.identities) {
+                throw new Error('Invalid sync code structure');
+            }
+
+            return data;
+        } catch (e) {
+            console.error('Sync parse error:', e);
+            return null;
+        }
+    },
+
+    // Show export or import tab
+    showTab(tab) {
+        const exportBtn = document.getElementById('sync-tab-export');
+        const importBtn = document.getElementById('sync-tab-import');
+        const exportPanel = document.getElementById('sync-export-panel');
+        const importPanel = document.getElementById('sync-import-panel');
+
+        if (tab === 'export') {
+            exportBtn.className = 'flex-1 py-2 px-4 rounded-lg bg-purple-500 text-white font-semibold';
+            importBtn.className = 'flex-1 py-2 px-4 rounded-lg bg-gray-200 text-gray-700 font-semibold';
+            exportPanel.classList.remove('hidden');
+            importPanel.classList.add('hidden');
+        } else {
+            importBtn.className = 'flex-1 py-2 px-4 rounded-lg bg-purple-500 text-white font-semibold';
+            exportBtn.className = 'flex-1 py-2 px-4 rounded-lg bg-gray-200 text-gray-700 font-semibold';
+            importPanel.classList.remove('hidden');
+            exportPanel.classList.add('hidden');
+        }
+    },
+
+    // Copy code to clipboard
+    async copyCode() {
+        const code = document.getElementById('sync-export-code').value;
+        try {
+            await navigator.clipboard.writeText(code);
+            const status = document.getElementById('sync-copy-status');
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+        } catch (e) {
+            // Fallback for older browsers
+            document.getElementById('sync-export-code').select();
+            document.execCommand('copy');
+            const status = document.getElementById('sync-copy-status');
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+        }
+    },
+
+    // Import code from another device
+    importCode() {
+        const code = document.getElementById('sync-import-code').value.trim();
+        const status = document.getElementById('sync-import-status');
+
+        if (!code) {
+            status.className = 'text-red-500 text-sm mt-2';
+            status.textContent = '❌ Please paste a sync code';
+            status.classList.remove('hidden');
+            return;
+        }
+
+        const data = this.parseCode(code);
+
+        if (!data) {
+            status.className = 'text-red-500 text-sm mt-2';
+            status.textContent = '❌ Invalid sync code. Please check and try again.';
+            status.classList.remove('hidden');
+            return;
+        }
+
+        // Show confirmation with data preview
+        const child = data.identities.children[0];
+        const childName = child ? child.name : 'Unknown';
+        const level = data.profile.level || 1;
+        const xp = data.profile.totalXpEarned || 0;
+        const syncDate = new Date(data.ts).toLocaleString();
+
+        const confirm = window.confirm(
+            `Import data from another device?\n\n` +
+            `Child: ${childName}\n` +
+            `Level: ${level}\n` +
+            `Total XP: ${xp}\n` +
+            `Synced: ${syncDate}\n\n` +
+            `⚠️ This will REPLACE all data on this device!`
+        );
+
+        if (!confirm) {
+            status.className = 'text-gray-500 text-sm mt-2';
+            status.textContent = 'Import cancelled';
+            status.classList.remove('hidden');
+            return;
+        }
+
+        // Import the data
+        try {
+            // Save all data
+            Object.assign(LDS.profile, data.profile);
+            Object.assign(LDS.identities, data.identities);
+
+            Storage.save();
+            Storage.saveIdentities();
+
+            if (data.session) {
+                Storage.saveSession(data.session);
+                Identity.currentUserId = data.session.userId;
+                Identity.currentUserRole = data.session.role;
+                Identity.currentChildId = data.session.childId;
+            }
+
+            status.className = 'text-green-500 text-sm mt-2';
+            status.textContent = '✅ Data imported successfully! Reloading...';
+            status.classList.remove('hidden');
+
+            // Reload after brief delay
+            setTimeout(() => location.reload(), 1500);
+
+        } catch (e) {
+            status.className = 'text-red-500 text-sm mt-2';
+            status.textContent = '❌ Import failed: ' + e.message;
+            status.classList.remove('hidden');
+        }
+    }
+};
+
+function openSyncModal() {
+    closeCareTeamModal();
+    document.getElementById('sync-modal').classList.add('active');
+
+    // Generate and display the export code
+    const code = Sync.generateCode();
+    document.getElementById('sync-export-code').value = code;
+
+    // Reset import panel
+    document.getElementById('sync-import-code').value = '';
+    document.getElementById('sync-import-status').classList.add('hidden');
+    document.getElementById('sync-copy-status').classList.add('hidden');
+
+    // Show export tab by default
+    Sync.showTab('export');
+}
+
+function closeSyncModal() {
+    document.getElementById('sync-modal').classList.remove('active');
 }
 
 // ─────────────────────────────────────────────────────────────────────────
