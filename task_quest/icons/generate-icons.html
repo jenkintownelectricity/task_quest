@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Quest Icon Generator</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        h1 { color: #6366f1; }
+        .icon-preview {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .icon-preview canvas {
+            border: 2px solid #333;
+            border-radius: 20%;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #4f46e5; }
+        .instructions {
+            background: #2a2a3e;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Quest Icon Generator</h1>
+
+    <div class="instructions">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Click "Generate All Icons" to create icons</li>
+            <li>Click "Download All" to save them</li>
+            <li>Place the downloaded files in the <code>icons/</code> folder</li>
+        </ol>
+    </div>
+
+    <button onclick="generateAllIcons()">Generate All Icons</button>
+    <button onclick="downloadAll()">Download All</button>
+
+    <div id="previews"></div>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const canvases = {};
+
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const s = size;
+
+            // Background gradient
+            const bgGrad = ctx.createLinearGradient(0, 0, s, s);
+            bgGrad.addColorStop(0, '#6366f1');
+            bgGrad.addColorStop(1, '#8b5cf6');
+
+            // Draw rounded square background
+            ctx.fillStyle = bgGrad;
+            roundRect(ctx, 0, 0, s, s, s * 0.2);
+            ctx.fill();
+
+            // Inner glow
+            ctx.fillStyle = 'rgba(255,255,255,0.1)';
+            ctx.beginPath();
+            ctx.arc(s/2, s/2, s * 0.39, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Checkmark
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = s * 0.06;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(s * 0.35, s * 0.5);
+            ctx.lineTo(s * 0.45, s * 0.6);
+            ctx.lineTo(s * 0.66, s * 0.38);
+            ctx.stroke();
+
+            // Star
+            const starGrad = ctx.createLinearGradient(s*0.68, s*0.18, s*0.82, s*0.38);
+            starGrad.addColorStop(0, '#fbbf24');
+            starGrad.addColorStop(1, '#f59e0b');
+            ctx.fillStyle = starGrad;
+            drawStar(ctx, s * 0.74, s * 0.28, s * 0.08, 5);
+
+            // XP Badge
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.arc(s * 0.78, s * 0.74, s * 0.1, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${s * 0.06}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('XP', s * 0.78, s * 0.75);
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function drawStar(ctx, cx, cy, r, points) {
+            ctx.beginPath();
+            for (let i = 0; i < points * 2; i++) {
+                const radius = i % 2 === 0 ? r : r * 0.5;
+                const angle = (i * Math.PI / points) - Math.PI / 2;
+                const x = cx + Math.cos(angle) * radius;
+                const y = cy + Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function generateAllIcons() {
+            const container = document.getElementById('previews');
+            container.innerHTML = '';
+
+            sizes.forEach(size => {
+                const div = document.createElement('div');
+                div.className = 'icon-preview';
+
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                canvas.style.width = Math.min(size, 128) + 'px';
+                canvas.style.height = Math.min(size, 128) + 'px';
+
+                drawIcon(canvas, size);
+                canvases[size] = canvas;
+
+                const label = document.createElement('div');
+                label.textContent = `${size}x${size}`;
+
+                div.appendChild(canvas);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        function downloadAll() {
+            sizes.forEach(size => {
+                const canvas = canvases[size];
+                if (!canvas) return;
+
+                const link = document.createElement('a');
+                link.download = `icon-${size}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Generate on load
+        generateAllIcons();
+    </script>
+</body>
+</html>
