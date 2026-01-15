@@ -1,0 +1,145 @@
+{
+  "$lds": {
+    "v": "1.0.0",
+    "type": "fast_brain.router",
+    "id": "lds:voice/fast-brain-router-v1",
+    "created": "2026-01-15T00:00:00Z",
+    "origin": "hive215-premier-voice"
+  },
+
+  "router": {
+    "name": "Fast Brain LLM Router",
+    "description": "Intelligent routing between fast (Groq) and powerful (Claude) models",
+    "version": "1.0.0",
+    "default_model": "groq:llama-3.3-70b-versatile"
+  },
+
+  "models": {
+    "groq": {
+      "provider": "groq",
+      "api_base": "https://api.groq.com/openai/v1",
+      "key_env": "GROQ_API_KEY",
+      "models": {
+        "instant": {
+          "id": "llama-3.1-8b-instant",
+          "max_tokens": 8192,
+          "speed": "fastest",
+          "use_for": ["simple_queries", "quick_confirmations", "basic_lookups"]
+        },
+        "versatile": {
+          "id": "llama-3.3-70b-versatile",
+          "max_tokens": 32768,
+          "speed": "fast",
+          "use_for": ["general_tasks", "intent_classification", "conversation"]
+        },
+        "reasoning": {
+          "id": "deepseek-r1-distill-llama-70b",
+          "max_tokens": 16384,
+          "speed": "moderate",
+          "use_for": ["complex_reasoning", "planning", "analysis"]
+        }
+      }
+    },
+    "anthropic": {
+      "provider": "anthropic",
+      "api_base": "https://api.anthropic.com/v1",
+      "key_env": "ANTHROPIC_API_KEY",
+      "models": {
+        "sonnet": {
+          "id": "claude-sonnet-4-20250514",
+          "max_tokens": 8192,
+          "speed": "moderate",
+          "use_for": ["complex_tasks", "creative_content", "detailed_analysis"]
+        },
+        "opus": {
+          "id": "claude-opus-4-5-20251101",
+          "max_tokens": 32000,
+          "speed": "slow",
+          "use_for": ["most_complex_tasks", "system_design", "critical_decisions"]
+        },
+        "haiku": {
+          "id": "claude-3-5-haiku-20241022",
+          "max_tokens": 8192,
+          "speed": "fast",
+          "use_for": ["quick_classification", "simple_formatting", "validation"]
+        }
+      }
+    }
+  },
+
+  "routing_rules": {
+    "by_complexity": [
+      {
+        "complexity": "trivial",
+        "description": "Yes/no, confirmations, simple lookups",
+        "route": "groq:instant",
+        "latency_target_ms": 200
+      },
+      {
+        "complexity": "simple",
+        "description": "Task status, point checks, basic commands",
+        "route": "groq:versatile",
+        "latency_target_ms": 500
+      },
+      {
+        "complexity": "moderate",
+        "description": "Multi-step reasoning, recommendations",
+        "route": "groq:reasoning",
+        "latency_target_ms": 2000
+      },
+      {
+        "complexity": "complex",
+        "description": "Creative responses, detailed explanations",
+        "route": "anthropic:sonnet",
+        "latency_target_ms": 5000
+      },
+      {
+        "complexity": "critical",
+        "description": "System changes, important decisions",
+        "route": "anthropic:opus",
+        "latency_target_ms": 15000
+      }
+    ],
+
+    "by_intent": {
+      "complete_task": "groq:instant",
+      "check_progress": "groq:instant",
+      "view_rewards": "groq:instant",
+      "start_timer": "groq:instant",
+      "help": "groq:versatile",
+      "explain_task": "anthropic:haiku",
+      "motivate": "anthropic:haiku",
+      "plan_day": "groq:reasoning",
+      "parent_report": "anthropic:sonnet",
+      "system_config": "anthropic:opus"
+    },
+
+    "fallback_chain": [
+      "groq:versatile",
+      "anthropic:haiku",
+      "anthropic:sonnet"
+    ]
+  },
+
+  "optimization": {
+    "cache_responses": true,
+    "cache_ttl_seconds": 300,
+    "parallel_calls": false,
+    "retry_on_failure": true,
+    "max_retries": 2,
+    "timeout_ms": 30000
+  },
+
+  "cost_tracking": {
+    "enabled": true,
+    "budget_monthly_usd": 50,
+    "alert_threshold_percent": 80,
+    "prefer_cheap_models": true
+  },
+
+  "inference": {
+    "receives_from": ["L4_CURRENT"],
+    "outputs_to": ["L4_CURRENT"],
+    "requires": ["api_keys", "intent_classification"]
+  }
+}

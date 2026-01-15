@@ -1,0 +1,81 @@
+{
+  "$lds": {
+    "v": "1.0.0",
+    "type": "kernel.orchestrator",
+    "id": "lds:voice/L0-kernel-v1",
+    "created": "2026-01-15T00:00:00Z",
+    "authority": "L0",
+    "origin": "task-quest-hive215"
+  },
+
+  "kernel": {
+    "name": "L0 Voice Kernel",
+    "description": "Root orchestrator for 5-layer Ocean Data Flow architecture",
+    "version": "1.0.0",
+    "governance": {
+      "chain": "L0 Human → L1 Abyss → L2 Deep → L3 Thermocline → L4 Current → L5 Surface",
+      "constraint": "Authority flows DOWN only. Data flows UP for decisions."
+    }
+  },
+
+  "layers": {
+    "L5_SURFACE": {
+      "name": "Mouth (TTS/Output)",
+      "sense": "speech",
+      "direction": "outbound",
+      "components": ["text_to_speech", "voice_synthesis", "response_formatter"],
+      "module": "./L5_surface.lds.json"
+    },
+    "L4_CURRENT": {
+      "name": "Intent (Action Processing)",
+      "sense": "understanding",
+      "direction": "processing",
+      "components": ["intent_classifier", "action_executor", "tool_router"],
+      "module": "./L4_current.lds.json"
+    },
+    "L3_THERMOCLINE": {
+      "name": "Context (Working Memory)",
+      "sense": "memory",
+      "direction": "state",
+      "components": ["context_manager", "session_state", "conversation_history"],
+      "module": "./L3_thermocline.lds.json"
+    },
+    "L2_DEEP": {
+      "name": "Knowledge (Entity Store)",
+      "sense": "knowledge",
+      "direction": "reference",
+      "components": ["entity_resolver", "lds_loader", "vector_search"],
+      "module": "./L2_deep.lds.json"
+    },
+    "L1_ABYSS": {
+      "name": "Persistence (Database)",
+      "sense": "storage",
+      "direction": "persist",
+      "components": ["supabase_client", "local_storage", "sync_manager"],
+      "module": "./L1_abyss.lds.json"
+    }
+  },
+
+  "fast_brain": {
+    "enabled": true,
+    "module": "./fast_brain/router.lds.json",
+    "routing": {
+      "quick_tasks": "groq:llama-3.1-8b-instant",
+      "complex_tasks": "claude:opus-4",
+      "default": "groq:llama-3.3-70b-versatile"
+    }
+  },
+
+  "ocean_data_flow": {
+    "description": "Data flows like ocean currents between layers",
+    "upward_flow": "Persistence → Knowledge → Context → Intent → Output",
+    "downward_flow": "Commands → Processing → State → Storage",
+    "thermal_mixing": "L3 Thermocline bridges warm surface activity with cold deep storage"
+  },
+
+  "inference": {
+    "relates_to": ["lds:tasks/daily-v1", "lds:achievements/badges-v1", "lds:rewards/shop-v1"],
+    "implies": ["voice-enabled", "llm-routing", "multi-layer-architecture"],
+    "requires": ["supabase-connection", "tts-engine", "llm-api-keys"]
+  }
+}

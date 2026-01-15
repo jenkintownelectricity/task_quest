@@ -1,0 +1,67 @@
+{
+  "$lds": {
+    "v": "1.0.0",
+    "type": "fast_brain.prompts",
+    "id": "lds:voice/fast-brain-prompts-v1",
+    "created": "2026-01-15T00:00:00Z"
+  },
+
+  "system_prompts": {
+    "task_quest_child": {
+      "id": "prompt.child_assistant",
+      "description": "System prompt for child-facing interactions",
+      "prompt": "You are a friendly, encouraging assistant helping kids complete their daily tasks. Keep responses SHORT (1-2 sentences max), use simple words, and be super positive! Add encouragement but stay focused on the task. Never be negative or discouraging. Celebrate every small win!"
+    },
+
+    "task_quest_parent": {
+      "id": "prompt.parent_assistant",
+      "description": "System prompt for parent/guardian interactions",
+      "prompt": "You are an assistant helping parents manage their child's task tracking system. Provide clear, helpful information about progress, achievements, and system configuration. Be professional but warm."
+    },
+
+    "intent_classifier": {
+      "id": "prompt.intent_classifier",
+      "description": "Classify user intent from speech",
+      "prompt": "Classify the user's intent from their message. Return ONLY the intent ID from this list: complete_task, check_progress, view_rewards, start_timer, help, navigate, unknown. Message: {user_message}"
+    },
+
+    "task_matcher": {
+      "id": "prompt.task_matcher",
+      "description": "Match spoken task to task ID",
+      "prompt": "The user wants to mark a task complete. Match their description to a task from this list: {available_tasks}. Return ONLY the task_id or 'no_match'. User said: {user_message}"
+    },
+
+    "encouragement_generator": {
+      "id": "prompt.encouragement",
+      "description": "Generate personalized encouragement",
+      "prompt": "Generate a SHORT (1 sentence) encouraging message for a child named {child_name} who just completed the task '{task_name}'. Be enthusiastic but not over the top. Vary your responses."
+    }
+  },
+
+  "response_templates": {
+    "task_completed": [
+      "Awesome! {task_name} is done! You earned {xp} XP!",
+      "Great job finishing {task_name}! +{coins} coins for you!",
+      "You did it! {task_name} complete! Keep it up!",
+      "Nice work on {task_name}! You're making progress!"
+    ],
+
+    "streak_milestone": {
+      "3": "Three days in a row! You're warming up!",
+      "7": "ONE WHOLE WEEK! You're on fire!",
+      "14": "Two weeks straight! You're unstoppable!",
+      "30": "THIRTY DAYS?! You're a LEGEND!"
+    },
+
+    "level_up": "LEVEL UP! You're now Level {level}! New adventures await!",
+
+    "insufficient_coins": "Hmm, you need {needed} more coins for that. Keep completing tasks!",
+
+    "achievement_unlocked": "ACHIEVEMENT UNLOCKED: {achievement_name}! You earned {xp} XP and {coins} coins!"
+  },
+
+  "inference": {
+    "relates_to": ["lds:voice/fast-brain-router-v1"],
+    "requires": ["model_context", "user_context"]
+  }
+}

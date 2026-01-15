@@ -1,0 +1,79 @@
+{
+  "$lds": {
+    "v": "1.0.0",
+    "type": "layer.surface",
+    "id": "lds:voice/L5-surface-v1",
+    "created": "2026-01-15T00:00:00Z",
+    "layer": 5,
+    "name": "SURFACE"
+  },
+
+  "layer": {
+    "name": "L5 Surface - Mouth",
+    "sense": "Speech Output",
+    "ocean_metaphor": "The visible surface where all output emerges",
+    "temperature": "warm",
+    "flow": "outbound"
+  },
+
+  "components": {
+    "text_to_speech": {
+      "id": "tts.engine",
+      "providers": [
+        {"name": "browser", "api": "SpeechSynthesis", "fallback": true},
+        {"name": "elevenlabs", "api": "elevenlabs/v1", "quality": "premium"},
+        {"name": "openai", "api": "openai/tts-1", "quality": "standard"}
+      ],
+      "default_provider": "browser",
+      "voice_settings": {
+        "rate": 1.0,
+        "pitch": 1.0,
+        "volume": 1.0,
+        "voice_id": null
+      }
+    },
+
+    "response_formatter": {
+      "id": "formatter.output",
+      "modes": {
+        "child_friendly": {
+          "max_sentence_length": 15,
+          "vocabulary_level": "simple",
+          "encouragement_phrases": true
+        },
+        "parent_mode": {
+          "max_sentence_length": 30,
+          "vocabulary_level": "standard",
+          "detail_level": "full"
+        }
+      }
+    },
+
+    "celebration_sounds": {
+      "task_complete": "ding.mp3",
+      "level_up": "fanfare.mp3",
+      "streak_milestone": "achievement.mp3",
+      "error": "gentle_error.mp3"
+    }
+  },
+
+  "output_templates": {
+    "task_completion": "Great job completing {task_name}! You earned {xp} XP and {coins} coins!",
+    "streak_update": "Amazing! You're on a {streak_count} day streak!",
+    "level_up": "Congratulations! You reached Level {level}!",
+    "reward_purchase": "You bought {reward_name} for {cost} coins. Enjoy!",
+    "encouragement": [
+      "You're doing great!",
+      "Keep it up!",
+      "You're a star!",
+      "Way to go!",
+      "Super job!"
+    ]
+  },
+
+  "inference": {
+    "receives_from": ["L4_CURRENT"],
+    "outputs_to": ["user.audio", "user.visual"],
+    "requires": ["formatted_response", "voice_config"]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$lds": {
+    "v": "1.0.0",
+    "type": "layer.current",
+    "id": "lds:voice/L4-current-v1",
+    "created": "2026-01-15T00:00:00Z",
+    "layer": 4,
+    "name": "CURRENT"
+  },
+
+  "layer": {
+    "name": "L4 Current - Intent Processing",
+    "sense": "Understanding",
+    "ocean_metaphor": "The active currents that drive action and movement",
+    "temperature": "variable",
+    "flow": "processing"
+  },
+
+  "components": {
+    "intent_classifier": {
+      "id": "intent.classifier",
+      "model": "fast_brain",
+      "intents": [
+        {"id": "complete_task", "triggers": ["done", "finished", "completed", "did it"]},
+        {"id": "check_progress", "triggers": ["how am I doing", "my points", "my level"]},
+        {"id": "view_rewards", "triggers": ["rewards", "shop", "what can I buy"]},
+        {"id": "start_timer", "triggers": ["start timer", "set timer", "countdown"]},
+        {"id": "help", "triggers": ["help", "what do I do", "I'm stuck"]},
+        {"id": "navigate", "triggers": ["go to", "show me", "open"]}
+      ],
+      "confidence_threshold": 0.7
+    },
+
+    "action_executor": {
+      "id": "action.executor",
+      "actions": {
+        "complete_task": {
+          "handler": "task_completion_handler",
+          "requires": ["task_id", "profile_id"],
+          "updates": ["L1_ABYSS.tq_task_completions", "L1_ABYSS.tq_profiles"]
+        },
+        "purchase_reward": {
+          "handler": "reward_purchase_handler",
+          "requires": ["reward_id", "profile_id", "cost"],
+          "validates": ["sufficient_coins"]
+        },
+        "check_achievements": {
+          "handler": "achievement_checker",
+          "triggers_on": ["task_completion", "level_up", "streak_update"]
+        }
+      }
+    },
+
+    "tool_router": {
+      "id": "tool.router",
+      "available_tools": [
+        {"name": "task_manager", "for": "task CRUD operations"},
+        {"name": "reward_shop", "for": "viewing/purchasing rewards"},
+        {"name": "achievement_tracker", "for": "checking/unlocking achievements"},
+        {"name": "timer", "for": "visual countdown timers"},
+        {"name": "lds_viewer", "for": "parent entity management"}
+      ]
+    }
+  },
+
+  "inference": {
+    "receives_from": ["L3_THERMOCLINE", "user.speech"],
+    "outputs_to": ["L5_SURFACE", "L1_ABYSS"],
+    "requires": ["intent_data", "context", "user_profile"]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "$lds": {
+    "v": "1.0.0",
+    "type": "layer.deep",
+    "id": "lds:voice/L2-deep-v1",
+    "created": "2026-01-15T00:00:00Z",
+    "layer": 2,
+    "name": "DEEP"
+  },
+
+  "layer": {
+    "name": "L2 Deep - Knowledge & Entities",
+    "sense": "Knowledge",
+    "ocean_metaphor": "The deep waters where knowledge resides, cold and stable",
+    "temperature": "cold",
+    "flow": "reference"
+  },
+
+  "components": {
+    "entity_resolver": {
+      "id": "entity.resolver",
+      "entity_sources": [
+        {"type": "embedded", "path": "../entities/*.lds.json"},
+        {"type": "database", "table": "tq_profiles"},
+        {"type": "database", "table": "tq_task_completions"},
+        {"type": "database", "table": "tq_achievements_unlocked"}
+      ],
+      "resolution_order": ["cache", "embedded", "database"]
+    },
+
+    "lds_loader": {
+      "id": "lds.loader",
+      "entity_registry": {
+        "profiles": "lds:profile/*",
+        "tasks": "lds:tasks/*",
+        "achievements": "lds:achievements/*",
+        "rewards": "lds:rewards/*",
+        "levels": "lds:levels/*",
+        "roles": "lds:roles/*",
+        "compliance": "lds:compliance/*"
+      },
+      "lazy_load": true,
+      "cache_ttl": 3600
+    },
+
+    "vector_search": {
+      "id": "vector.search",
+      "enabled": false,
+      "description": "Optional semantic search over entities",
+      "provider": "supabase_pgvector",
+      "use_cases": ["find_similar_tasks", "recommendation_engine"]
+    },
+
+    "knowledge_graph": {
+      "id": "knowledge.graph",
+      "relationships": [
+        {"from": "profile", "to": "task_completions", "type": "has_completed"},
+        {"from": "profile", "to": "achievements", "type": "has_unlocked"},
+        {"from": "profile", "to": "rewards", "type": "has_purchased"},
+        {"from": "task", "to": "achievement", "type": "contributes_to"},
+        {"from": "profile", "to": "family", "type": "belongs_to"}
+      ]
+    }
+  },
+
+  "embedded_entities": {
+    "tasks_daily": "../entities/tasks-daily.lds.json",
+    "achievements": "../entities/achievements.lds.json",
+    "rewards_shop": "../entities/rewards-shop.lds.json",
+    "levels": "../entities/levels.lds.json",
+    "roles_rbac": "../entities/roles-rbac.lds.json",
+    "compliance_hipaa": "../entities/compliance-hipaa.lds.json",
+    "profile_armand": "../entities/profile-armand-lefebvre.lds.json"
+  },
+
+  "inference": {
+    "receives_from": ["L1_ABYSS", "L3_THERMOCLINE"],
+    "outputs_to": ["L3_THERMOCLINE"],
+    "requires": ["entity_type", "entity_id"]
+  }
+}

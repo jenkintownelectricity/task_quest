@@ -1,0 +1,77 @@
+{
+  "$lds": {
+    "v": "1.0.0",
+    "type": "layer.thermocline",
+    "id": "lds:voice/L3-thermocline-v1",
+    "created": "2026-01-15T00:00:00Z",
+    "layer": 3,
+    "name": "THERMOCLINE"
+  },
+
+  "layer": {
+    "name": "L3 Thermocline - Context & Memory",
+    "sense": "Memory",
+    "ocean_metaphor": "The boundary layer where warm surface meets cold depths - rapid state changes",
+    "temperature": "transitional",
+    "flow": "bidirectional"
+  },
+
+  "components": {
+    "context_manager": {
+      "id": "context.manager",
+      "session_context": {
+        "current_user": null,
+        "current_view": "dashboard",
+        "active_task": null,
+        "timer_state": null,
+        "last_interaction": null
+      },
+      "ttl_seconds": 3600
+    },
+
+    "conversation_history": {
+      "id": "conversation.history",
+      "max_turns": 10,
+      "storage": "session",
+      "includes": ["user_utterance", "intent", "response", "timestamp"]
+    },
+
+    "working_memory": {
+      "id": "working.memory",
+      "slots": {
+        "today_tasks": [],
+        "completed_today": [],
+        "pending_approvals": [],
+        "active_streaks": {},
+        "recent_achievements": []
+      },
+      "refresh_triggers": ["session_start", "task_completion", "day_change"]
+    },
+
+    "state_machine": {
+      "id": "state.machine",
+      "states": [
+        {"id": "idle", "description": "Waiting for user input"},
+        {"id": "listening", "description": "Processing voice input"},
+        {"id": "thinking", "description": "LLM processing"},
+        {"id": "speaking", "description": "TTS output active"},
+        {"id": "timer_active", "description": "Countdown in progress"},
+        {"id": "focus_mode", "description": "Single task focus active"}
+      ],
+      "current": "idle"
+    }
+  },
+
+  "thermal_mixing": {
+    "description": "Manages data flow between warm surface (L4-L5) and cold depths (L1-L2)",
+    "upward_cache": "Frequently accessed entities cached for fast retrieval",
+    "downward_persist": "Important state changes persisted to L1 Abyss",
+    "mixing_events": ["task_completion", "session_end", "manual_sync"]
+  },
+
+  "inference": {
+    "receives_from": ["L2_DEEP", "L4_CURRENT"],
+    "outputs_to": ["L4_CURRENT", "L2_DEEP"],
+    "requires": ["session_id", "profile_id"]
+  }
+}
