@@ -6,10 +6,10 @@ import type {
 import {
   getAllTasks, putTask, deleteTask as dbDeleteTask,
   getAllEdges, putEdge, deleteEdge as dbDeleteEdge,
-  getAllRoutines, putRoutine,
+  getAllRoutines,
   getAllAuditEntries, appendAudit,
   getPreferences, putPreferences,
-  isSeeded, importKernel,
+  isSeeded, importKernel, exportKernel,
 } from './db';
 import { seedTasks, seedEdges, seedRoutines, seedAuditLog, defaultPreferences } from '../data/seed';
 import { generateId, computeHash } from '../utils/canonical';
@@ -126,7 +126,7 @@ interface AppContextValue {
   editTask: (id: string | null) => void;
   showEditor: (show: boolean) => void;
   logAudit: (action: AuditAction, entityType: AuditEntry['entity_type'], entityId: string, details?: Record<string, unknown>) => Promise<void>;
-  exportAllData: () => Promise<string>;
+  exportAllData: () => Promise<Record<string, unknown>>;
   importData: (json: string) => Promise<void>;
 }
 
@@ -209,7 +209,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     task.$lds.content_hash = await computeHash(task);
     await putTask(task);
     dispatch({ type: 'UPSERT_TASK', payload: task });
-    await logAudit('task_edited', 'task', task.$lds.id, { title: task.title });
+    await logAudit('task_updated', 'task', task.$lds.id, { title: task.title });
   }, [logAudit]);
 
   const completeTask = useCallback(async (taskId: string) => {
@@ -268,7 +268,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const updated = { ...state.preferences, ...partial };
     await putPreferences(updated);
     dispatch({ type: 'SET_PREFERENCES', payload: updated });
-  }, [state.preferences]);
+    await logAudit('preferences_updated', 'kernel', 'user_prefs', { changed: Object.keys(partial) });
+  }, [state.preferences, logAudit]);
 
   const setView = useCallback((view: ViewType) => {
     dispatch({ type: 'SET_VIEW', payload: view });
@@ -286,10 +287,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SHOW_EDITOR', payload: show });
   }, []);
 
-  const exportAllData = useCallback(async (): Promise<string> => {
+  const exportAllData = useCallback(async (): Promise<Record<string, unknown>> => {
     const data = await exportKernel();
-    await logAudit('kernel_exported', 'kernel', 'full_export');
-    return JSON.stringify(data, null, 2);
+    await logAudit('kernel_exported', 'kernel', 'full_export', { counts: { tasks: data.tasks?.length ?? 0 } });
+    return data as Record<string, unknown>;
   }, [logAudit]);
 
   const importData = useCallback(async (json: string) => {

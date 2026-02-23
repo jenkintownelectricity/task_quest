@@ -4,6 +4,35 @@ import { useApp } from '../store/context';
 import { getTheme, themes, type ThemeName } from '../utils/theme';
 import type { ViewType } from '../types/kernel';
 
+function downloadTextFile(filename: string, text: string) {
+  const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 250);
+}
+
+function safeJSONStringify(obj: unknown) {
+  const seen = new WeakSet();
+  return JSON.stringify(
+    obj,
+    (_key, value) => {
+      if (typeof value === 'function') return undefined;
+      if (value === undefined) return undefined;
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) return undefined;
+        seen.add(value);
+      }
+      return value;
+    },
+    2
+  );
+}
+
 export function Settings() {
   const { state, updatePreferences, exportAllData, importData } = useApp();
   const theme = getTheme(state.preferences.theme);
@@ -13,14 +42,14 @@ export function Settings() {
   const [saved, setSaved] = useState(false);
 
   const handleExport = async () => {
-    const json = await exportAllData();
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `kerneladhd-export-${new Date().toISOString().split('T')[0]}.lds.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const exported = await exportAllData();
+      const json = safeJSONStringify(exported);
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadTextFile(`kerneladhd.export.${stamp}.lds.json`, json);
+    } catch (err) {
+      console.error('Export failed:', err);
+    }
   };
 
   const handleImport = () => {

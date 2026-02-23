@@ -5,6 +5,7 @@ import { FocusView } from './components/FocusView';
 import { GraphView } from './components/GraphView';
 import { TimelineView } from './components/TimelineView';
 import { HistoryView } from './components/HistoryView';
+import { CalendarView } from './components/CalendarView';
 import { Settings } from './components/Settings';
 import { TaskEditor } from './components/TaskEditor';
 import { AIAssist } from './components/AIAssist';
@@ -56,6 +57,8 @@ function AppContent() {
         return <GraphView />;
       case 'timeline':
         return <TimelineView />;
+      case 'calendar':
+        return <CalendarView />;
       case 'history':
         return <HistoryView />;
       case 'settings' as string:

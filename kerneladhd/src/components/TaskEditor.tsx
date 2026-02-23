@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Save } from 'lucide-react';
 import { useApp } from '../store/context';
-import type { Task, EnergyLevel, Importance, MicroStep } from '../types/kernel';
+import type { EnergyLevel, Importance, MicroStep } from '../types/kernel';
 import { getTheme } from '../utils/theme';
 import { generateId } from '../utils/canonical';
 

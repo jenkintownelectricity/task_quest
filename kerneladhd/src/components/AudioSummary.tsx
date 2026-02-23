@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Volume2, VolumeX, Loader } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useApp } from '../store/context';
 import { getTheme } from '../utils/theme';
 

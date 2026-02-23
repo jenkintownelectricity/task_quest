@@ -70,6 +70,7 @@ export interface AuditEntry {
 
 export type AuditAction =
   | 'task_created'
+  | 'task_updated'
   | 'task_edited'
   | 'task_completed'
   | 'task_deferred'
@@ -80,6 +81,7 @@ export type AuditAction =
   | 'edge_deleted'
   | 'kernel_imported'
   | 'kernel_exported'
+  | 'preferences_updated'
   | 'ai_suggestion_accepted'
   | 'ai_suggestion_rejected';
 
@@ -93,7 +95,7 @@ export interface UserPreferences {
   ai_provider: 'groq' | 'anthropic' | 'openai';
 }
 
-export type ViewType = 'list' | 'focus' | 'graph' | 'timeline' | 'history';
+export type ViewType = 'list' | 'focus' | 'graph' | 'timeline' | 'calendar' | 'history';
 
 export interface AppState {
   tasks: Task[];

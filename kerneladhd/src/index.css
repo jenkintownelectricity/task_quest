@@ -116,6 +116,27 @@ select {
   }
 }
 
+/* Calendar responsive — mobile vertical list at <640px */
+@media (max-width: 639px) {
+  .calendar-week-grid {
+    display: none !important;
+  }
+
+  .calendar-week-mobile {
+    display: block !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .calendar-week-grid {
+    display: grid !important;
+  }
+
+  .calendar-week-mobile {
+    display: none !important;
+  }
+}
+
 /* Touch targets — ADHD-safe minimum */
 button, [role="button"] {
   min-height: 36px;

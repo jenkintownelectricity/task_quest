@@ -4,7 +4,7 @@ import { useApp } from '../store/context';
 import { getTheme } from '../utils/theme';
 
 export function AIAssist() {
-  const { state, logAudit, dispatch } = useApp();
+  const { state, logAudit } = useApp();
   const theme = getTheme(state.preferences.theme);
   const [isOpen, setIsOpen] = useState(false);
   const [prompt, setPrompt] = useState('');

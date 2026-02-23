@@ -1,5 +1,5 @@
 import {
-  List, Target, GitBranch, Clock, History, Settings as SettingsIcon, Menu, X,
+  List, Target, GitBranch, Clock, Calendar, History, Settings as SettingsIcon, Menu, X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useApp } from '../store/context';
@@ -16,6 +16,7 @@ const navItems: { view: ViewType | 'settings'; icon: typeof List; label: string 
   { view: 'focus', icon: Target, label: 'Focus' },
   { view: 'graph', icon: GitBranch, label: 'Graph' },
   { view: 'timeline', icon: Clock, label: 'Timeline' },
+  { view: 'calendar', icon: Calendar, label: 'Calendar' },
   { view: 'history', icon: History, label: 'History' },
   { view: 'settings', icon: SettingsIcon, label: 'Settings' },
 ];
@@ -178,7 +179,7 @@ export function Layout({ children }: LayoutProps) {
         }}
         className="mobile-nav"
       >
-        {navItems.slice(0, 5).map(({ view, icon: Icon, label }) => {
+        {navItems.slice(0, 6).map(({ view, icon: Icon, label }) => {
           const isActive = currentView === view;
           return (
             <button

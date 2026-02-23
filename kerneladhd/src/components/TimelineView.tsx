@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Calendar, Clock, Zap } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 import { useApp } from '../store/context';
 import { TaskCard } from './TaskCard';
 import { getTheme } from '../utils/theme';

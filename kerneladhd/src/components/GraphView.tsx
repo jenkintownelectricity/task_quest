@@ -4,6 +4,20 @@ import { useApp } from '../store/context';
 import { getTheme } from '../utils/theme';
 import type { Task } from '../types/kernel';
 
+function luminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const channels = [r, g, b].map((v) =>
+    v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
+  );
+  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+}
+
+function textColorFor(bgHex: string): string {
+  return luminance(bgHex) > 0.45 ? '#0b0b0b' : '#ffffff';
+}
+
 interface NodePos {
   x: number;
   y: number;
@@ -185,14 +199,17 @@ export function GraphView() {
       const isSelected = state.selectedTaskId === node.task.$lds.id;
       const r = isHovered || isSelected ? 28 : 24;
 
-      // Node circle
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = isSelected
+      // Determine node fill
+      const nodeFill = isSelected
         ? theme.primary
         : isHovered
           ? theme.primaryLight
           : theme.surface;
+
+      // Node circle
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = nodeFill;
       ctx.fill();
       ctx.strokeStyle = isSelected ? theme.primary : theme.border;
       ctx.lineWidth = 2;
@@ -206,15 +223,20 @@ export function GraphView() {
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      // Label
-      ctx.fillStyle = isSelected ? '#fff' : theme.text;
+      // Label — always readable against nodeFill
+      const labelColor = textColorFor(nodeFill);
+      const label = node.task.title.slice(0, 12) + (node.task.title.length > 12 ? '\u2026' : '');
+
       ctx.font = '11px system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      const label = node.task.title.length > 12
-        ? node.task.title.substring(0, 11) + '...'
-        : node.task.title;
+      // Outline stroke for readability on any background
+      ctx.lineWidth = 3;
+      ctx.strokeStyle =
+        labelColor === '#ffffff' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.55)';
+      ctx.strokeText(label, node.x, node.y + r + 16);
+      ctx.fillStyle = labelColor;
       ctx.fillText(label, node.x, node.y + r + 16);
     });
 
@@ -254,7 +276,7 @@ export function GraphView() {
   );
 
   const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
+    () => {
       if (hoveredNode) {
         selectTask(hoveredNode);
       }
@@ -263,7 +285,7 @@ export function GraphView() {
   );
 
   const handleDblClick = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
+    () => {
       if (hoveredNode) {
         editTask(hoveredNode);
       }
